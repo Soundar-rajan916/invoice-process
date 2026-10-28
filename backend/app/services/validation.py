@@ -40,6 +40,14 @@ def is_valid_gstin_checksum(gstin: str) -> bool:
     return gstin[14].upper() == expected_char
 
 
+def validate_gstin_checksum(gstin: str) -> bool:
+    return is_valid_gstin_checksum(gstin)
+
+
+def validate_gstin_format(gstin: str) -> bool:
+    return bool(GSTIN_FORMAT_REGEX.match(gstin.strip().upper()))
+
+
 def validate_extraction(
     extraction: InvoiceExtraction,
     known_suppliers: dict[str, str] | None = None,  # gstin -> supplier_name

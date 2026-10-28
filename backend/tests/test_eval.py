@@ -1,11 +1,8 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from pathlib import Path
 
 import numpy as np
-import pytest
-
 from eval.augment import augment_image
 from eval.metrics import (
     InvoiceEvalSample,
@@ -60,9 +57,7 @@ def test_sample_evaluation_hand_built():
             "sgst": 90.00,
             "igst": 0.00,
             "total": 1180.00,
-            "line_items": [
-                {"description": "Widget", "quantity": 10, "rate": 100, "amount": 1000}
-            ],
+            "line_items": [{"description": "Widget", "quantity": 10, "rate": 100, "amount": 1000}],
             "expected_flags": ["total_mismatch"],
         },
         predicted={
@@ -75,9 +70,7 @@ def test_sample_evaluation_hand_built():
             "sgst": 90.00,
             "igst": 0.00,
             "total": 1180.00,
-            "line_items": [
-                {"description": "Widget", "quantity": 10, "rate": 100, "amount": 1000}
-            ],
+            "line_items": [{"description": "Widget", "quantity": 10, "rate": 100, "amount": 1000}],
         },
         validation_issues=[
             {

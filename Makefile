@@ -43,10 +43,10 @@ lint:
 	$(PYTHON) -m ruff check backend eval mock_accounting
 
 typecheck:
-	$(PYTHON) -m mypy backend/app eval
+	$(PYTHON) -m mypy --explicit-package-bases backend/app eval mock_accounting
 
 test:
-	$(PYTHON) -m pytest backend/tests -v --cov=backend/app --cov-report=term-missing
+	$(PYTHON) -m pytest backend/tests -v
 
 eval:
 	$(PYTHON) -m eval.run --manifest data/synthetic/manifest.jsonl --inputs data/synthetic/pdfs --extractor mock --limit 200 --out eval/reports/

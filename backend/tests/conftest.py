@@ -79,3 +79,75 @@ async def mock_accounting_client() -> AsyncGenerator[AsyncClient, None]:
     transport = ASGITransport(app=mock_accounting_app)
     async with AsyncClient(transport=transport, base_url="http://mock-accounting") as c:
         yield c
+
+
+@pytest.fixture
+async def reviewer_user(db_session: AsyncSession):
+    import uuid
+
+    from app.core.security import hash_password
+    from app.models.entities import User
+
+    user = User(
+        id=uuid.uuid4(),
+        email="reviewer@test.com",
+        password_hash=hash_password("ReviewerPass123"),
+        role="reviewer",
+        is_active=True,
+    )
+    db_session.add(user)
+    await db_session.flush()
+    return user
+
+
+@pytest.fixture
+async def admin_user(db_session: AsyncSession):
+    import uuid
+
+    from app.core.security import hash_password
+    from app.models.entities import User
+
+    user = User(
+        id=uuid.uuid4(),
+        email="admin@test.com",
+        password_hash=hash_password("AdminPass123"),
+        role="admin",
+        is_active=True,
+    )
+    db_session.add(user)
+    await db_session.flush()
+    return user
+
+
+@pytest.fixture
+async def reviewer_client(
+    db_session: AsyncSession, reviewer_user
+) -> AsyncGenerator[AsyncClient, None]:
+    from app.core.security import create_access_token
+
+    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+        yield db_session
+
+    app.dependency_overrides[get_db_session] = override_get_db
+    token = create_access_token(reviewer_user.id, reviewer_user.role)
+    transport = ASGITransport(app=app)
+    async with AsyncClient(
+        transport=transport, base_url="http://test", cookies={"access_token": token}
+    ) as c:
+        yield c
+
+
+@pytest.fixture
+async def admin_client(db_session: AsyncSession, admin_user) -> AsyncGenerator[AsyncClient, None]:
+    from app.core.security import create_access_token
+
+    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+        yield db_session
+
+    app.dependency_overrides[get_db_session] = override_get_db
+    token = create_access_token(admin_user.id, admin_user.role)
+    transport = ASGITransport(app=app)
+    async with AsyncClient(
+        transport=transport, base_url="http://test", cookies={"access_token": token}
+    ) as c:
+        yield c

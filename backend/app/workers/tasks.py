@@ -49,3 +49,35 @@ def process_invoice(self: Any, invoice_id_str: str) -> dict[str, str]:
 
             asyncio.run(_mark_failed())
         raise self.retry(exc=exc) from exc
+
+
+@shared_task(
+    bind=True,
+    name="app.workers.tasks.push_invoice_task",
+    max_retries=3,
+    autoretry_for=(ConnectionError, TimeoutError),
+    retry_backoff=True,
+    retry_jitter=True,
+    acks_late=True,
+)
+def push_invoice_task(self: Any, invoice_id_str: str) -> dict[str, str]:
+    """Celery task executing idempotent push of approved invoice to accounting API."""
+    import uuid
+
+    from app.services.push import push_invoice
+
+    invoice_id = uuid.UUID(invoice_id_str)
+
+    async def _run() -> str:
+        async with async_session_maker() as session:
+            inv = await push_invoice(session, invoice_id)
+            return inv.status if inv else "SKIPPED"
+
+    try:
+        status = asyncio.run(_run())
+        return {"invoice_id": invoice_id_str, "status": status}
+    except Exception as exc:
+        logger.exception(
+            "Error executing push_invoice_task", invoice_id=invoice_id_str, error=str(exc)
+        )
+        raise self.retry(exc=exc) from exc

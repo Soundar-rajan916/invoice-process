@@ -55,11 +55,19 @@ def create_app() -> FastAPI:
     # Error Handlers (RFC 7807)
     register_error_handlers(app)
 
-    # Core Health & Readiness Routers
+    # Routers
     app.include_router(health_router)
+    from app.api.admin import router as admin_router
+    from app.api.auth import router as auth_router
     from app.api.files import router as files_router
+    from app.api.invoices import router as invoices_router
+    from app.api.metrics import router as metrics_router
 
     app.include_router(files_router)
+    app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(invoices_router, prefix="/api/v1")
+    app.include_router(metrics_router, prefix="/api/v1")
+    app.include_router(admin_router, prefix="/api/v1")
 
     return app
 
