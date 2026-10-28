@@ -73,7 +73,10 @@ ignore_missing_imports = true
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
-addopts = "-v --cov=app --cov-report=term-missing --cov-fail-under=85"
+markers = [
+    "slow: marks tests as slow load tests (run with -m slow)",
+]
+addopts = "-v --cov=app --cov-report=term-missing --cov-fail-under=85 -m 'not slow'"
 
 [tool.coverage.run]
 source = ["app"]

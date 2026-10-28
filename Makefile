@@ -53,6 +53,12 @@ eval:
 	$(PYTHON) -m eval.check --report eval/reports/report.json
 
 frontend-test:
-	cd web && npm test run
+	cd web && npm run test:run
 
-check: lint typecheck test
+frontend-lint:
+	cd web && npm run lint
+
+frontend-build:
+	cd web && npm run build
+
+check: lint typecheck test frontend-lint frontend-test frontend-build

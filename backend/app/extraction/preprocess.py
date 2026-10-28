@@ -28,7 +28,12 @@ def compute_blur_score(img_cv: np.ndarray) -> float:
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
     else:
         gray = img_cv
-    score = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+    h, w = gray.shape[:2]
+    max_dim = max(h, w)
+    if max_dim > 1200:
+        scale = 1200.0 / max_dim
+        gray = cv2.resize(gray, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+    score = float(cv2.Laplacian(gray, cv2.CV_32F).var())
     return score
 
 

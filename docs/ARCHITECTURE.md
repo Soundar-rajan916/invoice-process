@@ -96,3 +96,40 @@ flowchart TD
 | **Computer Vision** | PyMuPDF + OpenCV + Pillow | High-speed text extraction, deskewing, blur detection |
 | **LLM Provider** | Groq SDK (`AsyncGroq`) | Ultra-fast inference latency behind clean `Extractor` protocol |
 | **Frontend UI** | React 18 + Vite + TS + Tailwind | Component-driven review UI with zoom-pan-pinch document viewer |
+
+---
+
+## 4. Key Architectural Trade-Offs
+
+### 4.1 100% Human Review vs. Statistical Sampling
+- **Decision:** Mandate 100% human review via `NEEDS_REVIEW` with strict database check constraints preventing any automated bypass.
+- **Trade-off Analysis:** 
+  - *Automated Straight-Through Processing (STP) with Sampling:* Maximizes throughput and reduces human operator costs on clean, high-confidence invoices.
+  - *Universal Gate (InvoiceFlow approach):* In distributor wholesale operations, an undetected 10x quantity error or erroneous tax debit creates statutory GST penalties, buyer-supplier reconciliation disputes, and cash flow distortion. The operational overhead of 4 reviewers processing ~500 invoices/day (~2 minutes per invoice across a team) is vastly cheaper than recovering accounting discrepancies. R2 strictly prioritizes zero accounting contamination over marginal labor reduction.
+
+### 4.2 Groq Open LPUs vs. Proprietary Frontier Models (e.g. GPT-4o / Claude 3.5 Sonnet)
+- **Decision:** Call Groq directly via official Python SDK behind an abstract `Extractor` protocol.
+- **Trade-off Analysis:**
+  - *Frontier Cloud Models:* Offer marginally higher zero-shot parsing on obscure handwriting but incur 10x–30x higher inference cost and 3–8 second latency per call.
+  - *Groq Inference Engine:* Sub-second token generation latency enables interactive preprocessing and immediate multi-attempt JSON repair cycles during worker ingest. Model pricing permits running 2,000 month-end invoices at negligible cost. Downstream deterministic validation and repair retry prompts compensate for any minor zero-shot reasoning gaps.
+
+### 4.3 Text Path vs. Vision Path Routing
+- **Decision:** Two-tier automatic routing based on digital text presence (>= 80 characters/page).
+- **Trade-off Analysis:**
+  - *Vision-Only Everywhere:* Simpler architecture, single model path. However, vision inference consumes substantial token quotas, limits request batching to image payload limits, and introduces OCR hallucination on small tabular fonts.
+  - *Dual-Path Pipeline:* Digital PDFs (which represent ~70% of business invoices) bypass rasterization and vision processing entirely, transferring raw text to `GROQ_TEXT_MODEL` at 5x speed and 80% lower cost. The vision pipeline is reserved specifically for scanned documents, mobile photos, and degraded paper copies.
+
+---
+
+## 5. Data Model Summary
+
+All primary entities use UUID primary keys, timezone-aware UTC timestamps, and optimistic locking (`row_version`):
+
+- **`users`:** Accounts team and administrators with Argon2id password hashing and role-based permissions (`reviewer`, `admin`).
+- **`suppliers`:** Master registry holding validated 15-character GSTINs, supplier legal names, and state codes.
+- **`source_files`:** Immutable original files stored in MinIO with SHA-256 deduplication and source channel tracking (`upload`, `email`, `whatsapp`).
+- **`invoices`:** Central state machine entity linked to the source file, status, optimistic locking version, approved/current extractions, and partial unique index on `(supplier_gstin, normalized_invoice_number, financial_year)`.
+- **`extractions`:** Append-only versioned JSONB extractions (`model` or `human_edit`) preserving confidence scores, model IDs, token usage, and latency.
+- **`validation_issues`:** Structured validation warnings and errors mapped per field and invoice.
+- **`review_events`:** Tamper-proof, append-only audit trail protected by database triggers blocking `UPDATE` and `DELETE`.
+- **`push_attempts`:** Log of accounting API delivery attempts with HTTP status codes and idempotency tracking.

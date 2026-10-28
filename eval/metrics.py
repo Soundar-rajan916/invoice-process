@@ -8,7 +8,30 @@ from typing import Any
 import numpy as np
 from app.services.dedup import normalize_invoice_number
 from rapidfuzz import fuzz
-from scipy.optimize import linear_sum_assignment
+
+try:
+    from scipy.optimize import linear_sum_assignment
+except Exception:
+
+    def linear_sum_assignment(cost_matrix: Any) -> tuple[list[int], list[int]]:
+        """Greedy matching fallback if scipy linear_sum_assignment is unavailable."""
+        n_rows = len(cost_matrix)
+        n_cols = len(cost_matrix[0]) if n_rows > 0 else 0
+        used_cols: set[int] = set()
+        row_ind: list[int] = []
+        col_ind: list[int] = []
+        for r in range(n_rows):
+            best_c = -1
+            best_cost = float("inf")
+            for c in range(n_cols):
+                if c not in used_cols and cost_matrix[r, c] < best_cost:
+                    best_cost = cost_matrix[r, c]
+                    best_c = c
+            if best_c != -1:
+                used_cols.add(best_c)
+                row_ind.append(r)
+                col_ind.append(best_c)
+        return row_ind, col_ind
 
 
 def clean_string(s: str | None) -> str:

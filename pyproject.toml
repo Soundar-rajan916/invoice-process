@@ -69,4 +69,7 @@ ignore_missing_imports = true
 asyncio_mode = "auto"
 testpaths = ["backend/tests"]
 pythonpath = [".", "backend"]
-addopts = "-v"
+markers = [
+    "slow: marks tests as slow load tests (run with -m slow)",
+]
+addopts = "-v -m 'not slow'"
