@@ -103,7 +103,7 @@ def downscale_and_compress(pil_img: Image.Image, max_long_side: int, quality: in
 
 
 class Preprocessor:
-    def __init__(self, invoice_id: str) -> None:
+    def __init__(self, invoice_id: str = "eval") -> None:
         self.invoice_id = invoice_id
         self.min_text_chars = settings.MIN_TEXT_CHARS
         self.max_long_side = settings.MAX_IMAGE_LONG_SIDE

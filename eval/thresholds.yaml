@@ -1,0 +1,20 @@
+# CI evaluation thresholds for InvoiceFlow
+# Any metric falling below these values fails the CI gate (eval.check)
+
+accuracies:
+  invoice_number: 0.95
+  invoice_date: 0.95
+  supplier_gstin: 0.97
+  total: 0.97
+  line_item_amount: 0.93
+
+flags:
+  total_mismatch:
+    min_recall: 1.0
+  gstin_checksum:
+    min_recall: 1.0
+  line_amount_mismatch:
+    min_recall: 1.0
+
+false_alarm:
+  max_clean_invoice_rate: 0.02
