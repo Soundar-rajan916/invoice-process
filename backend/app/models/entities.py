@@ -139,6 +139,10 @@ class Invoice(Base, TimestampMixin):
                 (Column("dup_of_id").is_(None))
                 & (~Column("status").in_(["REJECTED", "REJECTED_DUPLICATE"]))
             ),
+            sqlite_where=(
+                (Column("dup_of_id").is_(None))
+                & (~Column("status").in_(["REJECTED", "REJECTED_DUPLICATE"]))
+            ),
         ),
     )
 

@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import logging as std_logging
 import sys
-from typing import Any, MutableMapping
+from collections.abc import MutableMapping
+from typing import Any
+
 import structlog
+
 from app.core.config import settings
 
 
@@ -15,7 +18,9 @@ def drop_sensitive_data(
         lower_key = key.lower()
         if any(secret in lower_key for secret in ("key", "secret", "password", "token", "auth")):
             event_dict[key] = "[REDACTED]"
-        elif "url" in lower_key and ("X-Amz-Signature" in str(event_dict[key]) or "sig=" in str(event_dict[key])):
+        elif "url" in lower_key and (
+            "X-Amz-Signature" in str(event_dict[key]) or "sig=" in str(event_dict[key])
+        ):
             event_dict[key] = "[REDACTED_PRESIGNED_URL]"
     return event_dict
 

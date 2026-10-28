@@ -43,6 +43,7 @@ test-results/
 # Data and Artifacts
 data/synthetic/
 data/real/
+data/storage_fallback/
 eval/reports/
 out/
 minio_data/

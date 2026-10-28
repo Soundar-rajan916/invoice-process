@@ -8,8 +8,11 @@ from httpx import ASGITransport, AsyncClient
 from mock_accounting.app import app as mock_accounting_app
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from app.core.config import settings
 from app.core.database import Base, get_db_session
 from app.main import app
+
+settings.ENVIRONMENT = "test"
 
 # SQLite in-memory test database for unit test suite
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -55,6 +58,20 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(transport=transport, base_url="http://test") as c:
         yield c
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def dummy_page():
+    from app.extraction.base import PageInput
+
+    return PageInput(
+        page_number=1,
+        text="TAX INVOICE\nInvoice No: INV-100\nDate: 01/04/2026\nTotal: 1500.00",
+        image_bytes=b"dummy_jpeg_bytes",
+        is_digital=True,
+        storage_key="pages/test/1.jpg",
+        original_filename="inv.pdf",
+    )
 
 
 @pytest.fixture

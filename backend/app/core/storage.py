@@ -19,7 +19,8 @@ class StorageService:
         self.secret_key = settings.S3_SECRET_KEY
         self.region = settings.S3_REGION
 
-        self._client = None
+        self._client: Any = None
+        self._s3_available: bool | None = None
         self._local_fallback_dir = Path("data/storage_fallback")
 
     @property
@@ -33,25 +34,31 @@ class StorageService:
                 region_name=self.region,
                 config=Config(
                     signature_version="s3v4",
-                    connect_timeout=1,
-                    read_timeout=1,
+                    connect_timeout=0.2,
+                    read_timeout=0.2,
                     retries={"max_attempts": 0},
                 ),
             )
         return self._client
 
     def ensure_bucket_exists(self) -> None:
+        if self._s3_available is False:
+            return
         try:
             self.client.head_bucket(Bucket=self.bucket)
+            self._s3_available = True
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code")
             if error_code in ("404", "NoSuchBucket"):
                 self.client.create_bucket(Bucket=self.bucket)
+                self._s3_available = True
                 logger.info("Created S3 bucket", bucket=self.bucket)
             else:
-                logger.warning(
-                    "Could not head S3 bucket, using local fallback if needed", error=str(e)
-                )
+                self._s3_available = False
+                logger.warning("S3 bucket check failed, using local storage fallback", error=str(e))
+        except Exception as e:
+            self._s3_available = False
+            logger.warning("Could not reach S3 endpoint, using local fallback", error=str(e))
 
     def upload_bytes(
         self,
@@ -59,6 +66,12 @@ class StorageService:
         storage_key: str,
         content_type: str = "application/octet-stream",
     ) -> str:
+        if self._s3_available is False:
+            local_path = self._local_fallback_dir / storage_key
+            local_path.parent.mkdir(parents=True, exist_ok=True)
+            local_path.write_bytes(data)
+            return storage_key
+
         try:
             self.client.put_object(
                 Bucket=self.bucket,
@@ -66,21 +79,27 @@ class StorageService:
                 Body=data,
                 ContentType=content_type,
             )
+            self._s3_available = True
             return storage_key
-        except Exception as e:
-            logger.warning(
-                "S3 upload failed, using local storage fallback", key=storage_key, error=str(e)
-            )
+        except Exception:
+            self._s3_available = False
             local_path = self._local_fallback_dir / storage_key
             local_path.parent.mkdir(parents=True, exist_ok=True)
             local_path.write_bytes(data)
             return storage_key
 
     def download_bytes(self, storage_key: str) -> bytes:
+        if self._s3_available is False:
+            local_path = self._local_fallback_dir / storage_key
+            if local_path.exists():
+                return local_path.read_bytes()
+            raise FileNotFoundError(f"Storage key '{storage_key}' not found in local fallback")
+
         try:
             response = self.client.get_object(Bucket=self.bucket, Key=storage_key)
             return response["Body"].read()
         except Exception as e:
+            self._s3_available = False
             local_path = self._local_fallback_dir / storage_key
             if local_path.exists():
                 return local_path.read_bytes()
@@ -89,6 +108,8 @@ class StorageService:
             ) from e
 
     def generate_presigned_url(self, storage_key: str, expires_in: int = 3600) -> str:
+        if self._s3_available is False:
+            return f"/api/v1/files/raw/{storage_key}"
         try:
             url = self.client.generate_presigned_url(
                 ClientMethod="get_object",

@@ -57,6 +57,9 @@ def create_app() -> FastAPI:
 
     # Core Health & Readiness Routers
     app.include_router(health_router)
+    from app.api.files import router as files_router
+
+    app.include_router(files_router)
 
     return app
 
