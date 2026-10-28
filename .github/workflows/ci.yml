@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend:
+    name: Backend Lint, Typecheck, Tests & Eval
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: invoiceflow_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -e backend -e .
+
+      - name: Lint with Ruff
+        run: |
+          ruff check backend eval mock_accounting
+          ruff format --check backend eval mock_accounting
+
+      - name: Type check with mypy
+        run: |
+          mypy backend/app eval
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/invoiceflow_test
+          DATABASE_URL_SYNC: postgresql://postgres:postgres@localhost:5432/invoiceflow_test
+        run: |
+          cd backend && alembic upgrade head
+
+      - name: Run Backend Tests with Coverage
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/invoiceflow_test
+          DATABASE_URL_SYNC: postgresql://postgres:postgres@localhost:5432/invoiceflow_test
+          REDIS_URL: redis://localhost:6379/0
+          EXTRACTOR: mock
+        run: |
+          pytest backend/tests -v --cov=app --cov-report=term-missing --cov-fail-under=85
+
+      - name: Generate synthetic test invoices
+        run: |
+          python tools/generate_invoices.py --count 50 --out data/synthetic --seed 42
+
+      - name: Run Mock Evaluation Harness
+        run: |
+          python -m eval.run --manifest data/synthetic/manifest.jsonl --inputs data/synthetic/pdfs --extractor mock --out eval/reports/
+          python -m eval.check --report eval/reports/report.json
+
+  frontend:
+    name: Frontend Lint, Tests & OpenAPI Drift Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd web && npm ci
+
+      - name: Frontend Typecheck & Lint
+        run: |
+          cd web && npm run typecheck && npm run lint
+
+      - name: Frontend Unit Tests
+        run: |
+          cd web && npm test run
+
+      - name: OpenAPI Type Drift Check
+        run: |
+          cd web && npm run generate-types:check

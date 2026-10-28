@@ -1,0 +1,59 @@
+# InvoiceFlow: Assumptions & Design Invariants
+
+This document records all domain, technical, and operational assumptions made during the design and implementation of InvoiceFlow (Phases 0–3).
+
+---
+
+## 1. Business & Domain Assumptions
+
+1. **Language & Script:**
+   - Invoices are primarily in English (with standard Indian alphanumeric formats for GSTIN, PAN, dates, currency symbols, and item descriptions).
+2. **Indian GST Rules:**
+   - Buyer is registered in Tamil Nadu (`BUYER_STATE_CODE = "33"` by default, configurable).
+   - Intra-state supplies (Supplier state == Buyer state) charge CGST and SGST equally (`cgst == sgst`).
+   - Inter-state supplies (Supplier state != Buyer state) charge IGST (`cgst = 0`, `sgst = 0`).
+   - Financial year in India runs from April 1 to March 31. For example, `2026-03-31` belongs to `2025-26`, while `2026-04-01` belongs to `2026-27`.
+   - GSTIN is a 15-character alphanumeric string following the statutory checksum algorithm (MOD 36 weight 1 and 2 check character).
+3. **Number & Date Formats:**
+   - Dates on Indian invoices are printed in day-first format (e.g., `DD/MM/YYYY`, `DD-MM-YYYY`, `DD Mon YYYY`, `YYYY-MM-DD`).
+   - Number strings may contain Indian digit grouping (e.g., `1,23,456.50`). The extraction and parsing pipelines normalize these to standard decimal strings (`123456.50`).
+4. **Tolerance Limits:**
+   - Fractional rounding differences up to ₹0.01 per line calculation (`abs(qty * rate - amount) <= 0.01`) and up to ₹1.00 on total invoice rounding (`abs(taxable + taxes - total) <= 1.00`) are acceptable in practice due to line-level rounding conventions.
+
+---
+
+## 2. System & Architecture Assumptions
+
+1. **R1 (Multipage & Degraded Inputs):**
+   - Invoices with clear text layers (digital PDFs with >= 80 characters per page) utilize the faster, cost-effective LLM text extraction route.
+   - Scanned PDFs or photos utilize the vision extraction route.
+   - Extremely blurry images (variance of the Laplacian below `BLUR_REJECT_THRESHOLD = 50.0`) are automatically routed to `RESEND_REQUESTED` to save token costs and prevent incorrect processing.
+2. **R2 (Zero Unreviewed Financial Data):**
+   - Under no circumstances can an invoice bypass human verification. The state machine strictly mandates that every invoice reaches `NEEDS_REVIEW` before any human transition to `APPROVED`.
+   - The PostgreSQL database enforces this with a hard `CHECK` constraint: `status NOT IN ('PUSHING', 'PUSHED') OR (approved_by IS NOT NULL AND approved_extraction_id IS NOT NULL)`.
+   - If an invoice is edited after being marked `APPROVED` (but prior to being pushed), its status automatically reverts to `NEEDS_REVIEW`.
+   - Approvals of invoices containing remaining validation `error` issues require an explicit human override with an `override_reason` (minimum 10 characters), recorded immutably in the audit log.
+3. **R3 (Deduplication):**
+   - Three-tier duplicate defense:
+     1. *Layer 1 (Byte-level):* Exact SHA-256 match on uploaded file halts processing immediately, registers a `duplicate_file_skipped` audit event, and references the existing invoice.
+     2. *Layer 2 (Business Key):* Normalized invoice number (`INV-0042` -> `INV42`), supplier GSTIN, and Indian Financial Year form a partial unique index in PostgreSQL (`WHERE dup_of_id IS NULL AND status NOT IN ('REJECTED', 'REJECTED_DUPLICATE')`).
+     3. *Layer 3 (Fuzzy Match):* Matching supplier GSTIN, identical total amount, and identical invoice date with distinct invoice numbers generate a `possible_duplicate` warning.
+4. **R4 (Scale & Month-End Spikes):**
+   - Celery workers use `acks_late=True` and `worker_prefetch_multiplier=1` to guarantee fair task distribution and prevent task starvation during 4x volume spikes.
+   - LLM concurrency is guarded by a system-wide `asyncio.Semaphore` (`GROQ_MAX_CONCURRENCY`) to prevent rate-limit exhaustion.
+   - Database updates on invoice status utilize compare-and-set queries (`UPDATE invoices SET status = :new_status WHERE id = :id AND status = :expected_status`) preventing race conditions across concurrent Celery workers.
+
+---
+
+## 3. Security & Operational Assumptions
+
+1. **Authentication & Session:**
+   - Reviewer and admin authentication uses Argon2id password hashing.
+   - Sessions are managed via short-lived JWTs stored in `HttpOnly`, `SameSite=Strict` cookies.
+   - State-changing API endpoints enforce a CSRF protection header (`X-Requested-With: XMLHttpRequest`).
+2. **Accounting API Integration:**
+   - The downstream accounting system expects `POST /api/invoices` with an `Idempotency-Key` header computed as `sha256(supplier_gstin|normalized_invoice_number|financial_year)`.
+   - The mock accounting service simulates transient failures (`500` and `429`) to verify exponential backoff retries.
+3. **Storage Retention:**
+   - Original files in MinIO are immutable (`originals/{sha256[:2]}/{sha256}`).
+   - Audit logs in PostgreSQL are append-only; an explicit database trigger prevents `UPDATE` or `DELETE` operations on `review_events`.

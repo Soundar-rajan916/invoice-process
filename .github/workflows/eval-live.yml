@@ -1,0 +1,53 @@
+name: Live Groq Evaluation
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Number of invoices to evaluate"
+        required: true
+        default: "50"
+      concurrency:
+        description: "Concurrent Groq requests"
+        required: true
+        default: "4"
+
+jobs:
+  eval-live:
+    name: Evaluate against Groq Models
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -e backend -e .
+
+      - name: Generate evaluation dataset
+        run: |
+          python tools/generate_invoices.py --count 100 --out data/synthetic --seed 42 --faulty-ratio 0.10 --duplicates 5
+
+      - name: Run Live Evaluation
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_TEXT_MODEL: llama-3.3-70b-versatile
+          GROQ_VISION_MODEL: llama-3.2-11b-vision-preview
+        run: |
+          python -m eval.run --manifest data/synthetic/manifest.jsonl --inputs data/synthetic/pdfs --extractor groq --limit ${{ github.event.inputs.limit }} --concurrency ${{ github.event.inputs.concurrency }} --out eval/reports/
+          python -m eval.check --report eval/reports/report.json
+
+      - name: Upload Evaluation Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report
+          path: eval/reports/
