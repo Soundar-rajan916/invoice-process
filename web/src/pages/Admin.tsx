@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import {
@@ -8,6 +8,8 @@ import {
   FileSpreadsheet,
   Check,
   Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 export const GST_STATE_MAP: Record<string, string> = {
@@ -69,6 +71,8 @@ export function Admin() {
   const [supplierError, setSupplierError] = useState<string | null>(null);
   const [csvResult, setCsvResult] = useState<any | null>(null);
   const csvInputRef = useRef<HTMLInputElement>(null);
+  const [supplierPage, setSupplierPage] = useState(1);
+  const [supplierPageSize, setSupplierPageSize] = useState(10);
 
   // User state
   const [newUserEmail, setNewUserEmail] = useState("");
@@ -82,6 +86,24 @@ export function Admin() {
     queryKey: ["admin-suppliers"],
     queryFn: () => apiRequest("/api/v1/admin/suppliers"),
   });
+
+  const filteredSuppliers = useMemo(() => {
+    return (suppliers || []).filter(
+      (s: any) =>
+        !supplierSearch ||
+        s.name?.toLowerCase().includes(supplierSearch.toLowerCase()) ||
+        s.gstin?.toLowerCase().includes(supplierSearch.toLowerCase()) ||
+        formatStateDisplay(s.state_code).toLowerCase().includes(supplierSearch.toLowerCase())
+    );
+  }, [suppliers, supplierSearch]);
+
+  const totalSupplierPages = Math.max(1, Math.ceil(filteredSuppliers.length / supplierPageSize));
+  const currentSupplierPage = Math.min(supplierPage, totalSupplierPages);
+
+  const paginatedSuppliers = useMemo(() => {
+    const start = (currentSupplierPage - 1) * supplierPageSize;
+    return filteredSuppliers.slice(start, start + supplierPageSize);
+  }, [filteredSuppliers, currentSupplierPage, supplierPageSize]);
 
   // 2. Fetch Users
   const { data: users = [] } = useQuery({
@@ -314,7 +336,10 @@ export function Admin() {
                   type="text"
                   placeholder="Filter suppliers by name or GSTIN..."
                   value={supplierSearch}
-                  onChange={(e) => setSupplierSearch(e.target.value)}
+                  onChange={(e) => {
+                    setSupplierSearch(e.target.value);
+                    setSupplierPage(1);
+                  }}
                   className="w-full pl-8 pr-3 py-1.5 text-xs font-normal border border-findeck-border rounded-btn outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent bg-white text-findeck-text"
                 />
               </div>
@@ -323,28 +348,23 @@ export function Admin() {
               <div className="p-8 text-center text-xs text-findeck-muted">Loading suppliers...</div>
             ) : suppliers.length === 0 ? (
               <div className="p-8 text-center text-xs text-findeck-muted">No suppliers registered.</div>
+            ) : filteredSuppliers.length === 0 ? (
+              <div className="p-8 text-center text-xs text-findeck-muted">No suppliers match your search.</div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-findeck-text">
-                  <thead className="bg-findeck-bg-sidebar/60 text-xs text-findeck-muted border-b border-findeck-border">
-                    <tr>
-                      <th className="px-6 py-3 font-medium">GSTIN</th>
-                      <th className="px-6 py-3 font-medium">Supplier Name</th>
-                      <th className="px-6 py-3 font-medium">State</th>
-                      <th className="px-6 py-3 font-medium">Status</th>
-                      <th className="px-6 py-3 font-medium text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-findeck-border/60">
-                    {suppliers
-                      .filter(
-                        (s: any) =>
-                          !supplierSearch ||
-                          s.name?.toLowerCase().includes(supplierSearch.toLowerCase()) ||
-                          s.gstin?.toLowerCase().includes(supplierSearch.toLowerCase()) ||
-                          formatStateDisplay(s.state_code).toLowerCase().includes(supplierSearch.toLowerCase())
-                      )
-                      .map((s: any) => (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm text-findeck-text">
+                    <thead className="bg-findeck-bg-sidebar/60 text-xs text-findeck-muted border-b border-findeck-border">
+                      <tr>
+                        <th className="px-6 py-3 font-medium">GSTIN</th>
+                        <th className="px-6 py-3 font-medium">Supplier Name</th>
+                        <th className="px-6 py-3 font-medium">State</th>
+                        <th className="px-6 py-3 font-medium">Status</th>
+                        <th className="px-6 py-3 font-medium text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-findeck-border/60">
+                      {paginatedSuppliers.map((s: any) => (
                         <tr key={s.id} className="hover:bg-findeck-bg-sidebar/30 transition-colors text-xs">
                           <td className="px-6 py-3.5 font-mono font-medium text-findeck-text">{s.gstin}</td>
                           <td className="px-6 py-3.5 font-medium text-findeck-text">{s.name}</td>
@@ -380,9 +400,76 @@ export function Admin() {
                           </td>
                         </tr>
                       ))}
-                  </tbody>
-                </table>
-              </div>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="px-6 py-3.5 border-t border-findeck-border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-findeck-muted">
+                  <div className="flex items-center space-x-3">
+                    <span className="tabular-nums">
+                      Showing{" "}
+                      <strong className="text-findeck-text font-semibold">
+                        {(currentSupplierPage - 1) * supplierPageSize + 1}
+                      </strong>
+                      –
+                      <strong className="text-findeck-text font-semibold">
+                        {Math.min(currentSupplierPage * supplierPageSize, filteredSuppliers.length)}
+                      </strong>{" "}
+                      of{" "}
+                      <strong className="text-findeck-text font-semibold">
+                        {filteredSuppliers.length}
+                      </strong>{" "}
+                      suppliers
+                    </span>
+                    <span className="text-findeck-border">|</span>
+                    <div className="flex items-center space-x-1.5">
+                      <span>Per page:</span>
+                      <select
+                        value={supplierPageSize}
+                        onChange={(e) => {
+                          setSupplierPageSize(Number(e.target.value));
+                          setSupplierPage(1);
+                        }}
+                        className="px-2 py-0.5 border border-findeck-border rounded-btn text-xs bg-white text-findeck-text outline-none focus:border-findeck-accent cursor-pointer"
+                      >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {totalSupplierPages > 1 && (
+                    <div className="flex items-center space-x-1.5">
+                      <button
+                        type="button"
+                        disabled={currentSupplierPage <= 1}
+                        onClick={() => setSupplierPage((p) => Math.max(1, p - 1))}
+                        className="p-1 border border-findeck-border rounded-btn hover:bg-findeck-bg-sidebar disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-findeck-text transition-colors"
+                        title="Previous page"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+
+                      <span className="px-2.5 py-0.5 text-xs text-findeck-text font-medium tabular-nums">
+                        Page {currentSupplierPage} of {totalSupplierPages}
+                      </span>
+
+                      <button
+                        type="button"
+                        disabled={currentSupplierPage >= totalSupplierPages}
+                        onClick={() => setSupplierPage((p) => Math.min(totalSupplierPages, p + 1))}
+                        className="p-1 border border-findeck-border rounded-btn hover:bg-findeck-bg-sidebar disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-findeck-text transition-colors"
+                        title="Next page"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>
