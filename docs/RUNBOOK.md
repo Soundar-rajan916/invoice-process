@@ -159,3 +159,39 @@ Model availability evolves frequently on cloud providers. Never change `GROQ_TEX
 
 - **MinIO Storage:** Page images (`pages/`) and immutable originals (`originals/`) are stored permanently. Monitor bucket utilization and configure S3 lifecycle policies if archiving older fiscal years.
 - **Audit Table Trigger:** The `review_events` table is protected by a trigger blocking `UPDATE` and `DELETE`. Do not attempt administrative pruning of this table.
+
+
+---
+
+## 7. Disaster Recovery, Failovers & Security Incidents
+
+### 7.1 Upstream LLM Provider Outage (Groq API Down)
+- **Breaker Protection:** The `llm_circuit_breaker` trips to `OPEN` after 5 consecutive failures.
+- **Failover:** If outage persists > 30 minutes, update `FALLBACK_LLM_BASE_URL`, `FALLBACK_LLM_API_KEY`, and `FALLBACK_LLM_MODEL` in AWS Secrets Manager or `.env`.
+- Invoices are safely paused in `WAITING_PROVIDER`. No financial invoices are dropped or misprocessed.
+
+### 7.2 Accounting Software Outage
+- Invoices in `APPROVED` state wait safely without calling unavailable endpoints.
+- Circuit breaker fast-fails pending pushes to `PUSH_FAILED`.
+- Once accounting system is restored, visit **Admin > Dead Letters** (`/admin/dead-letters`) and bulk retry. Deterministic idempotency keys prevent duplicate ledger postings.
+
+### 7.3 Redis & Postgres Failover
+- **Postgres:** Multi-AZ RDS automatically promotes standby within 60-120 seconds. Connection pool handles reconnection with exponential backoff.
+- **Redis:** Multi-node ElastiCache automatically elects new primary within 30 seconds. Inflight tasks retry via Celery `acks_late=True`.
+
+### 7.4 Rotating Application Secrets
+1. Rotate database password in RDS: `ALTER USER invoiceflow_admin WITH PASSWORD '...'`.
+2. Update AWS Secrets Manager secret `/invoiceflow/prod/secrets`.
+3. Trigger ECS rolling update via CI/CD.
+
+### 7.5 Suspected Data Leak & Right to Erasure
+1. Revoke active reviewer sessions by inserting entries into `revoked_tokens` or rotating `JWT_SECRET`.
+2. If specific invoice PII must be purged under statutory GDPR/DPDP rules:
+   ```bash
+   curl -X POST https://api.invoiceflow.yourcompany.com/api/v1/admin/invoices/<INVOICE_ID>/erase \
+     -H "Authorization: Bearer <ADMIN_TOKEN>" \
+     -H "X-Requested-With: XMLHttpRequest" \
+     -H "Content-Type: application/json" \
+     -d '{"reason": "Statutory Right to Erasure data privacy request"}'
+   ```
+   This deletes underlying S3 files, anonymizes extraction fields, and preserves an immutable audit tombstone.

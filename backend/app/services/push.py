@@ -97,6 +97,25 @@ async def push_invoice(
     if not invoice:
         return None
 
+    # Check SHADOW_MODE (Phase 6)
+    if settings.SHADOW_MODE:
+        logger.info(
+            "SHADOW_MODE active: external push skipped",
+            invoice_id=str(invoice.id),
+        )
+        invoice.status = "APPROVED"
+        invoice.is_shadow = True
+        invoice.status_reason = "shadow_mode_push_disabled"
+        session.add(
+            ReviewEvent(
+                invoice_id=invoice.id,
+                action="shadow_mode_push_disabled",
+                payload={"message": "External push skipped because SHADOW_MODE is active"},
+            )
+        )
+        await session.commit()
+        return invoice
+
     # Circuit Breaker Check (R4)
     if not await accounting_circuit_breaker.is_allowed():
         logger.warning(

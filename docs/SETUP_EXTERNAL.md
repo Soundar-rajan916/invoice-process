@@ -120,3 +120,4 @@ InvoiceFlow supports standard IMAP over TLS (Port 993) and SMTP over TLS (Port 5
 When `ANTIVIRUS_ENABLED=true`:
 - Ensure `clamav` container is running in `docker-compose.yml` on port 3310.
 - ClamAV automatically updates virus signatures via `freshclam`.
+

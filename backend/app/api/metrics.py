@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import numpy as np
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -160,3 +160,100 @@ async def get_metrics_summary(
             "estimated_cost_per_invoice_usd": avg_cost,
         },
     }
+
+
+@router.get("/prometheus")
+@router.get("", include_in_schema=False)
+async def get_prometheus_metrics(
+    db: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Exposes application and pipeline metrics in standard Prometheus text exposition format (6.2)."""
+    import redis
+
+    from app.core.circuit_breaker import accounting_circuit_breaker, llm_circuit_breaker
+    from app.core.config import settings
+    from app.core.telemetry import metrics_registry
+    from app.models.entities import ReconciliationFinding
+
+    now = datetime.now(UTC)
+    lines: list[str] = []
+
+    # 1. Invoices by status
+    lines.append("# HELP invoiceflow_invoices_by_status Total invoices by current state")
+    lines.append("# TYPE invoiceflow_invoices_by_status gauge")
+    count_stmt = select(Invoice.status, func.count(Invoice.id)).group_by(Invoice.status)
+    for row in (await db.execute(count_stmt)).all():
+        lines.append(f'invoiceflow_invoices_by_status{{status="{row[0]}"}} {row[1]}')
+
+    # 2. Circuit Breaker states (0=CLOSED, 1=HALF_OPEN, 2=OPEN)
+    state_map = {"CLOSED": 0, "HALF_OPEN": 1, "OPEN": 2}
+    lines.append("# HELP invoiceflow_circuit_breaker_state Circuit breaker state (0=CLOSED, 1=HALF_OPEN, 2=OPEN)")
+    lines.append("# TYPE invoiceflow_circuit_breaker_state gauge")
+    lines.append(f'invoiceflow_circuit_breaker_state{{breaker="llm"}} {state_map.get(llm_circuit_breaker.state.value, 0)}')
+    lines.append(f'invoiceflow_circuit_breaker_state{{breaker="accounting"}} {state_map.get(accounting_circuit_breaker.state.value, 0)}')
+
+    # 3. Active review claims
+    claim_stmt = select(func.count(Invoice.id)).where(
+        Invoice.claimed_by.is_not(None),
+        Invoice.claim_expires_at > now,
+    )
+    active_claims = (await db.execute(claim_stmt)).scalar() or 0
+    lines.append("# HELP invoiceflow_review_claims_active Currently claimed invoices in review workspace")
+    lines.append("# TYPE invoiceflow_review_claims_active gauge")
+    lines.append(f"invoiceflow_review_claims_active {active_claims}")
+
+    # 4. Reconciliation findings by severity
+    lines.append("# HELP invoiceflow_reconciliation_findings_total Total findings discovered by nightly reconciliation")
+    lines.append("# TYPE invoiceflow_reconciliation_findings_total gauge")
+    recon_stmt = select(ReconciliationFinding.severity, func.count(ReconciliationFinding.id)).group_by(ReconciliationFinding.severity)
+    for row in (await db.execute(recon_stmt)).all():
+        lines.append(f'invoiceflow_reconciliation_findings_total{{severity="{row[0]}"}} {row[1]}')
+
+    # 5. Queue depths & ages from Redis
+    lines.append("# HELP invoiceflow_queue_depth Celery queue backlog count")
+    lines.append("# TYPE invoiceflow_queue_depth gauge")
+    lines.append("# HELP invoiceflow_queue_age_seconds Age of oldest message in queue")
+    lines.append("# TYPE invoiceflow_queue_age_seconds gauge")
+    try:
+        r = redis.Redis.from_url(settings.REDIS_URL, socket_timeout=0.5)
+        for q in ["ingest", "extract", "push", "notify", "maintenance"]:
+            depth = r.llen(q)
+            lines.append(f'invoiceflow_queue_depth{{queue="{q}"}} {depth}')
+            lines.append(f'invoiceflow_queue_age_seconds{{queue="{q}"}} {0.0}')
+    except Exception:
+        for q in ["ingest", "extract", "push", "notify", "maintenance"]:
+            lines.append(f'invoiceflow_queue_depth{{queue="{q}"}} 0')
+            lines.append(f'invoiceflow_queue_age_seconds{{queue="{q}"}} 0.0')
+
+    # 6. LLM Token, Cost & 429 Metrics
+    lines.append("# HELP invoiceflow_llm_tokens_total Total tokens consumed by LLM models")
+    lines.append("# TYPE invoiceflow_llm_tokens_total counter")
+    for key, val in metrics_registry.llm_tokens_total.items():
+        model, ttype = key.split("|", 1)
+        lines.append(f'invoiceflow_llm_tokens_total{{model="{model}",type="{ttype}"}} {val}')
+
+    lines.append("# HELP invoiceflow_llm_cost_usd_total Estimated LLM extraction cost in USD")
+    lines.append("# TYPE invoiceflow_llm_cost_usd_total counter")
+    lines.append(f"invoiceflow_llm_cost_usd_total {metrics_registry.llm_cost_total:.6f}")
+
+    lines.append("# HELP invoiceflow_rate_limit_429_total Count of 429 Too Many Requests received from providers")
+    lines.append("# TYPE invoiceflow_rate_limit_429_total counter")
+    lines.append(f"invoiceflow_rate_limit_429_total {metrics_registry.llm_429_count}")
+
+    # 7. Push Attempts, Reviewer Edits & Watchdog Requeues
+    lines.append("# HELP invoiceflow_push_attempts_total Total push deliveries to accounting API")
+    lines.append("# TYPE invoiceflow_push_attempts_total counter")
+    for res_type, cnt in metrics_registry.push_attempts.items():
+        lines.append(f'invoiceflow_push_attempts_total{{result="{res_type}"}} {cnt}')
+
+    lines.append("# HELP invoiceflow_reviewer_edits_total Total manual field corrections submitted by reviewers")
+    lines.append("# TYPE invoiceflow_reviewer_edits_total counter")
+    lines.append(f"invoiceflow_reviewer_edits_total {metrics_registry.reviewer_edits}")
+
+    lines.append("# HELP invoiceflow_watchdog_requeues_total Total times stuck invoices were requeued by watchdog")
+    lines.append("# TYPE invoiceflow_watchdog_requeues_total counter")
+    lines.append(f"invoiceflow_watchdog_requeues_total {metrics_registry.watchdog_requeues}")
+
+    body = "\n".join(lines) + "\n"
+    from fastapi.responses import Response
+    return Response(content=body, media_type="text/plain; version=0.0.4; charset=utf-8")

@@ -135,6 +135,13 @@ class Settings(BaseSettings):
     FALLBACK_LLM_MODEL: str = Field(default="")
     REVIEW_CLAIM_TIMEOUT_MINUTES: int = Field(default=5)
 
+    # Retention & Data Handling (6.1)
+    RETENTION_DAYS: int = Field(default=0)  # 0 = disabled
+
+    # Observability & Tracing (6.2)
+    OTEL_EXPORTER_OTLP_ENDPOINT: str = Field(default="")
+    SENTRY_DSN: str = Field(default="")
+
     # Shadow Mode (6.5)
     SHADOW_MODE: bool = Field(default=False)
 

@@ -8,6 +8,8 @@ from app.models.entities import (
     ReconciliationFinding,
     ReconciliationRun,
     ReviewEvent,
+    RevokedToken,
+    ShadowRecord,
     SourceFile,
     Supplier,
     User,
@@ -28,4 +30,6 @@ __all__ = [
     "PushAttempt",
     "ReconciliationRun",
     "ReconciliationFinding",
+    "RevokedToken",
+    "ShadowRecord",
 ]

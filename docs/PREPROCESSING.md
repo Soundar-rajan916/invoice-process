@@ -47,3 +47,4 @@ For digital PDFs with text streams, extracted values (invoice number, supplier G
 - Indian number grouping (e.g. `1,23,456.78` vs `123456.78`) and currency symbols (`₹`, `Rs.`, `INR`) are normalized.
 - Any extracted figure that does not appear in the source text generates an immediate `not_in_source` blocking error.
 - Halts invented or hallucinated amounts before they ever reach human reviewers or accounting systems.
+

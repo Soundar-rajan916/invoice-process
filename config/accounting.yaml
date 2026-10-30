@@ -19,3 +19,4 @@ error_mapping:
 custom_headers:
   X-Accounting-System: "InvoiceFlow-Core"
   X-Client-Version: "1.0.0"
+

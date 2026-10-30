@@ -123,14 +123,41 @@ class StorageService:
                 f"Storage key '{storage_key}' not found in S3 or local fallback"
             ) from e
 
-    def generate_presigned_url(self, storage_key: str, expires_in: int = 3600) -> str:
+    def delete_object(self, storage_key: str) -> bool:
+        """Deletes an object from S3 or local fallback."""
+        deleted = False
+        if self._s3_available is not False:
+            try:
+                self.client.delete_object(Bucket=self.bucket, Key=storage_key)
+                deleted = True
+            except Exception as e:
+                logger.warning("Failed to delete object from S3", key=storage_key, error=str(e))
+
+        candidate_dirs = (
+            self._local_fallback_dir,
+            Path("data/storage_fallback"),
+            Path("/app/data/storage_fallback"),
+            Path("../data/storage_fallback"),
+        )
+        for base in candidate_dirs:
+            local_path = base / storage_key
+            if local_path.exists():
+                try:
+                    local_path.unlink()
+                    deleted = True
+                except Exception as e:
+                    logger.warning("Failed to delete local fallback file", path=str(local_path), error=str(e))
+        return deleted
+
+    def generate_presigned_url(self, storage_key: str, expires_in: int = 300) -> str:
+        safe_expires = min(max(1, expires_in), 300)
         if self._s3_available is False:
             return f"/api/v1/files/raw/{storage_key}"
         try:
             url = self.client.generate_presigned_url(
                 ClientMethod="get_object",
                 Params={"Bucket": self.bucket, "Key": storage_key},
-                ExpiresIn=expires_in,
+                ExpiresIn=safe_expires,
             )
             return url
         except Exception:

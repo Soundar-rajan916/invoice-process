@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import io
 import uuid
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
@@ -12,8 +13,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db_session
+from app.core.logging import logger
 from app.core.security import hash_password, require_admin, verify_csrf_header
-from app.models.entities import Invoice, ReviewEvent, Supplier, User
+from app.core.storage import storage_service
+from app.models.entities import (
+    Extraction,
+    Invoice,
+    ReviewEvent,
+    ShadowRecord,
+    SourceFile,
+    Supplier,
+    User,
+)
 from app.services.validation import validate_gstin_checksum, validate_gstin_format
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -505,4 +516,211 @@ async def trigger_reconciliation(
         "run_id": str(run.id),
         "total_matched": run.total_matched,
         "total_discrepancies": run.total_discrepancies,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Data Retention, Right to Erasure, and Shadow Mode Endpoints (Phase 6)
+# ---------------------------------------------------------------------------
+class EraseInvoiceRequest(BaseModel):
+    reason: str = Field(min_length=5)
+
+
+@router.post("/invoices/{invoice_id}/erase")
+async def erase_invoice(
+    invoice_id: uuid.UUID,
+    body: EraseInvoiceRequest,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, Any]:
+    """Erases an invoice, purging raw storage files, redacting PII, and leaving an immutable tombstone."""
+    invoice = await db.get(Invoice, invoice_id)
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+
+    # 1. Purge S3 / MinIO objects
+    if invoice.source_file_id:
+        source = await db.get(SourceFile, invoice.source_file_id)
+        if source and source.storage_key:
+            try:
+                storage_service.delete_object(source.storage_key)
+            except Exception as e:
+                logger.warning("Could not delete raw file from storage", key=source.storage_key, error=str(e))
+
+    # 2. Redact Invoice PII fields
+    invoice.is_erased = True
+    invoice.erased_at = datetime.now(UTC)
+    invoice.erased_by = user.id
+    invoice.erased_reason = body.reason
+    invoice.sender = "REDACTED"
+    invoice.recipient = "REDACTED"
+    invoice.status = "REJECTED"
+    invoice.status_reason = f"Erased by admin: {body.reason}"
+    invoice.row_version += 1
+
+    # 3. Redact Extraction data
+    ext_stmt = select(Extraction).where(Extraction.invoice_id == invoice.id)
+    extractions = (await db.execute(ext_stmt)).scalars().all()
+    for ext in extractions:
+        ext.data = {"redacted": True, "reason": body.reason}
+
+    # 4. Create immutable tombstone audit event
+    db.add(
+        ReviewEvent(
+            invoice_id=invoice.id,
+            actor_id=user.id,
+            action="invoice_erased",
+            payload={
+                "reason": body.reason,
+                "erased_by": str(user.id),
+                "erased_at": invoice.erased_at.isoformat(),
+            },
+        )
+    )
+    await db.commit()
+    return {"message": "Invoice erased successfully", "invoice_id": str(invoice.id)}
+
+
+@router.post("/shadow/import")
+async def import_shadow_records(
+    file: UploadFile = File(...),
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, Any]:
+    """Imports historical ground-truth invoice records for shadow-mode dual run evaluation."""
+    content = await file.read()
+    text = content.decode("utf-8", errors="replace")
+    reader = csv.DictReader(io.StringIO(text))
+
+    batch_id = str(uuid.uuid4())
+    count = 0
+    for row in reader:
+        inv_num = (row.get("invoice_number") or row.get("invoice_no") or "").strip()
+        gstin = (row.get("supplier_gstin") or row.get("gstin") or "").strip()
+        date_str = (row.get("invoice_date") or row.get("date") or "").strip()
+        total_str = (row.get("total") or row.get("amount") or "0").replace(",", "").strip()
+        try:
+            total_val = float(total_str)
+        except ValueError:
+            total_val = 0.0
+
+        if inv_num and gstin:
+            rec = ShadowRecord(
+                batch_id=batch_id,
+                invoice_number=inv_num,
+                supplier_gstin=gstin,
+                invoice_date=date_str,
+                total=total_val,
+                raw_data=dict(row),
+            )
+            db.add(rec)
+            count += 1
+
+    await db.commit()
+    return {
+        "batch_id": batch_id,
+        "total_imported": count,
+        "message": f"Successfully imported {count} shadow records",
+    }
+
+
+@router.get("/shadow/report")
+async def get_shadow_report(
+    batch_id: str | None = Query(None),
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    """Generates dual-run shadow mode agreement report comparing system extractions against historical records."""
+    stmt = select(ShadowRecord)
+    if batch_id:
+        stmt = stmt.where(ShadowRecord.batch_id == batch_id)
+    shadow_records = (await db.execute(stmt)).scalars().all()
+
+    total_shadow = len(shadow_records)
+    if total_shadow == 0:
+        return {
+            "batch_id": batch_id,
+            "total_shadow_records": 0,
+            "total_matched": 0,
+            "perfect_matches": 0,
+            "overall_agreement_pct": 100.0,
+            "amount_matches": 0,
+            "date_matches": 0,
+            "missing_in_invoiceflow": [],
+            "mismatches_by_supplier": [],
+        }
+
+    matched_count = 0
+    perfect_count = 0
+    amount_matches = 0
+    date_matches = 0
+    missing_in_invoiceflow = []
+    supplier_mismatches: dict[str, int] = {}
+
+    for s_rec in shadow_records:
+        norm_num = "".join(c for c in s_rec.invoice_number if c.isalnum()).upper()
+        inv_stmt = select(Invoice).where(
+            Invoice.supplier_gstin == s_rec.supplier_gstin,
+            Invoice.normalized_invoice_number == norm_num,
+        )
+        inv = (await db.execute(inv_stmt)).scalars().first()
+        if not inv:
+            missing_in_invoiceflow.append({
+                "invoice_number": s_rec.invoice_number,
+                "supplier_gstin": s_rec.supplier_gstin,
+                "total": float(s_rec.total),
+            })
+            supplier_mismatches[s_rec.supplier_gstin] = supplier_mismatches.get(s_rec.supplier_gstin, 0) + 1
+            continue
+
+        matched_count += 1
+        ext = None
+        if inv.approved_extraction_id:
+            ext = await db.get(Extraction, inv.approved_extraction_id)
+        elif inv.current_extraction_id:
+            ext = await db.get(Extraction, inv.current_extraction_id)
+
+        amt_match = False
+        dt_match = False
+        if ext and ext.data:
+            inv_total = ext.data.get("total")
+            try:
+                if inv_total is not None and abs(float(inv_total) - float(s_rec.total)) < 0.01:
+                    amt_match = True
+            except (ValueError, TypeError):
+                pass
+
+            inv_date = ext.data.get("invoice_date")
+            if inv_date and str(inv_date) == str(s_rec.invoice_date):
+                dt_match = True
+
+        if amt_match:
+            amount_matches += 1
+        if dt_match:
+            date_matches += 1
+
+        if amt_match and dt_match:
+            perfect_count += 1
+        else:
+            supplier_mismatches[s_rec.supplier_gstin] = supplier_mismatches.get(s_rec.supplier_gstin, 0) + 1
+
+    overall_pct = round((perfect_count / total_shadow) * 100.0, 2) if total_shadow > 0 else 0.0
+
+    mismatches_by_supplier = [
+        {"supplier_gstin": gstin, "mismatches": cnt}
+        for gstin, cnt in sorted(supplier_mismatches.items(), key=lambda x: x[1], reverse=True)
+    ]
+
+    return {
+        "batch_id": batch_id,
+        "total_shadow_records": total_shadow,
+        "total_matched": matched_count,
+        "perfect_matches": perfect_count,
+        "overall_agreement_pct": overall_pct,
+        "amount_matches": amount_matches,
+        "date_matches": date_matches,
+        "missing_in_invoiceflow": missing_in_invoiceflow[:20],
+        "mismatches_by_supplier": mismatches_by_supplier,
     }

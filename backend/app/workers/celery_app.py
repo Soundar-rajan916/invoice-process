@@ -38,6 +38,7 @@ celery_app.conf.update(
         "app.workers.tasks.watchdog_stuck_invoices_task": {"queue": "maintenance"},
         "app.workers.tasks.reconcile_accounting_task": {"queue": "maintenance"},
         "app.workers.tasks.verify_invariants_task": {"queue": "maintenance"},
+        "app.workers.tasks.purge_expired_files_task": {"queue": "maintenance"},
     },
     beat_schedule={
         "poll-mailbox-every-interval": {
@@ -55,6 +56,10 @@ celery_app.conf.update(
         "reconcile-accounting-daily": {
             "task": "app.workers.tasks.reconcile_accounting_task",
             "schedule": 86400.0,  # Run daily
+        },
+        "purge-expired-retention-files-daily": {
+            "task": "app.workers.tasks.purge_expired_files_task",
+            "schedule": 86400.0,
         },
     },
 )

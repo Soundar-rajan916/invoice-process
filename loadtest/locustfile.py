@@ -79,3 +79,4 @@ class InvoiceIngestionUser(HttpUser):
                 "headers": {"X-Hub-Signature-256": "sha256=simulated"},
             },
         )
+

@@ -239,3 +239,54 @@ flowchart TD
   3. No orphaned processing states exist without active queue tasks.
   4. Database audit logs remain strictly append-only.
 
+
+
+---
+
+## 7. Phase 6 Architecture: Security, Observability, IaC & Shadow Mode
+
+```mermaid
+flowchart TD
+    subgraph Edge & Security Perimeter
+        CF[CloudFront CDN<br/>Origin Access Control] --> WAF[AWS WAFv2<br/>SQLi + CRS + Rate Limits]
+        WAF --> SEC_HDR[Security Headers Policy<br/>CSP, HSTS, X-Frame-Options: DENY]
+        SEC_HDR --> LIMIT[Payload Limit 25MB<br/>Login Lockout 5x/15m]
+    end
+
+    subgraph Observability Mesh
+        API[FastAPI Container] --> OTEL[OpenTelemetry Tracer<br/>W3C Traceparent Header]
+        OTEL --> WORKER[Celery Worker Pools]
+        API & WORKER --> PROM[Prometheus /metrics<br/>Gauges, Counters, Histograms]
+        PROM --> ALERTS[CloudWatch Alarms & SNS]
+    end
+
+    subgraph Dual-Run Verification
+        WORKER --> SHADOW{SHADOW_MODE?}
+        SHADOW -- True --> HOLD[Hold in APPROVED<br/>reason: shadow_mode_push_disabled]
+        SHADOW -- False --> PUSH[Accounting API Delivery]
+        HOLD --> REPORT[Shadow Comparison Engine<br/>GET /api/v1/admin/shadow/report]
+    end
+```
+
+### 7.1 Multi-Layer Defense-in-Depth
+- **Prompt Injection Defense:** Document text encapsulated in `<untrusted_document_content>` tags with strict system prompt boundaries. Pydantic schema validation rejects non-schema structures. Universal Human Gate (R2) guarantees untrusted text never triggers automated approval.
+- **Perimeter Hardening:** Strict Content Security Policy (CSP), HTTP Strict Transport Security (HSTS), X-Content-Type-Options: nosniff, X-Frame-Options: DENY, and 25 MB payload limits.
+- **Account Security:** Argon2id password hashing, NIST-compliant password strength rules, 5-attempt login lockout with backoff, session revocation via `revoked_tokens` table, and RFC 6238 TOTP two-factor authentication for administrators.
+- **File Safety & Privacy:** Presigned S3 URLs capped at `<= 300 seconds` (5 minutes) and scoped strictly to single objects. Path sanitation blocks directory traversal. Admin "Erase Invoice" action (`POST /api/v1/admin/invoices/{id}/erase`) redacts vendor PII, purges S3 files, and creates an immutable audit tombstone.
+
+### 7.2 Full-Stack Observability
+- **OpenTelemetry Tracing:** Distributed context propagation via W3C headers across API -> Redis Queue -> Worker -> Groq -> Accounting, tagging spans with `invoice_id`.
+- **Prometheus Text Exposition (`/metrics`):** Real-time monitoring of queue depths and ages, invoice state distribution, circuit breaker states, LLM token consumption and costs, 429 rate, review claim counts, push outcomes, reviewer edit frequency, and watchdog requeues.
+- **CloudWatch & Alerting:** Documented alert thresholds in `docs/ALERTS.md` covering queue starvation, circuit breaker trips, dead letters, and budget caps.
+
+### 7.3 Infrastructure as Code (AWS ap-south-1)
+- Modular Terraform in `infra/modules/` (`vpc`, `security`, `storage`, `database`, `cache`, `compute`, `frontend`, `observability`).
+- Two isolated environments (`staging`, `prod`) using remote state in encrypted S3 with DynamoDB state locking.
+- Multi-AZ PostgreSQL RDS with automated KMS encryption and backups.
+- Private ElastiCache Redis replication with in-transit and at-rest encryption.
+- Multi-stage non-root container images with automated rolling deployments and health check gates.
+
+### 7.4 Shadow Mode (Safe Production Rollout)
+- `SHADOW_MODE=true` allows the entire extraction, validation, and review pipeline to run without external accounting push side-effects.
+- Accounts team manual entries imported via `POST /api/v1/admin/shadow/import`.
+- Comprehensive comparison report `GET /api/v1/admin/shadow/report` computes field-level accuracy and vendor mismatch frequencies to satisfy go-live criteria.

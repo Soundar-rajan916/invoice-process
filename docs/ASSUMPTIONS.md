@@ -107,3 +107,39 @@ This document records all domain, technical, and operational assumptions made du
    - Discrepancies (unregistered pushes, amount mismatches, status divergences) produce persistent `reconciliation_findings` records.
    - Invoices in `PUSH_FAILED` and `FAILED` can be reviewed and retried or discarded from the Admin Dead-Letter interface with mandatory audit reasons.
 
+
+---
+
+## 6. Phase 6 Assumptions (Security, Observability, IaC & Shadow Mode)
+
+1. **Prompt Injection & Adversarial Content (6.1):**
+   - All text extracted from invoice documents is treated as untrusted input.
+   - Text is enclosed within `<untrusted_document_content>` tags with explicit negative directives in the system prompt prohibiting instruction-following from within the document body.
+   - Under no circumstances does an invoice bypass human verification (R2 universal human gate).
+   - Extracted text is never passed to arbitrary execution sinks or tool-selection prompts.
+
+2. **Perimeter & Session Security (6.1):**
+   - Web application and API enforce defense-in-depth HTTP security headers (CSP, HSTS with preloading, X-Content-Type-Options: nosniff, X-Frame-Options: DENY, Referrer-Policy: strict-origin-when-cross-origin).
+   - Inbound request payloads exceeding 25 MB are rejected immediately with HTTP 413 Payload Too Large.
+   - Brute-force protection locks accounts after 5 failed login attempts in 15 minutes with exponential backoff.
+   - Presigned S3 URLs are strictly capped at `<= 300 seconds` (5 minutes) and scoped to single object keys.
+   - Token revocation is enforced via the `revoked_tokens` database table checking JWT `jti` claims on every authenticated request.
+   - Two-factor authentication (TOTP RFC 6238) uses 160-bit Base32 secrets with a 30-second time-step interval and window of 1 step.
+
+3. **Data Privacy & Erasure (6.1):**
+   - Data retention (`RETENTION_DAYS`) defaults to 0 (disabled). When enabled, a periodic maintenance task purges underlying S3 files older than the retention threshold.
+   - The Admin "Erase Invoice" action (`POST /api/v1/admin/invoices/{id}/erase`) permanently deletes original and rendered files from S3, redacts vendor and line item personal data, and writes an append-only audit tombstone record.
+
+4. **Observability & OpenTelemetry (6.2):**
+   - Distributed tracing uses OpenTelemetry with W3C TraceContext propagation across HTTP headers and Celery task metadata.
+   - Every trace span carries `invoice_id` as an attribute to correlate uploads, extraction, validation, and push.
+   - Prometheus text format exposition at `/metrics` provides real-time gauges and counters across all key operational subsystems.
+
+5. **Infrastructure as Code & Cloud Portability (6.3):**
+   - Terraform configuration targets AWS `ap-south-1` using multi-AZ RDS PostgreSQL, private ElastiCache Redis, and ECS Fargate.
+   - Application configuration is strictly cloud-agnostic; all secrets and endpoints are supplied via standard environment variables, enabling zero-code-change portability to Google Cloud Platform (Cloud Run, GKE, Cloud SQL, Memorystore).
+
+6. **Shadow Mode Rollout (6.5):**
+   - Setting `SHADOW_MODE=true` suppresses external accounting pushes, pausing verified invoices at `APPROVED` with `status_reason="shadow_mode_push_disabled"`.
+   - The shadow comparison engine evaluates CSV ground truth against processed invoices within a ₹1.00 tolerance window.
+   - The production go-live threshold requires 14 consecutive days with `>= 95.0%` agreement and 0 unreviewed pushes.

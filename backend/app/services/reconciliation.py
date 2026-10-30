@@ -195,12 +195,8 @@ async def run_accounting_reconciliation(
             "total_matched": total_matched,
             "total_discrepancies": len(findings),
             "findings_count_by_type": {
-                "missing_in_accounting": sum(
-                    1 for f in findings if f.finding_type == "missing_in_accounting"
-                ),
-                "missing_in_invoiceflow": sum(
-                    1 for f in findings if f.finding_type == "missing_in_invoiceflow"
-                ),
+                "missing_in_accounting": sum(1 for f in findings if f.finding_type == "missing_in_accounting"),
+                "missing_in_invoiceflow": sum(1 for f in findings if f.finding_type == "missing_in_invoiceflow"),
                 "amount_mismatch": sum(1 for f in findings if f.finding_type == "amount_mismatch"),
             },
         }

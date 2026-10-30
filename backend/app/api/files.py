@@ -16,6 +16,13 @@ router = APIRouter(prefix="/api/v1/files", tags=["File Ingestion"])
 @router.get("/raw/{file_path:path}")
 async def get_raw_file(file_path: str) -> Response:
     """Serves raw files (e.g. rendered page images or original documents) from storage."""
+    # Phase 6 Security: Prevent path traversal
+    if ".." in file_path or file_path.startswith("/") or file_path.startswith("\\"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file path: path traversal is forbidden",
+        )
+
     try:
         data = storage_service.download_bytes(file_path)
     except FileNotFoundError as err:
@@ -37,7 +44,11 @@ async def get_raw_file(file_path: str) -> Response:
     return Response(
         content=data,
         media_type=content_type,
-        headers={"Cache-Control": "public, max-age=86400"},
+        headers={
+            "Cache-Control": "public, max-age=86400",
+            "Content-Disposition": "inline",
+            "X-Content-Type-Options": "nosniff",
+        },
     )
 
 

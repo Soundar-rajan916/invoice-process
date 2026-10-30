@@ -107,9 +107,7 @@ class CircuitBreaker:
 
 
 # Shared circuit breakers
-llm_circuit_breaker = CircuitBreaker(
-    name="groq_llm", failure_threshold=5, recovery_timeout_seconds=30.0
-)
+llm_circuit_breaker = CircuitBreaker(name="groq_llm", failure_threshold=5, recovery_timeout_seconds=30.0)
 accounting_circuit_breaker = CircuitBreaker(
     name="accounting_api", failure_threshold=5, recovery_timeout_seconds=30.0
 )

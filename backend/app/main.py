@@ -10,7 +10,11 @@ from app.api.health import router as health_router
 from app.core.config import settings
 from app.core.errors import register_error_handlers
 from app.core.logging import logger, setup_logging
-from app.core.middleware import RequestIdMiddleware
+from app.core.middleware import (
+    PayloadLimitMiddleware,
+    RequestIdMiddleware,
+    SecurityHeadersMiddleware,
+)
 from app.core.model_check import check_groq_models_at_startup
 from app.core.storage import storage_service
 
@@ -43,6 +47,8 @@ def create_app() -> FastAPI:
     )
 
     # Middlewares
+    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(PayloadLimitMiddleware)
     app.add_middleware(RequestIdMiddleware)
     app.add_middleware(
         CORSMiddleware,
@@ -69,6 +75,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(invoices_router, prefix="/api/v1")
     app.include_router(metrics_router, prefix="/api/v1")
+    app.include_router(metrics_router)  # Expose /metrics at root
     app.include_router(admin_router, prefix="/api/v1")
 
     return app

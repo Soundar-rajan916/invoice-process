@@ -13,6 +13,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    Numeric,
     String,
     Text,
 )
@@ -36,6 +37,8 @@ class User(Base, TimestampMixin):
         String(50), default="reviewer", nullable=False
     )  # reviewer | admin
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    totp_secret: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    totp_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
 
 class Supplier(Base, TimestampMixin):
@@ -175,6 +178,15 @@ class Invoice(Base, TimestampMixin):
     accounting_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     idempotency_key: Mapped[str | None] = mapped_column(String(100), nullable=True)
     row_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+
+    # Phase 6 Security & Privacy
+    is_erased: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    erased_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    erased_by: Mapped[uuid.UUID | None] = mapped_column(
+        GUID, ForeignKey("users.id"), nullable=True
+    )
+    erased_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_shadow: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     source_file = relationship("SourceFile", back_populates="invoices")
     inbound_message = relationship("InboundMessage", back_populates="invoices")
@@ -326,3 +338,28 @@ class ReconciliationFinding(Base, TimestampMixin):
 
     run = relationship("ReconciliationRun", back_populates="findings")
     invoice = relationship("Invoice", foreign_keys=[invoice_id])
+
+
+class RevokedToken(Base, TimestampMixin):
+    __tablename__ = "revoked_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    token_jti: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("users.id"), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    revoked_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class ShadowRecord(Base, TimestampMixin):
+    __tablename__ = "shadow_records"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    batch_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    invoice_number: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    supplier_gstin: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    invoice_date: Mapped[str] = mapped_column(String(20), nullable=False)
+    total: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
+    raw_data: Mapped[dict[str, Any]] = mapped_column(JSONType, default=dict, nullable=False)
+

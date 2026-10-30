@@ -55,3 +55,4 @@ During month-end reconciliation, invoice volume spikes from normal baseline to 2
 - Stuck invoices (`PROCESSING` > 5 min, `PUSHING` > 2 min) are automatically requeued up to 3 times by `watchdog_stuck_invoices_task`.
 - Exceeding 3 requeues routes invoice to `FAILED` status with reason `Watchdog timeout after 3 attempts`, landing in the Dead-Letter queue.
 - Dead-letter administration portal enables manual pipeline retries or documented discards.
+
