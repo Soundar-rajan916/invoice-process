@@ -93,9 +93,9 @@ export function AuditTrailFlowchart({
           title: "Processing Started",
           desc: payload.reason || "OCR & document extraction initiated",
           icon: Cpu,
-          badgeColor: "bg-blue-500 text-white",
-          cardBorder: "border-blue-200",
-          cardBg: "bg-blue-50/30",
+          badgeColor: "bg-accent text-ink",
+          cardBorder: "border-accent/30",
+          cardBg: "bg-accent-soft",
         };
       }
       if (toSt === "NEEDS_REVIEW") {
@@ -104,9 +104,9 @@ export function AuditTrailFlowchart({
           title: "Queued for Review",
           desc: issues > 0 ? `${issues} issue${issues > 1 ? "s" : ""} flagged for human verification` : "Routing to review queue",
           icon: AlertTriangle,
-          badgeColor: "bg-amber-500 text-white",
-          cardBorder: "border-amber-200",
-          cardBg: "bg-amber-50/30",
+          badgeColor: "bg-warning text-ink",
+          cardBorder: "border-warning/30",
+          cardBg: "bg-warning-soft",
         };
       }
       if (toSt === "APPROVED") {
@@ -114,9 +114,9 @@ export function AuditTrailFlowchart({
           title: "Invoice Approved",
           desc: payload.reason || "Validated and approved for accounting push",
           icon: CheckCircle2,
-          badgeColor: "bg-emerald-500 text-white",
-          cardBorder: "border-emerald-200",
-          cardBg: "bg-emerald-50/30",
+          badgeColor: "bg-success text-ink",
+          cardBorder: "border-success/30",
+          cardBg: "bg-success-soft",
         };
       }
       if (toSt === "PUSHING") {
@@ -124,9 +124,9 @@ export function AuditTrailFlowchart({
           title: "Dispatching to Accounting",
           desc: "Submitting payload to accounting system",
           icon: Send,
-          badgeColor: "bg-sky-500 text-white",
-          cardBorder: "border-sky-200",
-          cardBg: "bg-sky-50/30",
+          badgeColor: "bg-accent text-ink",
+          cardBorder: "border-accent/30",
+          cardBg: "bg-accent-soft",
         };
       }
       if (toSt === "PUSHED") {
@@ -134,9 +134,9 @@ export function AuditTrailFlowchart({
           title: "Pushed to Accounting",
           desc: "Successfully posted to accounting ledger",
           icon: Building2,
-          badgeColor: "bg-emerald-600 text-white",
-          cardBorder: "border-emerald-300",
-          cardBg: "bg-emerald-50/50",
+          badgeColor: "bg-success text-ink",
+          cardBorder: "border-success/30",
+          cardBg: "bg-success-soft",
         };
       }
       if (toSt === "PUSH_FAILED" || toSt === "FAILED") {
@@ -144,9 +144,9 @@ export function AuditTrailFlowchart({
           title: "Processing / Push Failed",
           desc: payload.error || "An error occurred during state transition",
           icon: XCircle,
-          badgeColor: "bg-rose-500 text-white",
-          cardBorder: "border-rose-200",
-          cardBg: "bg-rose-50/30",
+          badgeColor: "bg-danger text-ink",
+          cardBorder: "border-danger/30",
+          cardBg: "bg-danger-soft",
         };
       }
       return {
@@ -164,9 +164,9 @@ export function AuditTrailFlowchart({
         title: "Straight-Through Auto-Approval",
         desc: payload.reason || "Zero errors or warnings detected — auto-approved",
         icon: CheckCircle2,
-        badgeColor: "bg-emerald-500 text-white",
-        cardBorder: "border-emerald-200",
-        cardBg: "bg-emerald-50/30",
+        badgeColor: "bg-success text-ink",
+        cardBorder: "border-success/30",
+        cardBg: "bg-success-soft",
       };
     }
 
@@ -177,9 +177,9 @@ export function AuditTrailFlowchart({
           ? `Approved with audit override: "${payload.override_reason}"`
           : "Approved by reviewer for accounting dispatch",
         icon: CheckCircle2,
-        badgeColor: "bg-emerald-500 text-white",
-        cardBorder: "border-emerald-200",
-        cardBg: "bg-emerald-50/30",
+        badgeColor: "bg-success text-ink",
+        cardBorder: "border-success/30",
+        cardBg: "bg-success-soft",
       };
     }
 
@@ -199,9 +199,9 @@ export function AuditTrailFlowchart({
         title: "Issues Overridden",
         desc: payload.override_reason ? `Reason: "${payload.override_reason}"` : "Validation issues bypassed",
         icon: ShieldAlert,
-        badgeColor: "bg-amber-500 text-white",
-        cardBorder: "border-amber-200",
-        cardBg: "bg-amber-50/30",
+        badgeColor: "bg-warning text-ink",
+        cardBorder: "border-warning/30",
+        cardBg: "bg-warning-soft",
       };
     }
 
@@ -210,9 +210,9 @@ export function AuditTrailFlowchart({
         title: "Duplicate Confirmed",
         desc: `Marked duplicate of invoice ${payload.dup_of_id || ""}`,
         icon: Copy,
-        badgeColor: "bg-rose-500 text-white",
-        cardBorder: "border-rose-200",
-        cardBg: "bg-rose-50/30",
+        badgeColor: "bg-danger text-ink",
+        cardBorder: "border-danger/30",
+        cardBg: "bg-danger-soft",
       };
     }
 
@@ -221,9 +221,9 @@ export function AuditTrailFlowchart({
         title: "Duplicate Overridden",
         desc: payload.reason ? `Reason: "${payload.reason}"` : "Duplicate warning permitted by reviewer",
         icon: CheckCircle2,
-        badgeColor: "bg-amber-500 text-white",
-        cardBorder: "border-amber-200",
-        cardBg: "bg-amber-50/30",
+        badgeColor: "bg-warning text-ink",
+        cardBorder: "border-warning/30",
+        cardBg: "bg-warning-soft",
       };
     }
 
@@ -245,9 +245,9 @@ export function AuditTrailFlowchart({
           ? `Uploaded "${payload.filename}" — document re-queued for processing`
           : "Replacement file uploaded to fulfill resend request",
         icon: FileUp,
-        badgeColor: "bg-emerald-500 text-white",
-        cardBorder: "border-emerald-200",
-        cardBg: "bg-emerald-50/30",
+        badgeColor: "bg-success text-ink",
+        cardBorder: "border-success/30",
+        cardBg: "bg-success-soft",
       };
     }
 
@@ -269,9 +269,9 @@ export function AuditTrailFlowchart({
         title: "Invoice Rejected",
         desc: payload.reason ? `Reason: "${payload.reason}"` : "Rejected by accounts reviewer",
         icon: XCircle,
-        badgeColor: "bg-rose-500 text-white",
-        cardBorder: "border-rose-200",
-        cardBg: "bg-rose-50/30",
+        badgeColor: "bg-danger text-ink",
+        cardBorder: "border-danger/30",
+        cardBg: "bg-danger-soft",
       };
     }
 
@@ -422,7 +422,7 @@ export function AuditTrailFlowchart({
 
                       {/* Accounting ID Tag */}
                       {payload.accounting_id && (
-                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-success/30">
                           <Check className="h-3 w-3 text-emerald-600" />
                           <span>Ledger: {payload.accounting_id}</span>
                         </span>

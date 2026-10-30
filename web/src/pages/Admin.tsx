@@ -98,7 +98,7 @@ export function Admin() {
     );
   }, [suppliers, supplierSearch]);
 
-  const totalSupplierPages = Math.max(1, Math.ceil(filteredSuppliers.length / supplierPageSize));
+  const totalSupplierPages = Math.ceil(filteredSuppliers.length / supplierPageSize) || 1;
   const currentSupplierPage = Math.min(supplierPage, totalSupplierPages);
 
   const paginatedSuppliers = useMemo(() => {
@@ -114,12 +114,14 @@ export function Admin() {
 
   // Create Supplier
   const createSupplierMutation = useMutation({
-    mutationFn: () => {
-      return apiRequest("/api/v1/admin/suppliers", {
+    mutationFn: () =>
+      apiRequest("/api/v1/admin/suppliers", {
         method: "POST",
-        body: JSON.stringify({ gstin: newGstin.trim(), name: newName.trim() }),
-      });
-    },
+        body: JSON.stringify({
+          gstin: newGstin.toUpperCase().trim(),
+          name: newName.trim(),
+        }),
+      }),
     onSuccess: () => {
       setNewGstin("");
       setNewName("");
@@ -131,7 +133,7 @@ export function Admin() {
     },
   });
 
-  // Toggle Supplier Status (Activate / Deactivate)
+  // Toggle Supplier Status
   const toggleSupplierActiveMutation = useMutation({
     mutationFn: ({ supplierId, isActive }: { supplierId: string; isActive: boolean }) => {
       return apiRequest(`/api/v1/admin/suppliers/${supplierId}`, {
@@ -141,9 +143,6 @@ export function Admin() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-suppliers"] });
-    },
-    onError: (err: any) => {
-      setSupplierError(err.message || "Failed to update supplier status");
     },
   });
 
@@ -215,22 +214,22 @@ export function Admin() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-22 font-semibold text-findeck-text tracking-tight">
+          <h1 className="text-2xl font-bold text-findeck-text tracking-tight">
             System Administration
           </h1>
-          <p className="text-sm text-findeck-muted mt-1">
+          <p className="text-xs text-findeck-muted mt-1">
             Manage authorized suppliers master directory and reviewer team accounts.
           </p>
         </div>
 
         {/* Tab Switcher - Segmented control */}
-        <div className="flex bg-findeck-bg-sidebar p-1 rounded-pill border border-findeck-border self-start sm:self-auto">
+        <div className="flex bg-findeck-card p-1 rounded-pill border border-findeck-border self-start sm:self-auto shadow-2xs">
           <button
             onClick={() => setActiveTab("suppliers")}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-pill text-xs font-medium transition-all ${
+            className={`flex items-center space-x-2 px-4 py-1.5 rounded-pill text-xs font-medium transition-all cursor-pointer ${
               activeTab === "suppliers"
                 ? "bg-white text-findeck-text shadow-xs font-semibold"
                 : "text-findeck-muted hover:text-findeck-text"
@@ -241,7 +240,7 @@ export function Admin() {
           </button>
           <button
             onClick={() => setActiveTab("users")}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-pill text-xs font-medium transition-all ${
+            className={`flex items-center space-x-2 px-4 py-1.5 rounded-pill text-xs font-medium transition-all cursor-pointer ${
               activeTab === "users"
                 ? "bg-white text-findeck-text shadow-xs font-semibold"
                 : "text-findeck-muted hover:text-findeck-text"
@@ -257,11 +256,11 @@ export function Admin() {
         <div className="space-y-6">
           {/* Add Supplier & CSV Import Form */}
           <div className="bg-white p-6 rounded-card border border-findeck-border shadow-xs space-y-4">
-            <h3 className="font-semibold text-findeck-text text-14">
+            <h3 className="font-semibold text-findeck-text text-sm">
               Add New Verified Supplier
             </h3>
             {supplierError && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-btn border border-rose-200">
+              <div className="p-3 bg-danger-soft text-danger-strong text-xs rounded-btn border border-danger/30">
                 {supplierError}
               </div>
             )}
@@ -271,30 +270,30 @@ export function Admin() {
                 placeholder="GSTIN (15 characters, e.g., 27AAPFU0939F1ZV)"
                 value={newGstin}
                 onChange={(e) => setNewGstin(e.target.value)}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs font-mono outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text bg-white"
+                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs font-mono outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white"
               />
               <input
                 type="text"
                 placeholder="Supplier Business Name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text bg-white"
+                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white"
               />
               <div className="flex space-x-2">
                 <button
                   onClick={() => createSupplierMutation.mutate()}
                   disabled={!newGstin || !newName || createSupplierMutation.isPending}
-                  className="flex-1 inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-findeck-accent hover:bg-findeck-accent-hover text-white rounded-btn text-xs font-semibold disabled:opacity-50 transition-colors cursor-pointer"
+                  className="flex-1 inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-ink hover:bg-ink-hover text-white rounded-btn text-xs font-semibold disabled:opacity-50 transition-colors cursor-pointer shadow-xs"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Supplier</span>
                 </button>
                 <button
                   onClick={() => csvInputRef.current?.click()}
-                  className="inline-flex items-center space-x-1.5 px-3 py-2 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
+                  className="inline-flex items-center space-x-1.5 px-3 py-2 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-app transition-colors cursor-pointer bg-white"
                   title="Import CSV"
                 >
-                  <FileSpreadsheet className="h-4 w-4 text-findeck-accent" />
+                  <FileSpreadsheet className="h-4 w-4 text-ink" />
                   <span>CSV</span>
                 </button>
                 <input
@@ -314,7 +313,7 @@ export function Admin() {
                   Imported {csvResult.imported} supplier(s) successfully.
                 </div>
                 {csvResult.errors?.length > 0 && (
-                  <div className="text-rose-600 space-y-1">
+                  <div className="text-danger-strong space-y-1">
                     <span className="font-bold">Errors encountered:</span>
                     {csvResult.errors.map((err: any, i: number) => (
                       <div key={i}>
@@ -329,7 +328,7 @@ export function Admin() {
 
           {/* Suppliers List Table */}
           <div className="bg-white rounded-card border border-findeck-border shadow-xs overflow-hidden">
-            <div className="px-6 py-3.5 border-b border-findeck-border bg-findeck-bg-sidebar/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-semibold text-findeck-muted">
+            <div className="px-6 py-3.5 border-b border-findeck-border bg-findeck-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-semibold text-findeck-muted">
               <span className="uppercase tracking-wider">Registered Master Suppliers ({suppliers.length})</span>
               <div className="relative w-full sm:w-64">
                 <Search className="h-3.5 w-3.5 absolute left-3 top-2.5 text-findeck-muted" />
@@ -341,7 +340,7 @@ export function Admin() {
                     setSupplierSearch(e.target.value);
                     setSupplierPage(1);
                   }}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs font-normal border border-findeck-border rounded-btn outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent bg-white text-findeck-text"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs font-normal border border-findeck-border rounded-btn outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong bg-white text-findeck-text"
                 />
               </div>
             </div>
@@ -354,28 +353,28 @@ export function Admin() {
             ) : (
               <>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm text-findeck-text">
-                    <thead className="bg-findeck-bg-sidebar/60 text-xs text-findeck-muted border-b border-findeck-border">
+                  <table className="w-full text-left text-xs text-findeck-text">
+                    <thead className="bg-white text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-findeck-border">
                       <tr>
-                        <th className="px-6 py-3 font-medium">GSTIN</th>
-                        <th className="px-6 py-3 font-medium">Supplier Name</th>
-                        <th className="px-6 py-3 font-medium">State</th>
-                        <th className="px-6 py-3 font-medium">Status</th>
-                        <th className="px-6 py-3 font-medium text-right">Actions</th>
+                        <th className="px-6 py-3.5">GSTIN</th>
+                        <th className="px-6 py-3.5">Supplier Name</th>
+                        <th className="px-6 py-3.5">State</th>
+                        <th className="px-6 py-3.5">Status</th>
+                        <th className="px-6 py-3.5 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-findeck-border/60">
+                    <tbody className="divide-y divide-findeck-border">
                       {paginatedSuppliers.map((s: any) => (
-                        <tr key={s.id} className="hover:bg-findeck-bg-sidebar/30 transition-colors text-xs">
+                        <tr key={s.id} className="hover:bg-findeck-app/50 transition-colors">
                           <td className="px-6 py-3.5 font-mono font-medium text-findeck-text">{s.gstin}</td>
                           <td className="px-6 py-3.5 font-medium text-findeck-text">{s.name}</td>
                           <td className="px-6 py-3.5 text-findeck-muted font-medium">{formatStateDisplay(s.state_code)}</td>
                           <td className="px-6 py-3.5">
                             <span
-                              className={`px-2.5 py-0.5 rounded-pill text-11 font-semibold ${
+                              className={`px-2.5 py-0.5 rounded-pill text-xs font-medium border ${
                                 s.is_active
-                                  ? "bg-findeck-pill-up-bg text-findeck-pill-up-text border border-emerald-200/50"
-                                  : "bg-findeck-pill-down-bg text-findeck-pill-down-text border border-rose-200/50"
+                                  ? "bg-success-soft text-success-strong border-success/30"
+                                  : "bg-danger-soft text-danger-strong border-danger/30"
                               }`}
                             >
                               {s.is_active ? "Active" : "Deactivated"}
@@ -390,10 +389,10 @@ export function Admin() {
                                 })
                               }
                               disabled={toggleSupplierActiveMutation.isPending}
-                              className={`text-xs font-semibold px-2.5 py-1 rounded-btn transition-colors cursor-pointer ${
+                              className={`text-xs font-semibold px-2.5 py-1 rounded-btn transition-colors cursor-pointer border ${
                                 s.is_active
-                                  ? "text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/60"
-                                  : "text-findeck-pill-up-text bg-findeck-pill-up-bg hover:bg-emerald-100 border border-emerald-200/60"
+                                  ? "text-danger-strong bg-danger-soft hover:bg-danger/20 border-danger/30"
+                                  : "text-success-strong bg-success-soft hover:bg-success/20 border-success/30"
                               }`}
                             >
                               {s.is_active ? "Deactivate" : "Activate"}
@@ -432,7 +431,7 @@ export function Admin() {
                           setSupplierPageSize(Number(e.target.value));
                           setSupplierPage(1);
                         }}
-                        className="px-2 py-0.5 border border-findeck-border rounded-btn text-xs bg-white text-findeck-text outline-none focus:border-findeck-accent cursor-pointer"
+                        className="px-2 py-0.5 border border-findeck-border rounded-btn text-xs bg-white text-findeck-text outline-none focus:border-accent-strong cursor-pointer"
                       >
                         <option value={10}>10</option>
                         <option value={20}>20</option>
@@ -469,7 +468,7 @@ export function Admin() {
                               type="button"
                               onClick={onNext}
                               disabled={currentSupplierPage >= totalSupplierPages}
-                              className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-bg-sidebar text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                              className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-app text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                               title="Next page"
                             >
                               <ChevronRight className="h-4 w-4" />
@@ -484,7 +483,7 @@ export function Admin() {
                               type="button"
                               onClick={onPrevious}
                               disabled={currentSupplierPage <= 1}
-                              className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-bg-sidebar text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                              className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-app text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                               title="Previous page"
                             >
                               <ChevronLeft className="h-4 w-4" />
@@ -511,8 +510,8 @@ export function Admin() {
                             onClick={() => setPage(value)}
                             className={`w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer ${
                               isActive
-                                ? "bg-findeck-accent text-white border-findeck-accent shadow-xs"
-                                : "border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar"
+                                ? "bg-ink text-white border-ink shadow-xs"
+                                : "border-findeck-border bg-white text-findeck-text hover:bg-findeck-app"
                             }`}
                           >
                             {value}
@@ -532,17 +531,17 @@ export function Admin() {
         <div className="space-y-6">
           {/* Create User Form */}
           <div className="bg-white p-6 rounded-card border border-findeck-border shadow-xs space-y-4">
-            <h3 className="font-semibold text-findeck-text text-14">
+            <h3 className="font-semibold text-findeck-text text-sm">
               Create New Team Member
             </h3>
             {userError && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-btn border border-rose-200">
+              <div className="p-3 bg-danger-soft text-danger-strong text-xs rounded-btn border border-danger/30">
                 {userError}
               </div>
             )}
             {userSuccess && (
-              <div className="p-3 bg-findeck-pill-up-bg text-findeck-pill-up-text text-xs rounded-btn border border-emerald-200/60 flex items-center space-x-2">
-                <Check className="h-4 w-4 text-findeck-accent shrink-0" />
+              <div className="p-3 bg-success-soft text-success-strong text-xs rounded-btn border border-success/30 flex items-center space-x-2">
+                <Check className="h-4 w-4 text-success-strong shrink-0" />
                 <span>{userSuccess}</span>
               </div>
             )}
@@ -555,7 +554,7 @@ export function Admin() {
                   setNewUserEmail(e.target.value);
                   setUserError(null);
                 }}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text bg-white"
+                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white"
               />
               <input
                 type="password"
@@ -565,12 +564,12 @@ export function Admin() {
                   setNewUserPassword(e.target.value);
                   setUserError(null);
                 }}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text bg-white"
+                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white"
               />
               <select
                 value={newUserRole}
                 onChange={(e) => setNewUserRole(e.target.value as any)}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text bg-white"
+                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white cursor-pointer"
               >
                 <option value="reviewer">Reviewer</option>
                 <option value="admin">Administrator</option>
@@ -578,7 +577,7 @@ export function Admin() {
               <button
                 onClick={() => createUserMutation.mutate()}
                 disabled={!newUserEmail || !newUserPassword || createUserMutation.isPending}
-                className="inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-findeck-accent hover:bg-findeck-accent-hover text-white rounded-btn text-xs font-semibold disabled:opacity-50 transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-ink hover:bg-ink-hover text-white rounded-btn text-xs font-semibold disabled:opacity-50 transition-colors cursor-pointer shadow-xs"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Create User</span>
@@ -588,32 +587,32 @@ export function Admin() {
 
           {/* Users List Table */}
           <div className="bg-white rounded-card border border-findeck-border shadow-xs overflow-hidden">
-            <div className="px-6 py-3.5 border-b border-findeck-border bg-findeck-bg-sidebar/50 text-xs font-semibold text-findeck-muted uppercase tracking-wider">
+            <div className="px-6 py-3.5 border-b border-findeck-border bg-findeck-card text-xs font-semibold text-findeck-muted uppercase tracking-wider">
               Accounts Team Users ({users.length})
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-findeck-text">
-                <thead className="bg-findeck-bg-sidebar/60 text-xs text-findeck-muted border-b border-findeck-border">
+              <table className="w-full text-left text-xs text-findeck-text">
+                <thead className="bg-white text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-findeck-border">
                   <tr>
-                    <th className="px-6 py-3 font-medium">User Email</th>
-                    <th className="px-6 py-3 font-medium">Role</th>
-                    <th className="px-6 py-3 font-medium">Status</th>
-                    <th className="px-6 py-3 font-medium text-right">Actions</th>
+                    <th className="px-6 py-3.5">User Email</th>
+                    <th className="px-6 py-3.5">Role</th>
+                    <th className="px-6 py-3.5">Status</th>
+                    <th className="px-6 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-findeck-border/60">
+                <tbody className="divide-y divide-findeck-border">
                   {users.map((u: any) => (
-                    <tr key={u.id} className="hover:bg-findeck-bg-sidebar/30 transition-colors text-xs">
+                    <tr key={u.id} className="hover:bg-findeck-app/50 transition-colors">
                       <td className="px-6 py-3.5 font-medium text-findeck-text">{u.email}</td>
                       <td className="px-6 py-3.5">
                         <span className="capitalize font-medium text-findeck-text">{u.role}</span>
                       </td>
                       <td className="px-6 py-3.5">
                         <span
-                          className={`px-2.5 py-0.5 rounded-pill text-11 font-semibold ${
+                          className={`px-2.5 py-0.5 rounded-pill text-xs font-medium border ${
                             u.is_active
-                              ? "bg-findeck-pill-up-bg text-findeck-pill-up-text border border-emerald-200/50"
-                              : "bg-findeck-pill-down-bg text-findeck-pill-down-text border border-rose-200/50"
+                              ? "bg-success-soft text-success-strong border-success/30"
+                              : "bg-danger-soft text-danger-strong border-danger/30"
                           }`}
                         >
                           {u.is_active ? "Active" : "Deactivated"}
@@ -630,10 +629,10 @@ export function Admin() {
                                 isActive: !u.is_active,
                               })
                             }
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-btn transition-colors cursor-pointer ${
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-btn transition-colors cursor-pointer border ${
                               u.is_active
-                                ? "text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/60"
-                                : "text-findeck-pill-up-text bg-findeck-pill-up-bg hover:bg-emerald-100 border border-emerald-200/60"
+                                ? "text-danger-strong bg-danger-soft hover:bg-danger/20 border-danger/30"
+                                : "text-success-strong bg-success-soft hover:bg-success/20 border-success/30"
                             }`}
                           >
                             {u.is_active ? "Deactivate" : "Activate"}

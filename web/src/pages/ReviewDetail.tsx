@@ -403,7 +403,7 @@ export function ReviewDetail() {
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center p-12 text-findeck-muted">
-        <RefreshCw className="h-5 w-5 animate-spin mr-2 text-findeck-accent" />
+        <RefreshCw className="h-5 w-5 animate-spin mr-2 text-success-strong" />
         <span>Loading invoice document and extractions...</span>
       </div>
     );
@@ -449,7 +449,7 @@ export function ReviewDetail() {
               refetch();
               setConflictMessage(null);
             }}
-            className="px-3 py-1 bg-white text-amber-800 rounded-btn font-semibold text-xs hover:bg-amber-50"
+            className="px-3 py-1 bg-white text-warning-strong rounded-btn font-semibold text-xs hover:bg-amber-50"
           >
             Reload Latest Version
           </button>
@@ -478,10 +478,10 @@ export function ReviewDetail() {
                     : invoice?.status === "PUSHED"
                     ? "bg-findeck-pill-up-bg text-findeck-pill-up-text border border-emerald-300/60"
                     : invoice?.status === "RESEND_REQUESTED"
-                    ? "bg-purple-50 text-purple-800 border border-purple-200/60"
+                    ? "bg-purple-50 text-warning-strong border border-purple-200/60"
                     : invoice?.status === "REJECTED" || invoice?.status === "REJECTED_DUPLICATE"
-                    ? "bg-rose-50 text-rose-800 border border-rose-200/60"
-                    : "bg-amber-50 text-amber-800 border border-amber-200/60"
+                    ? "bg-danger text-ink border border-danger/40"
+                    : "bg-amber-50 text-warning-strong border border-amber-200/60"
                 }`}
               >
                 {invoice?.status?.replace(/_/g, " ")}
@@ -508,15 +508,15 @@ export function ReviewDetail() {
               setShowAuditDrawer(true);
               refetchAudit();
             }}
-            className="inline-flex items-center space-x-1 px-3 py-1.5 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1 px-3 py-1.5 border border-findeck-border bg-white rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-app transition-colors cursor-pointer"
           >
             <History className="h-3.5 w-3.5" />
             <span>Audit Trail</span>
           </button>
 
           {invoice?.status === "RESEND_REQUESTED" ? (
-            <div className="flex items-center space-x-2 text-xs font-semibold text-purple-800 bg-purple-50 px-3 py-1.5 rounded-btn border border-purple-200/60">
-              <RotateCcw className="h-3.5 w-3.5 text-purple-600" />
+            <div className="flex items-center space-x-2 text-xs font-semibold text-warning-strong bg-purple-50 px-3 py-1.5 rounded-btn border border-purple-200/60">
+              <RotateCcw className="h-3.5 w-3.5 text-warning-strong" />
               <span>Awaiting Replacement</span>
             </div>
           ) : invoice?.status === "APPROVED" || invoice?.status === "PUSHING" ? (
@@ -526,7 +526,7 @@ export function ReviewDetail() {
             </div>
           ) : invoice?.status === "PUSHED" ? (
             <div className="flex items-center space-x-2 text-xs font-semibold text-findeck-pill-up-text bg-findeck-pill-up-bg px-3 py-1.5 rounded-btn border border-emerald-200/60">
-              <CheckCircle2 className="h-3.5 w-3.5 text-findeck-accent" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-success-strong" />
               <span>Pushed to Accounting</span>
               {invoice?.accounting_id && (
                 <span className="font-mono text-11 font-bold text-emerald-800 bg-emerald-100/70 px-1.5 py-0.5 rounded">
@@ -535,8 +535,8 @@ export function ReviewDetail() {
               )}
             </div>
           ) : invoice?.status === "REJECTED" || invoice?.status === "REJECTED_DUPLICATE" ? (
-            <div className="flex items-center space-x-2 text-xs font-semibold text-rose-800 bg-rose-50 px-3 py-1.5 rounded-btn border border-rose-200/60">
-              <XCircle className="h-3.5 w-3.5 text-rose-600" />
+            <div className="flex items-center space-x-2 text-xs font-semibold text-danger-strong bg-rose-50 px-3 py-1.5 rounded-btn border border-rose-200/60">
+              <XCircle className="h-3.5 w-3.5 text-danger-strong" />
               <span>{invoice?.status === "REJECTED_DUPLICATE" ? "Duplicate Rejected" : "Invoice Rejected"}</span>
             </div>
           ) : (
@@ -545,14 +545,14 @@ export function ReviewDetail() {
                 <>
                   <button
                     onClick={() => setShowResendDialog(true)}
-                    className="px-3 py-1.5 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
+                    className="px-3 py-1.5 border border-findeck-border bg-white rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-app transition-colors cursor-pointer"
                   >
                     Request Resend
                   </button>
 
                   <button
                     onClick={() => setShowRejectDialog(true)}
-                    className="px-3 py-1.5 border border-rose-200 text-rose-700 rounded-btn text-xs font-semibold hover:bg-rose-50 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 border border-danger/30 text-danger-strong bg-danger-soft rounded-btn text-xs font-semibold hover:bg-danger/20 transition-colors cursor-pointer"
                   >
                     Reject
                   </button>
@@ -563,7 +563,7 @@ export function ReviewDetail() {
                 <button
                   onClick={handleSubmit((data) => saveMutation.mutate(data))}
                   disabled={saveMutation.isPending}
-                  className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-findeck-text text-white rounded-btn text-xs font-semibold hover:bg-black transition-colors shadow-xs cursor-pointer"
+                  className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-ink text-white rounded-btn text-xs font-semibold hover:bg-ink-hover transition-colors shadow-xs cursor-pointer"
                 >
                   <Save className="h-3.5 w-3.5" />
                   <span>Save Edits</span>
@@ -574,7 +574,7 @@ export function ReviewDetail() {
                 <button
                   onClick={onApproveClick}
                   disabled={approveMutation.isPending}
-                  className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-findeck-accent hover:bg-findeck-accent-hover text-white rounded-btn text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                  className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-ink hover:bg-ink-hover text-white rounded-btn text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                 >
                   <Check className="h-4 w-4" />
                   <span>Approve & Push</span>
@@ -587,22 +587,22 @@ export function ReviewDetail() {
 
       {/* Resend Requested Banner */}
       {invoice?.status === "RESEND_REQUESTED" && (
-        <div className="bg-purple-50/90 border-b border-purple-200/80 px-6 py-3 flex items-center justify-between shadow-2xs shrink-0">
+        <div className="bg-warning-soft border-b border-warning/20 px-6 py-3 flex items-center justify-between shadow-2xs shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-btn bg-purple-100 flex items-center justify-center text-purple-700 shrink-0">
+            <div className="w-8 h-8 rounded-btn bg-warning flex items-center justify-center text-ink shrink-0">
               <RotateCcw className="h-4 w-4" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+                <span className="text-xs font-bold text-warning-strong uppercase tracking-wide">
                   Resend Requested
                 </span>
-                <span className="text-xs text-purple-600">
+                <span className="text-xs text-warning-strong">
                   — Awaiting replacement document from supplier
                 </span>
               </div>
-              <p className="text-xs text-purple-800 font-medium mt-0.5">
-                <span className="font-semibold text-purple-900">Reason:</span>{" "}
+              <p className="text-xs text-warning-strong font-medium mt-0.5">
+                <span className="font-semibold text-warning-strong">Reason:</span>{" "}
                 {invoice?.status_reason || "Document requires resubmission."}
               </p>
             </div>
@@ -611,7 +611,7 @@ export function ReviewDetail() {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadReplacementMutation.isPending}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-purple-600 text-white rounded-btn text-xs font-semibold hover:bg-purple-700 shadow-xs transition-colors cursor-pointer"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-ink text-white rounded-btn text-xs font-semibold hover:bg-ink-hover shadow-xs transition-colors cursor-pointer"
             >
               {uploadReplacementMutation.isPending ? (
                 <>
@@ -628,7 +628,7 @@ export function ReviewDetail() {
             <button
               onClick={() => cancelResendMutation.mutate()}
               disabled={cancelResendMutation.isPending}
-              className="px-3 py-1.5 bg-white border border-purple-300 text-purple-700 rounded-btn text-xs font-semibold hover:bg-purple-100/60 transition-colors cursor-pointer"
+              className="px-3 py-1.5 bg-white border border-findeck-border bg-white text-findeck-text rounded-btn text-xs font-semibold hover:bg-findeck-app transition-colors cursor-pointer"
             >
               Cancel Resend
             </button>
@@ -667,10 +667,10 @@ export function ReviewDetail() {
         <div className="flex-1 h-full min-h-0 bg-white rounded-card border border-findeck-border shadow-xs overflow-y-auto">
           {/* Duplicate Banner (R3) */}
           {invoice?.dup_of_id && (
-            <div className="bg-amber-50/70 border-b border-amber-200/80 p-4">
+            <div className="bg-warning-soft border-b border-warning/20 p-4">
               <div className="flex items-start space-x-3">
-                <Copy className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
-                <div className="flex-1 text-sm text-amber-900">
+                <Copy className="h-5 w-5 text-warning-strong mt-0.5 shrink-0" />
+                <div className="flex-1 text-sm text-warning-strong">
                   <div className="font-bold">Duplicate Detected (R3 Layer 2)</div>
                   <p className="text-xs mt-0.5">
                     Matches invoice <strong>{invoice.duplicate_info?.invoice_number}</strong> from GSTIN{" "}
@@ -695,7 +695,7 @@ export function ReviewDetail() {
                       </button>
                       <button
                         onClick={() => setShowDuplicateOverrideDialog(true)}
-                        className="px-3 py-1 bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 rounded-btn text-xs font-semibold cursor-pointer"
+                        className="px-3 py-1 bg-white border border-amber-300 text-warning-strong hover:bg-amber-100 rounded-btn text-xs font-semibold cursor-pointer"
                       >
                         Not a Duplicate (Override)
                       </button>
@@ -708,14 +708,14 @@ export function ReviewDetail() {
 
           {/* Validation Issues Alert Banner */}
           {errorIssues.length > 0 && (
-            <div className="bg-rose-50/80 border-b border-rose-200/80 p-4">
+            <div className="bg-danger-soft border-b border-danger/20 p-4">
               <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-rose-600 mt-0.5 shrink-0" />
-                <div className="flex-1 text-sm text-rose-900">
+                <AlertCircle className="h-5 w-5 text-danger-strong mt-0.5 shrink-0" />
+                <div className="flex-1 text-sm text-danger-strong">
                   <div className="font-bold">
                     {errorIssues.length} Blocking Error{errorIssues.length > 1 ? "s" : ""}
                   </div>
-                  <ul className="mt-1 list-disc list-inside text-xs space-y-0.5 text-rose-800">
+                  <ul className="mt-1 list-disc list-inside text-xs space-y-0.5 text-danger-strong">
                     {errorIssues.map((iss: any) => (
                       <li key={iss.id}>
                         <strong>{iss.field || iss.code}:</strong> {iss.message}
@@ -729,14 +729,14 @@ export function ReviewDetail() {
 
           {/* Validation Warnings Alert Banner */}
           {warningIssues.length > 0 && (
-            <div className="bg-amber-50/70 border-b border-amber-200/80 p-4">
+            <div className="bg-warning-soft border-b border-warning/20 p-4">
               <div className="flex items-start space-x-3">
-                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
-                <div className="flex-1 text-sm text-amber-900">
+                <AlertTriangle className="h-5 w-5 text-warning-strong mt-0.5 shrink-0" />
+                <div className="flex-1 text-sm text-warning-strong">
                   <div className="font-bold">
                     {warningIssues.length} Warning{warningIssues.length > 1 ? "s" : ""}
                   </div>
-                  <ul className="mt-1 list-disc list-inside text-xs space-y-0.5 text-amber-800">
+                  <ul className="mt-1 list-disc list-inside text-xs space-y-0.5 text-warning-strong">
                     {warningIssues.map((iss: any) => (
                       <li key={iss.id}>
                         <strong>{iss.field || iss.code}:</strong> {iss.message}
@@ -759,14 +759,14 @@ export function ReviewDetail() {
                 <input
                   type="text"
                   {...register("invoice_number")}
-                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent font-semibold text-findeck-text ${
+                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong font-semibold text-findeck-text ${
                     getIssueForField("invoice_number")
-                      ? "border-rose-400 bg-rose-50/50"
+                      ? "border-danger-strong bg-danger-soft/40"
                       : "border-findeck-border"
                   }`}
                 />
                 {errors.invoice_number && (
-                  <p className="text-xs text-rose-600 mt-1">{errors.invoice_number.message}</p>
+                  <p className="text-xs text-danger-strong mt-1">{errors.invoice_number.message}</p>
                 )}
               </div>
 
@@ -777,14 +777,14 @@ export function ReviewDetail() {
                 <input
                   type="text"
                   {...register("invoice_date")}
-                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text ${
+                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text ${
                     getIssueForField("invoice_date")
-                      ? "border-rose-400 bg-rose-50/50"
+                      ? "border-danger-strong bg-danger-soft/40"
                       : "border-findeck-border"
                   }`}
                 />
                 {errors.invoice_date && (
-                  <p className="text-xs text-rose-600 mt-1">{errors.invoice_date.message}</p>
+                  <p className="text-xs text-danger-strong mt-1">{errors.invoice_date.message}</p>
                 )}
               </div>
 
@@ -795,14 +795,14 @@ export function ReviewDetail() {
                 <input
                   type="text"
                   {...register("supplier_name")}
-                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text ${
+                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text ${
                     getIssueForField("supplier_name")
-                      ? "border-amber-400 bg-amber-50/50"
+                      ? "border-warning-strong bg-warning-soft/40"
                       : "border-findeck-border"
                   }`}
                 />
                 {errors.supplier_name && (
-                  <p className="text-xs text-rose-600 mt-1">{errors.supplier_name.message}</p>
+                  <p className="text-xs text-danger-strong mt-1">{errors.supplier_name.message}</p>
                 )}
               </div>
 
@@ -813,14 +813,14 @@ export function ReviewDetail() {
                 <input
                   type="text"
                   {...register("supplier_gstin")}
-                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn font-mono font-medium outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text ${
+                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn font-mono font-medium outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text ${
                     getIssueForField("supplier_gstin")
-                      ? "border-rose-400 bg-rose-50/50"
+                      ? "border-danger-strong bg-danger-soft/40"
                       : "border-findeck-border"
                   }`}
                 />
                 {errors.supplier_gstin && (
-                  <p className="text-xs text-rose-600 mt-1">{errors.supplier_gstin.message}</p>
+                  <p className="text-xs text-danger-strong mt-1">{errors.supplier_gstin.message}</p>
                 )}
               </div>
             </div>
@@ -834,7 +834,7 @@ export function ReviewDetail() {
                 <button
                   type="button"
                   onClick={() => append({ description: "", quantity: "1", rate: "0", amount: "0.00" })}
-                  className="inline-flex items-center space-x-1 text-xs font-semibold text-findeck-accent hover:text-findeck-accent-hover cursor-pointer"
+                  className="inline-flex items-center space-x-1 text-xs font-semibold text-success-strong hover:text-success-strong-hover cursor-pointer"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Line</span>
@@ -888,7 +888,7 @@ export function ReviewDetail() {
                             <button
                               type="button"
                               onClick={() => remove(idx)}
-                              className="p-1 text-findeck-muted hover:text-rose-600 rounded-btn transition-colors cursor-pointer"
+                              className="p-1 text-findeck-muted hover:text-danger-strong rounded-btn transition-colors cursor-pointer"
                               title="Remove row"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -956,7 +956,7 @@ export function ReviewDetail() {
                       {...register("total")}
                       className={`mt-0.5 px-3 py-1.5 border rounded-btn font-mono tabular-nums font-bold text-right text-base w-36 outline-none focus:ring-1 ${
                         totalStatus.status === "mismatch"
-                          ? "border-rose-300 bg-rose-50/50 text-rose-900 focus:border-rose-400 focus:ring-rose-400"
+                          ? "border-rose-300 bg-rose-50/50 text-danger-strong focus:border-rose-400 focus:ring-rose-400"
                           : "border-findeck-border bg-white text-findeck-text focus:border-findeck-accent focus:ring-findeck-accent"
                       }`}
                     />
@@ -964,12 +964,12 @@ export function ReviewDetail() {
 
                   <div className="mt-4">
                     {totalMatches ? (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-pill text-xs font-semibold bg-findeck-pill-up-bg text-findeck-pill-up-text border border-emerald-200/60">
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-pill text-xs font-semibold bg-success-soft text-success-strong border border-success/30">
                         <Check className="h-3.5 w-3.5" />
                         <span>Matches</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-pill text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200/60">
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-pill text-xs font-semibold bg-danger text-ink border border-danger/40">
                         <X className="h-3.5 w-3.5" />
                         <span>{totalStatus.text}</span>
                       </span>
@@ -986,7 +986,7 @@ export function ReviewDetail() {
       {showOverrideDialog && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-card max-w-md w-full p-6 shadow-xl border border-findeck-border space-y-4">
-            <div className="flex items-center space-x-3 text-rose-600">
+            <div className="flex items-center space-x-3 text-danger-strong">
               <AlertCircle className="h-6 w-6" />
               <h3 className="text-lg font-bold text-findeck-text">Approve with Remaining Errors</h3>
             </div>
@@ -1000,7 +1000,7 @@ export function ReviewDetail() {
               onChange={(e) => setDialogReason(e.target.value)}
               className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-findeck-text"
             />
-            {actionError && <p className="text-xs text-rose-600">{actionError}</p>}
+            {actionError && <p className="text-xs text-danger-strong">{actionError}</p>}
             <div className="flex justify-end space-x-2.5">
               <button
                 onClick={() => {
@@ -1040,7 +1040,7 @@ export function ReviewDetail() {
               placeholder="Reason for rejection..."
               value={dialogReason}
               onChange={(e) => setDialogReason(e.target.value)}
-              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text"
+              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text"
             />
             <div className="flex justify-end space-x-2.5">
               <button
@@ -1085,7 +1085,7 @@ export function ReviewDetail() {
               placeholder="Reason for requesting resend..."
               value={dialogReason}
               onChange={(e) => setDialogReason(e.target.value)}
-              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text"
+              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text"
             />
             <div className="flex justify-end space-x-2.5">
               <button
@@ -1130,7 +1130,7 @@ export function ReviewDetail() {
               placeholder="Mandatory reason for override..."
               value={dialogReason}
               onChange={(e) => setDialogReason(e.target.value)}
-              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text"
+              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text"
             />
             <div className="flex justify-end space-x-2.5">
               <button

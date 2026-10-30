@@ -28,37 +28,41 @@ export function Dashboard() {
   const editRates = metrics?.field_edit_rates_7d || {};
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+    <div className="w-full space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-22 font-semibold text-findeck-text tracking-tight">
+          <h1 className="text-2xl font-bold text-findeck-text tracking-tight">
             System Performance & Metrics
           </h1>
-          <p className="text-sm text-findeck-muted mt-1">
+          <p className="text-xs text-findeck-muted mt-1">
             Real-time throughput, queue latency, and review accuracy telemetry.
           </p>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
+      {/* KPI Cards Grid (4 equal-width cards with rotating pastel circular badges) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Pending Review */}
+        {/* 1. Pending Review (Orange pastel badge) */}
         <div className="bg-white p-5 rounded-card border border-findeck-border shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-findeck-muted flex items-center gap-1.5">
-              <span>Pending Review</span>
-              <Info className="h-3.5 w-3.5 text-findeck-muted/70" />
-            </span>
+            <div className="flex items-center space-x-2.5">
+              <div className="h-8 w-8 rounded-full bg-warning flex items-center justify-center text-ink shrink-0 shadow-2xs">
+                <Clock className="h-4 w-4 stroke-[2.2]" />
+              </div>
+              <span className="text-xs font-medium text-findeck-muted flex items-center gap-1">
+                <span>Pending Review</span>
+                <Info className="h-3 w-3 text-findeck-muted/70" />
+              </span>
+            </div>
             <MoreHorizontal className="h-4 w-4 text-findeck-muted/50" />
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             <div className="text-28 font-semibold text-findeck-text tracking-tight font-mono tabular-nums">
               {counts["NEEDS_REVIEW"] || 0}
             </div>
             <div className="mt-2.5 flex items-center gap-2">
-              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-pill bg-amber-50 text-amber-800 border border-amber-200/60">
-                <Clock className="h-3 w-3 mr-1" />
+              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-pill bg-warning-soft text-warning-strong border border-warning/30">
                 Active
               </span>
               <span className="text-xs text-findeck-muted">requires review</span>
@@ -66,22 +70,26 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Pushed to Accounting */}
+        {/* 2. Pushed to Accounting (Mint pastel badge) */}
         <div className="bg-white p-5 rounded-card border border-findeck-border shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-findeck-muted flex items-center gap-1.5">
-              <span>Pushed to Accounting</span>
-              <Info className="h-3.5 w-3.5 text-findeck-muted/70" />
-            </span>
+            <div className="flex items-center space-x-2.5">
+              <div className="h-8 w-8 rounded-full bg-success flex items-center justify-center text-ink shrink-0 shadow-2xs">
+                <CheckCircle2 className="h-4 w-4 stroke-[2.2]" />
+              </div>
+              <span className="text-xs font-medium text-findeck-muted flex items-center gap-1">
+                <span>Pushed to Accounting</span>
+                <Info className="h-3 w-3 text-findeck-muted/70" />
+              </span>
+            </div>
             <MoreHorizontal className="h-4 w-4 text-findeck-muted/50" />
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             <div className="text-28 font-semibold text-findeck-text tracking-tight font-mono tabular-nums">
               {counts["PUSHED"] || 0}
             </div>
             <div className="mt-2.5 flex items-center gap-2">
-              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-pill bg-findeck-pill-up-bg text-findeck-pill-up-text border border-emerald-200/50">
-                <CheckCircle2 className="h-3 w-3 mr-1" />
+              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-pill bg-success-soft text-success-strong border border-success/30">
                 Pushed
               </span>
               <span className="text-xs text-findeck-muted">ledger synced</span>
@@ -89,23 +97,27 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Median Time to Approve */}
+        {/* 3. Median Time to Approve (Periwinkle pastel badge) */}
         <div className="bg-white p-5 rounded-card border border-findeck-border shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-findeck-muted flex items-center gap-1.5">
-              <span>Median Time to Approve</span>
-              <Info className="h-3.5 w-3.5 text-findeck-muted/70" />
-            </span>
+            <div className="flex items-center space-x-2.5">
+              <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-ink shrink-0 shadow-2xs">
+                <Activity className="h-4 w-4 stroke-[2.2]" />
+              </div>
+              <span className="text-xs font-medium text-findeck-muted flex items-center gap-1">
+                <span>Median Time to Approve</span>
+                <Info className="h-3 w-3 text-findeck-muted/70" />
+              </span>
+            </div>
             <MoreHorizontal className="h-4 w-4 text-findeck-muted/50" />
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             <div className="text-28 font-semibold text-findeck-text tracking-tight font-mono tabular-nums">
               {metrics?.median_time_to_approve_minutes || 0}{" "}
               <span className="text-sm font-normal text-findeck-muted">min</span>
             </div>
             <div className="mt-2.5 flex items-center gap-2">
-              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-pill bg-findeck-bg-sidebar text-findeck-text border border-findeck-border">
-                <Activity className="h-3 w-3 mr-1 text-findeck-muted" />
+              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-pill bg-accent-soft text-accent-strong border border-accent/30">
                 Throughput
               </span>
               <span className="text-xs text-findeck-muted">review speed</span>
@@ -113,23 +125,27 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Oldest Waiting Queue Age */}
+        {/* 4. Oldest Waiting Queue Age (Coral pastel badge) */}
         <div className="bg-white p-5 rounded-card border border-findeck-border shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-findeck-muted flex items-center gap-1.5">
-              <span>Oldest Waiting Queue Age</span>
-              <Info className="h-3.5 w-3.5 text-findeck-muted/70" />
-            </span>
+            <div className="flex items-center space-x-2.5">
+              <div className="h-8 w-8 rounded-full bg-danger flex items-center justify-center text-ink shrink-0 shadow-2xs">
+                <TrendingUp className="h-4 w-4 stroke-[2.2]" />
+              </div>
+              <span className="text-xs font-medium text-findeck-muted flex items-center gap-1">
+                <span>Oldest Waiting Queue Age</span>
+                <Info className="h-3 w-3 text-findeck-muted/70" />
+              </span>
+            </div>
             <MoreHorizontal className="h-4 w-4 text-findeck-muted/50" />
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             <div className="text-28 font-semibold text-findeck-text tracking-tight font-mono tabular-nums">
               {metrics?.oldest_waiting_age_minutes || 0}{" "}
               <span className="text-sm font-normal text-findeck-muted">min</span>
             </div>
             <div className="mt-2.5 flex items-center gap-2">
-              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-pill bg-findeck-bg-sidebar text-findeck-text border border-findeck-border">
-                <TrendingUp className="h-3 w-3 mr-1 text-findeck-muted" />
+              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-pill bg-danger-soft text-danger-strong border border-danger/30">
                 Queue
               </span>
               <span className="text-xs text-findeck-muted">wait latency</span>
@@ -143,7 +159,7 @@ export function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-findeck-text text-15">
+              <h3 className="font-semibold text-findeck-text text-sm">
                 Human Field Edit Rate (Past 7 Days)
               </h3>
               <Info className="h-3.5 w-3.5 text-findeck-muted/70" />
@@ -152,7 +168,7 @@ export function Dashboard() {
               Frequency of reviewer modifications per field (indicates model extraction accuracy trends).
             </p>
           </div>
-          <div className="text-xs font-medium text-findeck-muted bg-findeck-bg-sidebar px-3 py-1.5 rounded-pill border border-findeck-border font-mono tabular-nums">
+          <div className="text-xs font-medium text-findeck-text bg-findeck-app px-3 py-1.5 rounded-pill border border-findeck-border font-mono tabular-nums">
             Total human edits: {metrics?.total_edits_7d || 0}
           </div>
         </div>
@@ -169,7 +185,7 @@ export function Dashboard() {
               return (
                 <div
                   key={field}
-                  className="p-4 bg-findeck-app rounded-card border border-findeck-border/80 flex flex-col justify-between"
+                  className="p-4 bg-findeck-app rounded-card border border-findeck-border flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-medium text-findeck-text capitalize">
@@ -177,17 +193,17 @@ export function Dashboard() {
                     </span>
                     <span
                       className={`font-mono tabular-nums font-semibold ${
-                        isHigh ? "text-amber-700" : "text-findeck-accent"
+                        isHigh ? "text-warning-strong" : "text-accent-strong"
                       }`}
                     >
                       {pct.toFixed(1)}%
                     </span>
                   </div>
-                  {/* Findeck-style progress bar */}
-                  <div className="mt-3 h-2 w-full bg-findeck-border/60 rounded-full overflow-hidden">
+                  {/* Clean thin progress bar */}
+                  <div className="mt-3 h-2 w-full bg-white rounded-full overflow-hidden border border-findeck-border">
                     <div
                       className={`h-full rounded-full transition-all duration-300 ${
-                        isHigh ? "bg-amber-500" : "bg-findeck-accent"
+                        isHigh ? "bg-warning" : "bg-accent"
                       }`}
                       style={{ width: `${Math.min(pct, 100)}%` }}
                     />

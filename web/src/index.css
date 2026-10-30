@@ -4,42 +4,60 @@
 
 @layer base {
   :root {
-    --bg-app: #F7F8FA;
-    --bg-sidebar: #F2F3F7;
-    --bg-card: #FFFFFF;
-    --border: #E6EAE7;
-    --text: #0F1A12;
-    --text-muted: #6B766F;
-    --accent: #00A843;
-    --accent-hover: #00933A;
-    --accent-soft: #DFF4E1;
-    --accent-soft-border: #BFE6B8;
-    --danger: #D93636;
-    --danger-soft: #FFEAE6;
-    --warning: #F5A524;
-    --warning-soft: #FEF7DB;
-    --info: #2563EB;
-    --info-soft: #E8EFFD;
+    /* Surfaces from Reference B */
+    --bg-app: #ECEDF1;
+    --bg-card: #F7F7F9;
+    --bg-inset: #FFFFFF;
+    --bg-disabled: #F0F1F3;
+    --border: #E3E4EA;
+
+    /* Ink & Text */
+    --ink: #292929;
+    --ink-hover: #3D3D3F;
+    --text: #1D1E20;
+    --text-secondary: #535353;
+    --text-muted: #666668;
+
+    /* Pastel Accents (used as fills with --ink text) */
+    --accent: #9BA1F9;
+    --success: #A0E89E;
+    --danger: #FE8287;
+    --warning: #FFAC6F;
+
+    /* Soft Tints (for panels and soft pills) */
+    --accent-soft: #EEEEF8;
+    --success-soft: #EEF5EE;
+    --danger-soft: #F7EBED;
+    --warning-soft: #FFF1E4;
+
+    /* Strong variants for text, icons and focus rings on light surfaces */
+    --accent-strong: #4B52D8;
+    --success-strong: #1E7B3A;
+    --danger-strong: #B3262B;
+    --warning-strong: #A84E00;
+
+    /* Radii from Reference A */
     --radius-card: 16px;
-    --radius-btn: 10px;
+    --radius-btn: 12px;
     --radius-pill: 9999px;
 
-    /* Shadcn / Tailwind compatible mapping */
-    --background: 210 20% 98%;
-    --foreground: 140 15% 8%;
-    --card: 0 0% 100%;
-    --card-foreground: 140 15% 8%;
-    --primary: 144 100% 33%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 140 15% 8%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 140 5% 44%;
-    --accent-token: 144 100% 33%;
-    --accent-token-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --radius: 0.625rem;
+    /* Tailwind / Shadcn token mappings */
+    --background: var(--bg-app);
+    --foreground: var(--text);
+    --card: var(--bg-card);
+    --card-foreground: var(--text);
+    --primary: var(--ink);
+    --primary-foreground: #FFFFFF;
+    --secondary: var(--bg-card);
+    --secondary-foreground: var(--text);
+    --muted: var(--bg-card);
+    --muted-foreground: var(--text-muted);
+    --accent-token: var(--accent);
+    --accent-token-foreground: var(--ink);
+    --destructive: var(--danger-strong);
+    --destructive-foreground: #FFFFFF;
+    --ring: var(--accent-strong);
+    --radius: 0.75rem;
   }
 
   * {
@@ -61,7 +79,23 @@
   }
 }
 
-/* Subtle, sleek custom scrollbar matching Findeck feel */
+/* Minimal 120-150ms transitions */
+button, a, input, select {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Subtle, sleek custom scrollbar matching clean finance feel */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -70,9 +104,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
+  background: #D5D6DC;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+  background: #B8B9C2;
 }

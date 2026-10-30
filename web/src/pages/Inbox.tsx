@@ -10,6 +10,8 @@ import {
   FileCheck,
   RefreshCw,
   ArrowRight,
+  Check,
+  AlertCircle,
 } from "lucide-react";
 
 interface UploadFileResult {
@@ -100,24 +102,26 @@ export function Inbox() {
   const recentItems = queueData?.items || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Document Inbox</h1>
-        <p className="text-sm text-slate-600 mt-1">
+    <div className="w-full space-y-6">
+      {/* Top Banner with Title */}
+      <div className="bg-findeck-card p-6 rounded-card border border-findeck-border shadow-xs">
+        <h1 className="text-2xl font-bold text-findeck-text tracking-tight">Document Inbox</h1>
+        <p className="text-xs text-findeck-muted mt-1">
           Upload PDF or image invoices (JPEG, PNG, WebP, HEIC). System will extract, validate, and deduplicate automatically.
         </p>
       </div>
 
-      {/* Drag & Drop Upload Zone */}
+      {/* Drag & Drop Upload Zone: dashed border in --accent, --accent-soft tint on drag-over */}
       <div
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${dragActive
-          ? "border-indigo-600 bg-indigo-50/50 scale-[1.01]"
-          : "border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50/50"
-          }`}
+        className={`border-2 border-dashed rounded-card p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${
+          dragActive
+            ? "border-accent bg-accent-soft scale-[1.01]"
+            : "border-findeck-border bg-white hover:border-accent-strong hover:bg-accent-soft/30"
+        }`}
       >
         <input
           ref={fileInputRef}
@@ -127,32 +131,32 @@ export function Inbox() {
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <div className="h-16 w-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 mb-4 shadow-sm">
-          <UploadCloud className="h-8 w-8" />
+        <div className="h-14 w-14 rounded-2xl bg-accent-soft flex items-center justify-center text-ink mb-3 shadow-2xs">
+          <UploadCloud className="h-7 w-7 text-ink" />
         </div>
-        <p className="text-base font-semibold text-slate-800">
+        <p className="text-sm font-semibold text-findeck-text">
           {uploading
             ? "Uploading and queueing invoices..."
             : "Drop invoice files here, or click to browse"}
         </p>
-        <p className="text-xs text-slate-500 mt-1">
+        <p className="text-xs text-findeck-muted mt-1">
           Supports multi-file uploads: PDF, JPEG, PNG, WebP, HEIC (Max 20MB per file)
         </p>
       </div>
 
       {/* Upload Results Table */}
       {uploadResults.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <h3 className="font-semibold text-slate-800 text-sm">Upload Batch Results</h3>
+        <div className="bg-findeck-card rounded-card border border-findeck-border shadow-xs overflow-hidden">
+          <div className="px-6 py-3.5 border-b border-findeck-border flex justify-between items-center bg-white">
+            <h3 className="font-semibold text-findeck-text text-sm">Upload Batch Results</h3>
             <button
               onClick={() => setUploadResults([])}
-              className="text-xs font-medium text-slate-500 hover:text-slate-800"
+              className="text-xs font-medium text-findeck-muted hover:text-findeck-text cursor-pointer"
             >
               Clear
             </button>
           </div>
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-findeck-border">
             {uploadResults.map((res: any, idx) => {
               const fileName = res.file_name || res.filename || "Uploaded File";
               const isDuplicate = res.status === "duplicate_skipped" || res.is_duplicate;
@@ -160,76 +164,78 @@ export function Inbox() {
               const status = liveInvoice
                 ? liveInvoice.status
                 : res.status === "created" || res.status === "RECEIVED"
-                  ? "RECEIVED"
-                  : res.status;
+                ? "RECEIVED"
+                : res.status;
 
-              let badgeColor = "bg-blue-50 text-blue-700 border-blue-200";
+              let badgeColor = "bg-accent-soft text-accent-strong border-accent/30";
               let badgeText = "Queued for Processing";
               let StatusIcon = Clock;
 
               if (isDuplicate) {
-                badgeColor = "bg-amber-50 text-amber-700 border-amber-200";
+                badgeColor = "bg-accent-soft text-ink border-accent/30";
                 badgeText = "Duplicate File Skipped";
                 StatusIcon = Clock;
               } else if (status === "PROCESSING") {
-                badgeColor = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                badgeColor = "bg-accent-soft text-accent-strong border-accent/30";
                 badgeText = "Extracting & Validating...";
                 StatusIcon = RefreshCw;
               } else if (status === "NEEDS_REVIEW") {
-                badgeColor = "bg-amber-50 text-amber-800 border-amber-200";
+                badgeColor = "bg-warning-soft text-warning-strong border-warning/30";
                 badgeText =
                   liveInvoice?.error_count > 0
-                    ? `Ready for Review (${liveInvoice.error_count} error${liveInvoice.error_count > 1 ? "s" : ""
-                    })`
+                    ? `Ready for Review (${liveInvoice.error_count} error${
+                        liveInvoice.error_count > 1 ? "s" : ""
+                      })`
                     : "Ready for Review";
                 StatusIcon = CheckCircle2;
               } else if (status === "APPROVED" || status === "PUSHED") {
-                badgeColor = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                badgeColor = "bg-success-soft text-success-strong border-success/30";
                 badgeText = status === "PUSHED" ? "Pushed to Accounting" : "Approved";
                 StatusIcon = CheckCircle2;
               } else if (status === "RESEND_REQUESTED") {
-                badgeColor = "bg-purple-50 text-purple-700 border-purple-200";
+                badgeColor = "bg-warning-soft text-warning-strong border-warning/30";
                 badgeText = "Resend Requested";
                 StatusIcon = AlertTriangle;
               } else if (status === "REJECTED") {
-                badgeColor = "bg-rose-50 text-rose-700 border-rose-200";
+                badgeColor = "bg-danger-soft text-danger-strong border-danger/30";
                 badgeText = "Rejected";
                 StatusIcon = AlertTriangle;
               } else if (status === "FAILED" || res.status === "failed") {
-                badgeColor = "bg-red-50 text-red-700 border-red-200";
+                badgeColor = "bg-danger-soft text-danger-strong border-danger/30";
                 badgeText = "Processing Failed";
                 StatusIcon = AlertTriangle;
               }
 
               return (
-                <div key={idx} className="px-6 py-3.5 flex items-center justify-between text-sm">
+                <div key={idx} className="px-6 py-3.5 flex items-center justify-between text-xs bg-findeck-card">
                   <div className="flex items-center space-x-3">
                     <StatusIcon
-                      className={`h-5 w-5 ${status === "PROCESSING"
-                        ? "animate-spin text-indigo-500"
-                        : isDuplicate
-                          ? "text-amber-500"
+                      className={`h-4 w-4 ${
+                        status === "PROCESSING"
+                          ? "animate-spin text-accent-strong"
+                          : isDuplicate
+                          ? "text-ink"
                           : status === "NEEDS_REVIEW"
-                            ? "text-amber-600"
-                            : status === "APPROVED" || status === "PUSHED"
-                              ? "text-emerald-500"
-                              : status === "FAILED" || res.status === "failed"
-                                ? "text-red-500"
-                                : "text-blue-500"
-                        }`}
+                          ? "text-warning-strong"
+                          : status === "APPROVED" || status === "PUSHED"
+                          ? "text-success-strong"
+                          : status === "FAILED" || res.status === "failed"
+                          ? "text-danger-strong"
+                          : "text-accent-strong"
+                      }`}
                     />
-                    <span className="font-medium text-slate-700">{fileName}</span>
+                    <span className="font-medium text-findeck-text">{fileName}</span>
                   </div>
                   <div className="flex items-center space-x-4">
                     <span
-                      className={`text-xs px-2.5 py-1 rounded-full font-medium border ${badgeColor}`}
+                      className={`text-xs px-2.5 py-0.5 rounded-pill font-medium border ${badgeColor}`}
                     >
                       {badgeText}
                     </span>
                     {res.invoice_id && (
                       <Link
                         to={`/invoices/${res.invoice_id}`}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1"
+                        className="text-xs font-semibold text-accent-strong hover:underline flex items-center space-x-1"
                       >
                         <span>View</span>
                         <ArrowRight className="h-3 w-3" />
@@ -244,15 +250,15 @@ export function Inbox() {
       )}
 
       {/* Live Processing & Recent Invoices */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+      <div className="bg-findeck-card rounded-card border border-findeck-border shadow-xs overflow-hidden">
+        <div className="px-6 py-3.5 border-b border-findeck-border flex justify-between items-center bg-white">
           <div className="flex items-center space-x-2">
-            <FileCheck className="h-5 w-5 text-indigo-600" />
-            <h3 className="font-semibold text-slate-800 text-sm">Recent Ingested Invoices</h3>
+            <FileCheck className="h-4 w-4 text-ink" />
+            <h3 className="font-semibold text-findeck-text text-sm">Recent Ingested Invoices</h3>
           </div>
           <button
             onClick={() => refetch()}
-            className="inline-flex items-center space-x-1.5 text-xs font-medium text-slate-600 hover:text-slate-900"
+            className="inline-flex items-center space-x-1.5 text-xs font-medium text-findeck-muted hover:text-findeck-text cursor-pointer"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
             <span>Refresh</span>
@@ -260,49 +266,67 @@ export function Inbox() {
         </div>
 
         {recentItems.length === 0 ? (
-          <div className="px-6 py-12 text-center text-slate-500 text-sm">
+          <div className="px-6 py-12 text-center text-findeck-muted text-xs">
             No invoices uploaded yet. Drop files above to start processing.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+            <table className="w-full text-left text-xs text-findeck-text">
+              <thead className="bg-white text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-findeck-border">
                 <tr>
-                  <th className="px-6 py-3">Invoice / GSTIN</th>
-                  <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3">Received</th>
-                  <th className="px-6 py-3">Issues</th>
-                  <th className="px-6 py-3 text-right">Action</th>
+                  <th className="px-6 py-3.5">Invoice / GSTIN</th>
+                  <th className="px-6 py-3.5">Status</th>
+                  <th className="px-6 py-3.5">Received</th>
+                  <th className="px-6 py-3.5">Issues</th>
+                  <th className="px-6 py-3.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-findeck-border">
                 {recentItems.map((inv: any) => (
-                  <tr key={inv.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={inv.id} className="hover:bg-white transition-colors">
                     <td className="px-6 py-3.5">
-                      <div className="font-semibold text-slate-900">
+                      <div className="font-semibold text-findeck-text">
                         {inv.normalized_invoice_number || "Extracting..."}
                       </div>
-                      <div className="text-xs text-slate-400 font-mono">
+                      <div className="text-[11px] text-findeck-muted font-mono">
                         {inv.supplier_gstin || "Awaiting pipeline"}
                       </div>
                     </td>
                     <td className="px-6 py-3.5">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${inv.status === "NEEDS_REVIEW"
-                          ? "bg-amber-100 text-amber-800"
-                          : inv.status === "APPROVED"
-                            ? "bg-blue-100 text-blue-800"
-                            : inv.status === "PUSHED"
-                              ? "bg-emerald-100 text-emerald-800"
-                              : inv.status === "PROCESSING"
-                                ? "bg-purple-100 text-purple-800 animate-pulse"
-                                : "bg-slate-100 text-slate-700"
-                          }`}
+                        className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-pill text-xs font-medium border ${
+                          inv.status === "NEEDS_REVIEW"
+                            ? "bg-warning-soft text-warning-strong border-warning/30"
+                            : inv.status === "APPROVED" || inv.status === "PUSHED"
+                            ? "bg-success-soft text-success-strong border-success/30"
+                            : inv.status === "PROCESSING"
+                            ? "bg-accent-soft text-accent-strong border-accent/30 animate-pulse"
+                            : inv.status === "RESEND_REQUESTED"
+                            ? "bg-warning-soft text-warning-strong border-warning/30"
+                            : inv.status === "REJECTED" || inv.status === "FAILED"
+                            ? "bg-danger-soft text-danger-strong border-danger/30"
+                            : "bg-findeck-app text-findeck-text border-findeck-border"
+                        }`}
                       >
-                        {inv.status}
+                        {inv.status === "PUSHED" ? (
+                          <Check className="h-3 w-3 text-success-strong" />
+                        ) : (
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              inv.status === "NEEDS_REVIEW"
+                                ? "bg-warning"
+                                : inv.status === "APPROVED" || inv.status === "PUSHED"
+                                ? "bg-success"
+                                : inv.status === "PROCESSING"
+                                ? "bg-accent"
+                                : "bg-danger"
+                            }`}
+                          />
+                        )}
+                        <span>{inv.status}</span>
                       </span>
                     </td>
-                    <td className="px-6 py-3.5 text-xs text-slate-500">
+                    <td className="px-6 py-3.5 text-xs text-findeck-muted tabular-nums">
                       {new Date(inv.received_at).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -310,21 +334,23 @@ export function Inbox() {
                     </td>
                     <td className="px-6 py-3.5">
                       {inv.error_count > 0 ? (
-                        <span className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200">
-                          {inv.error_count} error{inv.error_count > 1 ? "s" : ""}
+                        <span className="inline-flex items-center space-x-1 text-xs font-semibold text-danger-strong bg-danger-soft px-2 py-0.5 rounded-pill border border-danger/30">
+                          <AlertCircle className="h-3 w-3" />
+                          <span className="tabular-nums">{inv.error_count} error{inv.error_count > 1 ? "s" : ""}</span>
                         </span>
                       ) : inv.warning_count > 0 ? (
-                        <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                          {inv.warning_count} warning{inv.warning_count > 1 ? "s" : ""}
+                        <span className="inline-flex items-center space-x-1 text-xs font-semibold text-warning-strong bg-warning-soft px-2 py-0.5 rounded-pill border border-warning/30">
+                          <AlertTriangle className="h-3 w-3" />
+                          <span className="tabular-nums">{inv.warning_count} warning{inv.warning_count > 1 ? "s" : ""}</span>
                         </span>
                       ) : (
-                        <span className="text-xs text-emerald-600 font-medium">Clean</span>
+                        <span className="text-xs text-success-strong font-medium">Clean</span>
                       )}
                     </td>
                     <td className="px-6 py-3.5 text-right">
                       <Link
                         to={`/invoices/${inv.id}`}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 inline-flex items-center space-x-1"
+                        className="text-xs font-semibold text-accent-strong hover:underline inline-flex items-center space-x-1"
                       >
                         <span>Open</span>
                         <ArrowRight className="h-3 w-3" />

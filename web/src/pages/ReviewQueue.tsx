@@ -12,6 +12,7 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
+  Check,
 } from "lucide-react";
 
 export function ReviewQueue() {
@@ -77,7 +78,7 @@ export function ReviewQueue() {
   return (
     <div className="w-full space-y-6">
       {/* Top Banner with Action & Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-findeck-card p-6 rounded-card border border-findeck shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-findeck-card p-6 rounded-card border border-findeck-border shadow-xs">
         <div>
           <h1 className="text-2xl font-bold text-findeck-text tracking-tight">Review Queue</h1>
           <p className="text-xs text-findeck-muted mt-1">
@@ -89,7 +90,7 @@ export function ReviewQueue() {
           <button
             onClick={startReviewing}
             disabled={items.length === 0}
-            className="inline-flex items-center space-x-2 px-4 py-2.5 bg-findeck-accent hover:bg-findeck-accent-hover text-white font-medium text-xs rounded-btn shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-2 px-4 py-2.5 bg-ink hover:bg-ink-hover text-white font-medium text-xs rounded-btn shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
           >
             <Play className="h-3.5 w-3.5 fill-white" />
             <span>Start Reviewing</span>
@@ -116,7 +117,7 @@ export function ReviewQueue() {
             {counts[st] !== undefined && (
               <span
                 className={`ml-1.5 px-1.5 py-0.2 rounded-pill text-[10px] tabular-nums ${
-                  statusFilter === st ? "bg-findeck-sidebar text-findeck-text font-bold" : "bg-slate-200/60 text-findeck-muted"
+                  statusFilter === st ? "bg-accent-soft text-ink font-bold" : "bg-slate-200/60 text-findeck-muted"
                 }`}
               >
                 {counts[st]}
@@ -127,7 +128,7 @@ export function ReviewQueue() {
       </div>
 
       {/* Filter Bar (Search, Flagged toggle, Sort) */}
-      <div className="bg-findeck-card p-4 rounded-card border border-findeck shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="bg-findeck-card p-4 rounded-card border border-findeck-border shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-80">
           <Search className="h-4 w-4 absolute left-3 top-3 text-findeck-muted" />
           <input
@@ -138,7 +139,7 @@ export function ReviewQueue() {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-9 pr-8 py-2 text-xs bg-white border border-findeck rounded-btn focus:outline-none focus:ring-1 focus:ring-findeck-accent transition-all text-findeck-text placeholder:text-findeck-muted"
+            className="w-full pl-9 pr-8 py-2 text-xs bg-white border border-findeck-border rounded-btn focus:outline-none focus:ring-1 focus:ring-accent-strong focus:border-accent-strong transition-all text-findeck-text placeholder:text-findeck-muted"
           />
           <span className="absolute right-2.5 top-2.5 text-[10px] text-findeck-muted font-mono">/</span>
         </div>
@@ -152,14 +153,14 @@ export function ReviewQueue() {
                 setFlaggedOnly(e.target.checked);
                 setPage(1);
               }}
-              className="h-4 w-4 rounded-[4px] border-findeck text-findeck-accent focus:ring-findeck-accent"
+              className="h-4 w-4 rounded-[4px] border-findeck-border text-ink focus:ring-accent-strong"
             />
             <span>Flagged issues only</span>
           </label>
 
           <button
             onClick={() => setSortOrder(sortOrder === "oldest" ? "newest" : "oldest")}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 border border-findeck rounded-btn text-xs font-medium text-findeck-text hover:bg-findeck-sidebar transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3 py-2 border border-findeck-border rounded-btn text-xs font-medium text-findeck-text hover:bg-white transition-colors cursor-pointer bg-white"
           >
             <ArrowUpDown className="h-3.5 w-3.5 text-findeck-muted" />
             <span>Sort: {sortOrder === "oldest" ? "Oldest First" : "Newest First"}</span>
@@ -168,7 +169,7 @@ export function ReviewQueue() {
       </div>
 
       {/* Main Queue Table Card */}
-      <div className="bg-findeck-card rounded-card border border-findeck shadow-xs overflow-hidden">
+      <div className="bg-findeck-card rounded-card border border-findeck-border shadow-xs overflow-hidden">
         {isLoading ? (
           <div className="py-20 text-center text-xs text-findeck-muted">Loading invoice queue...</div>
         ) : items.length === 0 ? (
@@ -179,7 +180,7 @@ export function ReviewQueue() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-findeck-text">
-              <thead className="bg-findeck-sidebar/70 text-[11px] font-semibold text-findeck-muted uppercase tracking-wider border-b border-findeck">
+              <thead className="bg-white text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-findeck-border">
                 <tr>
                   <th className="px-6 py-3.5">Invoice #</th>
                   <th className="px-6 py-3.5">Supplier GSTIN</th>
@@ -189,15 +190,15 @@ export function ReviewQueue() {
                   <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-findeck">
+              <tbody className="divide-y divide-findeck-border">
                 {items.map((inv: any) => (
                   <tr
                     key={inv.id}
-                    className="hover:bg-findeck-sidebar/50 transition-colors group cursor-pointer"
+                    className="hover:bg-white transition-colors group cursor-pointer"
                     onClick={() => navigate(`/invoices/${inv.id}`)}
                   >
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-findeck-text group-hover:text-findeck-accent transition-colors">
+                      <div className="font-semibold text-findeck-text group-hover:text-accent-strong transition-colors">
                         {inv.normalized_invoice_number || "Unextracted"}
                       </div>
                       <div className="text-[11px] text-findeck-muted">
@@ -216,27 +217,35 @@ export function ReviewQueue() {
                       <span
                         className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-pill text-xs font-medium border ${
                           inv.status === "NEEDS_REVIEW"
-                            ? "bg-findeck-warning-soft text-findeck-warning border-findeck-warning/30"
-                            : inv.status === "APPROVED" || inv.status === "PUSHED"
-                            ? "bg-findeck-accent-soft text-findeck-accent border-findeck-accent-soft-border"
+                            ? "bg-warning-soft text-warning-strong border-warning/30"
+                            : inv.status === "APPROVED"
+                            ? "bg-success-soft text-success-strong border-success/30"
+                            : inv.status === "PUSHED"
+                            ? "bg-success-soft text-success-strong border-success/30"
                             : inv.status === "RESEND_REQUESTED"
-                            ? "bg-[#FAF5FF] text-[#6B21A8] border-[#E9D5FF]"
-                            : inv.status === "REJECTED"
-                            ? "bg-findeck-danger-soft text-findeck-danger border-findeck-danger/30"
-                            : "bg-findeck-sidebar text-findeck-text border-findeck"
+                            ? "bg-warning-soft text-warning-strong border-warning/30"
+                            : inv.status === "REJECTED" || inv.status === "FAILED" || inv.status === "PUSH_FAILED"
+                            ? "bg-danger-soft text-danger-strong border-danger/30"
+                            : inv.status.includes("DUPLICATE")
+                            ? "bg-accent-soft text-ink border-accent/30"
+                            : "bg-findeck-app text-findeck-text border-findeck-border"
                         }`}
                       >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            inv.status === "NEEDS_REVIEW"
-                              ? "bg-findeck-warning"
-                              : inv.status === "APPROVED" || inv.status === "PUSHED"
-                              ? "bg-findeck-accent"
-                              : inv.status === "RESEND_REQUESTED"
-                              ? "bg-[#9333EA]"
-                              : "bg-findeck-danger"
-                          }`}
-                        />
+                        {inv.status === "PUSHED" ? (
+                          <Check className="h-3 w-3 text-success-strong" />
+                        ) : (
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              inv.status === "NEEDS_REVIEW"
+                                ? "bg-warning"
+                                : inv.status === "APPROVED" || inv.status === "PUSHED"
+                                ? "bg-success"
+                                : inv.status === "RESEND_REQUESTED"
+                                ? "bg-warning"
+                                : "bg-danger"
+                            }`}
+                          />
+                        )}
                         <span>{inv.status.replace(/_/g, " ")}</span>
                       </span>
                     </td>
@@ -249,7 +258,7 @@ export function ReviewQueue() {
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2">
                         {inv.status === "RESEND_REQUESTED" ? (
-                          <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-btn text-xs font-medium bg-[#FAF5FF] text-[#6B21A8] border border-[#E9D5FF]">
+                          <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-btn text-xs font-medium bg-warning-soft text-warning-strong border border-warning/30">
                             <span className="font-semibold">Reason:</span>
                             <span className="truncate max-w-[240px]" title={inv.status_reason || "Pending vendor resubmission"}>
                               {inv.status_reason || "Pending vendor resubmission"}
@@ -258,19 +267,19 @@ export function ReviewQueue() {
                         ) : (
                           <>
                             {inv.error_count > 0 && (
-                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-pill text-xs font-semibold bg-findeck-danger-soft text-findeck-danger border border-findeck-danger/30">
+                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-pill text-xs font-semibold bg-danger-soft text-danger-strong border border-danger/30">
                                 <AlertCircle className="h-3 w-3" />
                                 <span className="tabular-nums">{inv.error_count} error{inv.error_count > 1 ? "s" : ""}</span>
                               </span>
                             )}
                             {inv.warning_count > 0 && (
-                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-pill text-xs font-semibold bg-findeck-warning-soft text-findeck-warning border border-findeck-warning/30">
+                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-pill text-xs font-semibold bg-warning-soft text-warning-strong border border-warning/30">
                                 <AlertTriangle className="h-3 w-3" />
                                 <span className="tabular-nums">{inv.warning_count} warning{inv.warning_count > 1 ? "s" : ""}</span>
                               </span>
                             )}
                             {inv.error_count === 0 && inv.warning_count === 0 && (
-                              <span className="text-xs text-findeck-accent font-medium">Valid</span>
+                              <span className="text-xs text-success-strong font-medium">Valid</span>
                             )}
                           </>
                         )}
@@ -280,7 +289,7 @@ export function ReviewQueue() {
                       <Link
                         to={`/invoices/${inv.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center space-x-1 text-xs font-semibold text-findeck-accent hover:underline"
+                        className="inline-flex items-center space-x-1 text-xs font-semibold text-accent-strong hover:underline"
                       >
                         <span>Review</span>
                       </Link>
@@ -325,7 +334,7 @@ export function ReviewQueue() {
                       type="button"
                       onClick={onNext}
                       disabled={page >= totalPages}
-                      className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-bg-sidebar text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                      className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-app text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                       title="Next page"
                     >
                       <ChevronRight className="h-4 w-4" />
@@ -340,7 +349,7 @@ export function ReviewQueue() {
                       type="button"
                       onClick={onPrevious}
                       disabled={page <= 1}
-                      className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-bg-sidebar text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                      className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-app text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                       title="Previous page"
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -367,8 +376,8 @@ export function ReviewQueue() {
                     onClick={() => setPage(value)}
                     className={`w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer ${
                       isActive
-                        ? "bg-findeck-accent text-white border-findeck-accent shadow-xs"
-                        : "border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar"
+                        ? "bg-ink text-white border-ink shadow-xs"
+                        : "border-findeck-border bg-white text-findeck-text hover:bg-findeck-app"
                     }`}
                   >
                     {value}

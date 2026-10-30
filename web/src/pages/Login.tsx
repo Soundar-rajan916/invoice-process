@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { FileText, Lock, Mail, AlertCircle, ArrowRight } from "lucide-react";
+import { Lock, Mail, AlertCircle, ArrowRight, FileSpreadsheet } from "lucide-react";
 
 export function Login() {
   const { login } = useAuth();
@@ -29,8 +29,8 @@ export function Login() {
     <div className="min-h-screen bg-findeck-app flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="h-12 w-12 rounded-xl bg-findeck-accent flex items-center justify-center text-white shadow-xs">
-            <FileText className="h-6 w-6 stroke-[2.2]" />
+          <div className="h-12 w-12 rounded-[14px] bg-ink flex items-center justify-center text-white shadow-xs">
+            <FileSpreadsheet className="h-6 w-6 stroke-[2.2]" />
           </div>
         </div>
         <h2
@@ -47,8 +47,8 @@ export function Login() {
       <div className="mt-7 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-6 shadow-xs rounded-card sm:px-10 border border-findeck-border">
           {error && (
-            <div className="mb-6 p-3.5 rounded-btn bg-rose-50 border border-rose-200 flex items-start space-x-3 text-rose-800 text-sm">
-              <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
+            <div className="mb-6 p-3.5 rounded-btn bg-danger-soft border border-danger/30 flex items-start space-x-3 text-danger-strong text-sm">
+              <AlertCircle className="h-5 w-5 text-danger-strong shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
@@ -73,7 +73,7 @@ export function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-findeck-border rounded-btn focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-sm text-findeck-text outline-none transition-all bg-white"
+                  className="block w-full pl-9 pr-3 py-2 h-10 border border-findeck-border rounded-btn focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-sm text-findeck-text outline-none transition-all bg-white"
                   placeholder="reviewer@invoiceflow.internal"
                 />
               </div>
@@ -98,7 +98,7 @@ export function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-findeck-border rounded-btn focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-sm text-findeck-text outline-none transition-all bg-white"
+                  className="block w-full pl-9 pr-3 py-2 h-10 border border-findeck-border rounded-btn focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-sm text-findeck-text outline-none transition-all bg-white"
                   placeholder="••••••••••••"
                 />
               </div>
@@ -108,7 +108,7 @@ export function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center items-center space-x-2 py-2.5 px-4 rounded-btn text-sm font-semibold text-white bg-findeck-accent hover:bg-findeck-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-findeck-accent disabled:opacity-50 transition-all cursor-pointer shadow-xs"
+                className="w-full flex justify-center items-center space-x-2 py-2.5 px-4 rounded-btn text-sm font-semibold text-white bg-ink hover:bg-ink-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-strong disabled:opacity-50 transition-all cursor-pointer shadow-xs"
               >
                 <span>{loading ? "Authenticating..." : "Sign in"}</span>
                 {!loading && <ArrowRight className="h-4 w-4" />}

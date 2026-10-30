@@ -236,7 +236,7 @@ export function DocumentViewer({
               onClick={() => setShowThumbnails(!showThumbnails)}
               className={`p-1 rounded transition-colors cursor-pointer ${
                 showThumbnails
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-accent-strong text-white"
                   : "hover:bg-slate-800 text-slate-300 hover:text-white"
               }`}
               title="Toggle page thumbnails"
@@ -332,7 +332,7 @@ export function DocumentViewer({
               onClick={onToggleWideMode}
               className={`p-1 rounded transition-colors cursor-pointer ${
                 wideMode
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-accent-strong text-white"
                   : "hover:bg-slate-800 text-slate-400 hover:text-white"
               }`}
               title={wideMode ? "Standard 50/50 view" : "Wide 65% document view"}
@@ -440,7 +440,7 @@ export function DocumentViewer({
                 onClick={() => onPageChange(p.page_number)}
                 className={`group relative h-16 w-12 rounded border overflow-hidden shrink-0 transition-all cursor-pointer ${
                   isActive
-                    ? "border-indigo-500 ring-2 ring-indigo-400 shadow-md"
+                    ? "border-accent-strong ring-2 ring-accent-strong shadow-md"
                     : "border-slate-700 opacity-60 hover:opacity-100 hover:border-slate-500"
                 }`}
               >
@@ -452,7 +452,7 @@ export function DocumentViewer({
                 <div
                   className={`absolute bottom-0 inset-x-0 text-[9px] font-mono font-bold text-center py-0.5 ${
                     isActive
-                      ? "bg-indigo-600 text-white"
+                      ? "bg-accent-strong text-white"
                       : "bg-slate-900/80 text-slate-300"
                   }`}
                 >

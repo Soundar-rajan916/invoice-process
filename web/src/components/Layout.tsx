@@ -8,7 +8,7 @@ import {
   ShieldCheck,
   Building2,
   ChevronDown,
-  Plus,
+  FileSpreadsheet,
 } from "lucide-react";
 
 export function Layout() {
@@ -31,12 +31,12 @@ export function Layout() {
   return (
     <div className="min-h-screen bg-findeck-app flex font-sans antialiased text-findeck-text">
       {/* Fixed Left Sidebar (240px wide) */}
-      <aside className="w-60 shrink-0 bg-findeck-sidebar border-r border-findeck flex flex-col justify-between p-4 select-none min-h-screen sticky top-0 h-screen overflow-y-auto">
+      <aside className="w-60 shrink-0 bg-findeck-card border-r border-findeck-border flex flex-col justify-between p-4 select-none min-h-screen sticky top-0 h-screen overflow-y-auto">
         <div className="space-y-6">
-          {/* Brand Logo Header */}
-          <Link to="/queue" className="flex items-center space-x-2.5 px-2 pt-2">
-            <div className="h-8 w-8 rounded-[10px] bg-findeck-accent flex items-center justify-center text-white shadow-2xs">
-              <Plus className="h-5 w-5 stroke-[3]" />
+          {/* Brand Logo Header: rounded square in --ink with white glyph */}
+          <Link to="/queue" className="flex items-center space-x-2.5 px-2 pt-1">
+            <div className="h-8 w-8 rounded-[10px] bg-ink flex items-center justify-center text-white shadow-2xs">
+              <FileSpreadsheet className="h-4 w-4" />
             </div>
             <span className="font-semibold text-lg tracking-tight text-findeck-text">
               InvoiceFlow
@@ -54,33 +54,49 @@ export function Layout() {
               <NavLink
                 to="/queue"
                 className={({ isActive }) =>
-                  `flex items-center justify-between px-3 py-2 rounded-btn text-sm font-medium transition-colors ${
+                  `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck/50"
-                      : "text-findeck-muted hover:text-findeck-text hover:bg-white/50"
+                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck-border"
+                      : "text-findeck-text-secondary hover:text-findeck-text hover:bg-white/60"
                   }`
                 }
               >
-                <div className="flex items-center space-x-2.5">
-                  <ListOrdered className="h-4 w-4" />
-                  <span>Review Queue</span>
-                </div>
+                {({ isActive }) => (
+                  <div className="flex items-center space-x-2.5">
+                    {isActive ? (
+                      <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-ink shrink-0">
+                        <ListOrdered className="h-3 w-3 stroke-[2.5]" />
+                      </div>
+                    ) : (
+                      <ListOrdered className="h-[18px] w-[18px] text-findeck-muted shrink-0" />
+                    )}
+                    <span>Review Queue</span>
+                  </div>
+                )}
               </NavLink>
 
               <NavLink
                 to="/inbox"
                 className={({ isActive }) =>
-                  `flex items-center justify-between px-3 py-2 rounded-btn text-sm font-medium transition-colors ${
+                  `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck/50"
-                      : "text-findeck-muted hover:text-findeck-text hover:bg-white/50"
+                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck-border"
+                      : "text-findeck-text-secondary hover:text-findeck-text hover:bg-white/60"
                   }`
                 }
               >
-                <div className="flex items-center space-x-2.5">
-                  <Inbox className="h-4 w-4" />
-                  <span>Inbox</span>
-                </div>
+                {({ isActive }) => (
+                  <div className="flex items-center space-x-2.5">
+                    {isActive ? (
+                      <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-ink shrink-0">
+                        <Inbox className="h-3 w-3 stroke-[2.5]" />
+                      </div>
+                    ) : (
+                      <Inbox className="h-[18px] w-[18px] text-findeck-muted shrink-0" />
+                    )}
+                    <span>Inbox</span>
+                  </div>
+                )}
               </NavLink>
             </div>
 
@@ -93,30 +109,50 @@ export function Layout() {
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) =>
-                  `flex items-center space-x-2.5 px-3 py-2 rounded-btn text-sm font-medium transition-colors ${
+                  `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck/50"
-                      : "text-findeck-muted hover:text-findeck-text hover:bg-white/50"
+                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck-border"
+                      : "text-findeck-text-secondary hover:text-findeck-text hover:bg-white/60"
                   }`
                 }
               >
-                <LayoutDashboard className="h-4 w-4" />
-                <span>Dashboard</span>
+                {({ isActive }) => (
+                  <div className="flex items-center space-x-2.5">
+                    {isActive ? (
+                      <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-ink shrink-0">
+                        <LayoutDashboard className="h-3 w-3 stroke-[2.5]" />
+                      </div>
+                    ) : (
+                      <LayoutDashboard className="h-[18px] w-[18px] text-findeck-muted shrink-0" />
+                    )}
+                    <span>Dashboard</span>
+                  </div>
+                )}
               </NavLink>
 
               {user?.role === "admin" && (
                 <NavLink
                   to="/admin"
                   className={({ isActive }) =>
-                    `flex items-center space-x-2.5 px-3 py-2 rounded-btn text-sm font-medium transition-colors ${
+                    `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                       isActive
-                        ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck/50"
-                        : "text-findeck-muted hover:text-findeck-text hover:bg-white/50"
+                        ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck-border"
+                        : "text-findeck-text-secondary hover:text-findeck-text hover:bg-white/60"
                     }`
                   }
                 >
-                  <ShieldCheck className="h-4 w-4" />
-                  <span>Admin</span>
+                  {({ isActive }) => (
+                    <div className="flex items-center space-x-2.5">
+                      {isActive ? (
+                        <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-ink shrink-0">
+                          <ShieldCheck className="h-3 w-3 stroke-[2.5]" />
+                        </div>
+                      ) : (
+                        <ShieldCheck className="h-[18px] w-[18px] text-findeck-muted shrink-0" />
+                      )}
+                      <span>Admin</span>
+                    </div>
+                  )}
                 </NavLink>
               )}
             </div>
@@ -124,11 +160,11 @@ export function Layout() {
         </div>
 
         {/* Sidebar Footer: User Card and Logout */}
-        <div className="pt-4 border-t border-findeck space-y-2">
+        <div className="pt-4 border-t border-findeck-border space-y-2">
           {/* User Card */}
-          <div className="bg-white border border-findeck rounded-btn p-2 px-2.5 flex items-center justify-between shadow-2xs">
+          <div className="bg-white border border-findeck-border rounded-btn p-2 px-2.5 flex items-center justify-between shadow-2xs">
             <div className="flex items-center space-x-2.5 min-w-0">
-              <div className="h-7 w-7 rounded-[8px] bg-findeck-accent text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+              <div className="h-7 w-7 rounded-full bg-accent text-ink flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                 {userInitials}
               </div>
               <div className="min-w-0 text-left">
@@ -146,7 +182,7 @@ export function Layout() {
           {/* Logout Action */}
           <button
             onClick={() => logout()}
-            className="flex items-center space-x-2 px-2.5 py-1.5 rounded-btn text-xs font-medium text-findeck-muted hover:text-findeck-danger hover:bg-findeck-danger-soft w-full transition-colors cursor-pointer"
+            className="flex items-center space-x-2 px-2.5 py-1.5 rounded-btn text-xs font-medium text-findeck-muted hover:text-danger-strong hover:bg-danger-soft w-full transition-colors cursor-pointer"
             title="Log out"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -158,7 +194,7 @@ export function Layout() {
       {/* Main Viewport Content Area */}
       <div className="flex-1 min-w-0 flex flex-col bg-findeck-app min-h-screen">
         {/* Top Header / Breadcrumbs Bar */}
-        <header className="px-6 sm:px-8 py-3.5 bg-findeck-card border-b border-findeck flex items-center justify-between shrink-0">
+        <header className="px-6 sm:px-8 py-3.5 bg-findeck-card border-b border-findeck-border flex items-center justify-between shrink-0">
           {/* Breadcrumb */}
           <div className="flex items-center space-x-2 text-xs">
             <span className="text-findeck-muted">InvoiceFlow</span>
@@ -166,7 +202,7 @@ export function Layout() {
             <span className="font-semibold text-findeck-text">{getPageTitle()}</span>
           </div>
 
-          {/* Right User Email Chip */}
+          {/* Right User Workspace Chip */}
           <div className="flex items-center space-x-3 text-xs text-findeck-muted">
             <div className="flex items-center space-x-1.5">
               <Building2 className="h-3.5 w-3.5" />
