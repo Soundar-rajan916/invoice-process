@@ -1,3 +1,4 @@
+import { Pagination } from '@heroui/react';
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,8 +10,6 @@ import {
   AlertTriangle,
   ArrowUpDown,
   FileText,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 export function ReviewQueue() {
@@ -293,26 +292,26 @@ export function ReviewQueue() {
 
         {/* Pagination Bar */}
         {totalPages > 1 && (
-          <div className="px-6 py-3 border-t border-findeck flex items-center justify-between text-xs text-findeck-muted">
+          <div className="px-6 py-3 border-t border-findeck-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-findeck-muted bg-white">
             <div className="tabular-nums">
-              Showing page {page} of {totalPages} ({total} total invoices)
+              Showing page <strong className="text-findeck-text font-semibold">{page}</strong> of{" "}
+              <strong className="text-findeck-text font-semibold">{totalPages}</strong> ({total} total invoices)
             </div>
-            <div className="flex items-center space-x-2">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="p-1 border border-findeck rounded-btn hover:bg-findeck-sidebar disabled:opacity-50 cursor-pointer"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="p-1 border border-findeck rounded-btn hover:bg-findeck-sidebar disabled:opacity-50 cursor-pointer"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+            <Pagination
+              total={totalPages}
+              page={page}
+              onChange={(newPage) => setPage(newPage)}
+              showControls
+              size="sm"
+              variant="bordered"
+              classNames={{
+                wrapper: "gap-1",
+                item: "text-xs min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar transition-colors font-medium",
+                cursor: "bg-findeck-accent text-white font-semibold shadow-xs border-findeck-accent",
+                prev: "min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar",
+                next: "min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar",
+              }}
+            />
           </div>
         )}
       </div>

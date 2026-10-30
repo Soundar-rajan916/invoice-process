@@ -1,3 +1,4 @@
+import { Pagination } from '@heroui/react';
 import { useState, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
@@ -8,8 +9,6 @@ import {
   FileSpreadsheet,
   Check,
   Search,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 export const GST_STATE_MAP: Record<string, string> = {
@@ -442,31 +441,21 @@ export function Admin() {
                   </div>
 
                   {totalSupplierPages > 1 && (
-                    <div className="flex items-center space-x-1.5">
-                      <button
-                        type="button"
-                        disabled={currentSupplierPage <= 1}
-                        onClick={() => setSupplierPage((p) => Math.max(1, p - 1))}
-                        className="p-1 border border-findeck-border rounded-btn hover:bg-findeck-bg-sidebar disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-findeck-text transition-colors"
-                        title="Previous page"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-
-                      <span className="px-2.5 py-0.5 text-xs text-findeck-text font-medium tabular-nums">
-                        Page {currentSupplierPage} of {totalSupplierPages}
-                      </span>
-
-                      <button
-                        type="button"
-                        disabled={currentSupplierPage >= totalSupplierPages}
-                        onClick={() => setSupplierPage((p) => Math.min(totalSupplierPages, p + 1))}
-                        className="p-1 border border-findeck-border rounded-btn hover:bg-findeck-bg-sidebar disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-findeck-text transition-colors"
-                        title="Next page"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <Pagination
+                      total={totalSupplierPages}
+                      page={currentSupplierPage}
+                      onChange={(newPage) => setSupplierPage(newPage)}
+                      showControls
+                      size="sm"
+                      variant="bordered"
+                      classNames={{
+                        wrapper: "gap-1",
+                        item: "text-xs min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar transition-colors font-medium",
+                        cursor: "bg-findeck-accent text-white font-semibold shadow-xs border-findeck-accent",
+                        prev: "min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar",
+                        next: "min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar",
+                      }}
+                    />
                   )}
                 </div>
               </>
