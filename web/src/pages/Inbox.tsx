@@ -4,15 +4,13 @@ import { Link } from "react-router-dom";
 import { apiRequest } from "@/lib/api";
 import {
   UploadCloud,
-  CheckCircle2,
-  AlertTriangle,
   Clock,
   FileCheck,
   RefreshCw,
   ArrowRight,
-  Check,
-  AlertCircle,
 } from "lucide-react";
+import { StatusPill } from "@/components/StatusPill";
+import { IssueChip } from "@/components/IssueChip";
 
 interface UploadFileResult {
   file_name: string;
@@ -103,10 +101,18 @@ export function Inbox() {
 
   return (
     <div className="w-full space-y-6">
-      {/* Top Banner with Title */}
-      <div className="bg-findeck-card p-6 rounded-card border border-findeck-border shadow-xs">
-        <h1 className="text-2xl font-bold text-findeck-text tracking-tight">Document Inbox</h1>
-        <p className="text-xs text-findeck-muted mt-1">
+      {/* Top Banner on --bg-card */}
+      <div
+        className="p-6 rounded-card border shadow-xs"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          borderColor: "var(--border)",
+        }}
+      >
+        <h1 className="text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
+          Document Inbox
+        </h1>
+        <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
           Upload PDF or image invoices (JPEG, PNG, WebP, HEIC). System will extract, validate, and deduplicate automatically.
         </p>
       </div>
@@ -117,11 +123,11 @@ export function Inbox() {
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-card p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${
-          dragActive
-            ? "border-accent bg-accent-soft scale-[1.01]"
-            : "border-findeck-border bg-white hover:border-accent-strong hover:bg-accent-soft/30"
-        }`}
+        className="border-2 border-dashed rounded-card p-10 flex flex-col items-center justify-center cursor-pointer transition-all shadow-xs"
+        style={{
+          borderColor: "var(--accent)",
+          backgroundColor: dragActive ? "var(--accent-soft)" : "var(--bg-inset)",
+        }}
       >
         <input
           ref={fileInputRef}
@@ -131,32 +137,53 @@ export function Inbox() {
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <div className="h-14 w-14 rounded-2xl bg-accent-soft flex items-center justify-center text-ink mb-3 shadow-2xs">
-          <UploadCloud className="h-7 w-7 text-ink" />
+        <div
+          className="h-14 w-14 rounded-2xl flex items-center justify-center mb-3 shadow-2xs"
+          style={{
+            backgroundColor: "var(--accent-soft)",
+            color: "var(--ink)",
+          }}
+        >
+          <UploadCloud className="h-7 w-7 stroke-[2.2]" />
         </div>
-        <p className="text-sm font-semibold text-findeck-text">
+        <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
           {uploading
             ? "Uploading and queueing invoices..."
             : "Drop invoice files here, or click to browse"}
         </p>
-        <p className="text-xs text-findeck-muted mt-1">
+        <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
           Supports multi-file uploads: PDF, JPEG, PNG, WebP, HEIC (Max 20MB per file)
         </p>
       </div>
 
       {/* Upload Results Table */}
       {uploadResults.length > 0 && (
-        <div className="bg-findeck-card rounded-card border border-findeck-border shadow-xs overflow-hidden">
-          <div className="px-6 py-3.5 border-b border-findeck-border flex justify-between items-center bg-white">
-            <h3 className="font-semibold text-findeck-text text-sm">Upload Batch Results</h3>
+        <div
+          className="rounded-card border shadow-xs overflow-hidden"
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <div
+            className="px-6 py-3.5 border-b flex justify-between items-center"
+            style={{
+              backgroundColor: "var(--bg-inset)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <h3 className="font-semibold text-sm" style={{ color: "var(--text)" }}>
+              Upload Batch Results
+            </h3>
             <button
               onClick={() => setUploadResults([])}
-              className="text-xs font-medium text-findeck-muted hover:text-findeck-text cursor-pointer"
+              className="text-xs font-medium cursor-pointer"
+              style={{ color: "var(--text-muted)" }}
             >
               Clear
             </button>
           </div>
-          <div className="divide-y divide-findeck-border">
+          <div className="divide-y" style={{ borderColor: "var(--border)" }}>
             {uploadResults.map((res: any, idx) => {
               const fileName = res.file_name || res.filename || "Uploaded File";
               const isDuplicate = res.status === "duplicate_skipped" || res.is_duplicate;
@@ -167,75 +194,32 @@ export function Inbox() {
                 ? "RECEIVED"
                 : res.status;
 
-              let badgeColor = "bg-accent-soft text-accent-strong border-accent/30";
-              let badgeText = "Queued for Processing";
-              let StatusIcon = Clock;
-
-              if (isDuplicate) {
-                badgeColor = "bg-accent-soft text-ink border-accent/30";
-                badgeText = "Duplicate File Skipped";
-                StatusIcon = Clock;
-              } else if (status === "PROCESSING") {
-                badgeColor = "bg-accent-soft text-accent-strong border-accent/30";
-                badgeText = "Extracting & Validating...";
-                StatusIcon = RefreshCw;
-              } else if (status === "NEEDS_REVIEW") {
-                badgeColor = "bg-warning-soft text-warning-strong border-warning/30";
-                badgeText =
-                  liveInvoice?.error_count > 0
-                    ? `Ready for Review (${liveInvoice.error_count} error${
-                        liveInvoice.error_count > 1 ? "s" : ""
-                      })`
-                    : "Ready for Review";
-                StatusIcon = CheckCircle2;
-              } else if (status === "APPROVED" || status === "PUSHED") {
-                badgeColor = "bg-success-soft text-success-strong border-success/30";
-                badgeText = status === "PUSHED" ? "Pushed to Accounting" : "Approved";
-                StatusIcon = CheckCircle2;
-              } else if (status === "RESEND_REQUESTED") {
-                badgeColor = "bg-warning-soft text-warning-strong border-warning/30";
-                badgeText = "Resend Requested";
-                StatusIcon = AlertTriangle;
-              } else if (status === "REJECTED") {
-                badgeColor = "bg-danger-soft text-danger-strong border-danger/30";
-                badgeText = "Rejected";
-                StatusIcon = AlertTriangle;
-              } else if (status === "FAILED" || res.status === "failed") {
-                badgeColor = "bg-danger-soft text-danger-strong border-danger/30";
-                badgeText = "Processing Failed";
-                StatusIcon = AlertTriangle;
-              }
-
               return (
-                <div key={idx} className="px-6 py-3.5 flex items-center justify-between text-xs bg-findeck-card">
+                <div
+                  key={idx}
+                  className="px-6 py-3.5 flex items-center justify-between text-xs"
+                  style={{ backgroundColor: "var(--bg-card)" }}
+                >
                   <div className="flex items-center space-x-3">
-                    <StatusIcon
-                      className={`h-4 w-4 ${
-                        status === "PROCESSING"
-                          ? "animate-spin text-accent-strong"
-                          : isDuplicate
-                          ? "text-ink"
-                          : status === "NEEDS_REVIEW"
-                          ? "text-warning-strong"
-                          : status === "APPROVED" || status === "PUSHED"
-                          ? "text-success-strong"
-                          : status === "FAILED" || res.status === "failed"
-                          ? "text-danger-strong"
-                          : "text-accent-strong"
-                      }`}
-                    />
-                    <span className="font-medium text-findeck-text">{fileName}</span>
+                    <Clock className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
+                    <span className="font-medium" style={{ color: "var(--text)" }}>{fileName}</span>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <span
-                      className={`text-xs px-2.5 py-0.5 rounded-pill font-medium border ${badgeColor}`}
-                    >
-                      {badgeText}
-                    </span>
+                    {isDuplicate ? (
+                      <span
+                        className="text-xs px-2.5 py-0.5 rounded-full font-semibold shadow-2xs"
+                        style={{ backgroundColor: "var(--accent-soft)", color: "var(--ink)" }}
+                      >
+                        Duplicate File Skipped
+                      </span>
+                    ) : (
+                      <StatusPill status={status} />
+                    )}
                     {res.invoice_id && (
                       <Link
                         to={`/invoices/${res.invoice_id}`}
-                        className="text-xs font-semibold text-accent-strong hover:underline flex items-center space-x-1"
+                        className="text-xs font-semibold flex items-center space-x-1"
+                        style={{ color: "var(--accent-strong)" }}
                       >
                         <span>View</span>
                         <ArrowRight className="h-3 w-3" />
@@ -249,16 +233,31 @@ export function Inbox() {
         </div>
       )}
 
-      {/* Live Processing & Recent Invoices */}
-      <div className="bg-findeck-card rounded-card border border-findeck-border shadow-xs overflow-hidden">
-        <div className="px-6 py-3.5 border-b border-findeck-border flex justify-between items-center bg-white">
+      {/* Live Processing & Recent Invoices on --bg-card */}
+      <div
+        className="rounded-card border shadow-xs overflow-hidden"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          borderColor: "var(--border)",
+        }}
+      >
+        <div
+          className="px-6 py-3.5 border-b flex justify-between items-center"
+          style={{
+            backgroundColor: "var(--bg-inset)",
+            borderColor: "var(--border)",
+          }}
+        >
           <div className="flex items-center space-x-2">
-            <FileCheck className="h-4 w-4 text-ink" />
-            <h3 className="font-semibold text-findeck-text text-sm">Recent Ingested Invoices</h3>
+            <FileCheck className="h-4 w-4" style={{ color: "var(--ink)" }} />
+            <h3 className="font-semibold text-sm" style={{ color: "var(--text)" }}>
+              Recent Ingested Invoices
+            </h3>
           </div>
           <button
             onClick={() => refetch()}
-            className="inline-flex items-center space-x-1.5 text-xs font-medium text-findeck-muted hover:text-findeck-text cursor-pointer"
+            className="inline-flex items-center space-x-1.5 text-xs font-medium cursor-pointer"
+            style={{ color: "var(--text-muted)" }}
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
             <span>Refresh</span>
@@ -266,13 +265,20 @@ export function Inbox() {
         </div>
 
         {recentItems.length === 0 ? (
-          <div className="px-6 py-12 text-center text-findeck-muted text-xs">
+          <div className="px-6 py-12 text-center text-xs" style={{ color: "var(--text-muted)" }}>
             No invoices uploaded yet. Drop files above to start processing.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-findeck-text">
-              <thead className="bg-white text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-findeck-border">
+            <table className="w-full text-left text-xs" style={{ color: "var(--text)" }}>
+              <thead
+                className="text-[11px] font-semibold uppercase tracking-wider border-b"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  color: "var(--text-secondary)",
+                  borderColor: "var(--border)",
+                }}
+              >
                 <tr>
                   <th className="px-6 py-3.5">Invoice / GSTIN</th>
                   <th className="px-6 py-3.5">Status</th>
@@ -281,52 +287,31 @@ export function Inbox() {
                   <th className="px-6 py-3.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-findeck-border">
+              <tbody>
                 {recentItems.map((inv: any) => (
-                  <tr key={inv.id} className="hover:bg-white transition-colors">
+                  <tr
+                    key={inv.id}
+                    className="transition-colors group cursor-pointer"
+                    style={{ borderBottom: "1px solid var(--border)" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--accent-soft)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
+                  >
                     <td className="px-6 py-3.5">
-                      <div className="font-semibold text-findeck-text">
+                      <div className="font-semibold" style={{ color: "var(--text)" }}>
                         {inv.normalized_invoice_number || "Extracting..."}
                       </div>
-                      <div className="text-[11px] text-findeck-muted font-mono">
+                      <div className="text-[11px] font-mono" style={{ color: "var(--text-muted)" }}>
                         {inv.supplier_gstin || "Awaiting pipeline"}
                       </div>
                     </td>
                     <td className="px-6 py-3.5">
-                      <span
-                        className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-pill text-xs font-medium border ${
-                          inv.status === "NEEDS_REVIEW"
-                            ? "bg-warning-soft text-warning-strong border-warning/30"
-                            : inv.status === "APPROVED" || inv.status === "PUSHED"
-                            ? "bg-success-soft text-success-strong border-success/30"
-                            : inv.status === "PROCESSING"
-                            ? "bg-accent-soft text-accent-strong border-accent/30 animate-pulse"
-                            : inv.status === "RESEND_REQUESTED"
-                            ? "bg-warning-soft text-warning-strong border-warning/30"
-                            : inv.status === "REJECTED" || inv.status === "FAILED"
-                            ? "bg-danger-soft text-danger-strong border-danger/30"
-                            : "bg-findeck-app text-findeck-text border-findeck-border"
-                        }`}
-                      >
-                        {inv.status === "PUSHED" ? (
-                          <Check className="h-3 w-3 text-success-strong" />
-                        ) : (
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full ${
-                              inv.status === "NEEDS_REVIEW"
-                                ? "bg-warning"
-                                : inv.status === "APPROVED" || inv.status === "PUSHED"
-                                ? "bg-success"
-                                : inv.status === "PROCESSING"
-                                ? "bg-accent"
-                                : "bg-danger"
-                            }`}
-                          />
-                        )}
-                        <span>{inv.status}</span>
-                      </span>
+                      <StatusPill status={inv.status} />
                     </td>
-                    <td className="px-6 py-3.5 text-xs text-findeck-muted tabular-nums">
+                    <td className="px-6 py-3.5 text-xs tabular-nums" style={{ color: "var(--text-muted)" }}>
                       {new Date(inv.received_at).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -334,23 +319,30 @@ export function Inbox() {
                     </td>
                     <td className="px-6 py-3.5">
                       {inv.error_count > 0 ? (
-                        <span className="inline-flex items-center space-x-1 text-xs font-semibold text-danger-strong bg-danger-soft px-2 py-0.5 rounded-pill border border-danger/30">
-                          <AlertCircle className="h-3 w-3" />
-                          <span className="tabular-nums">{inv.error_count} error{inv.error_count > 1 ? "s" : ""}</span>
-                        </span>
+                        <IssueChip type="error" count={inv.error_count} />
                       ) : inv.warning_count > 0 ? (
-                        <span className="inline-flex items-center space-x-1 text-xs font-semibold text-warning-strong bg-warning-soft px-2 py-0.5 rounded-pill border border-warning/30">
-                          <AlertTriangle className="h-3 w-3" />
-                          <span className="tabular-nums">{inv.warning_count} warning{inv.warning_count > 1 ? "s" : ""}</span>
-                        </span>
+                        <IssueChip type="warning" count={inv.warning_count} />
                       ) : (
-                        <span className="text-xs text-success-strong font-medium">Clean</span>
+                        <IssueChip type="valid" />
                       )}
                     </td>
                     <td className="px-6 py-3.5 text-right">
                       <Link
                         to={`/invoices/${inv.id}`}
-                        className="text-xs font-semibold text-accent-strong hover:underline inline-flex items-center space-x-1"
+                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-btn text-xs font-semibold transition-all shadow-2xs"
+                        style={{
+                          backgroundColor: "var(--bg-inset)",
+                          border: "1px solid var(--border)",
+                          color: "var(--ink)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "var(--accent-soft)";
+                          e.currentTarget.style.color = "var(--accent-strong)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "var(--bg-inset)";
+                          e.currentTarget.style.color = "var(--ink)";
+                        }}
                       >
                         <span>Open</span>
                         <ArrowRight className="h-3 w-3" />

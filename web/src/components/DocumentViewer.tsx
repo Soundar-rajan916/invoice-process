@@ -9,7 +9,6 @@ import {
   ChevronRight,
   ArrowLeftRight,
   Layers,
-  ExternalLink,
   FileText,
   Sun,
   Moon,
@@ -131,7 +130,6 @@ export function DocumentViewer({
 
   // Mouse pan handlers
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Only drag with primary mouse button
     if (e.button !== 0) return;
     setIsDragging(true);
     setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
@@ -169,7 +167,6 @@ export function DocumentViewer({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Avoid hotkeys when typing in form inputs
       const target = e.target as HTMLElement;
       if (
         target.tagName === "INPUT" ||
@@ -198,25 +195,50 @@ export function DocumentViewer({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isFullscreen, handleFitPage, handleFitWidth]);
 
+  const isDark = canvasTheme === "dark";
+
   return (
     <div
-      className={`flex flex-col h-full min-h-0 bg-slate-900 border-r border-slate-200 select-none ${className}`}
+      className={`flex flex-col h-full min-h-0 select-none overflow-hidden transition-colors ${className}`}
+      style={{
+        backgroundColor: isDark ? "var(--ink)" : "var(--bg-inset)",
+        borderColor: "var(--border)",
+      }}
     >
       {/* 1. Header Toolbar */}
-      <div className="h-11 shrink-0 bg-slate-900 text-slate-200 px-3 flex items-center justify-between border-b border-slate-800 text-xs shadow-xs z-10">
+      <div
+        className="h-12 shrink-0 px-4 flex items-center justify-between border-b text-xs transition-colors z-10"
+        style={{
+          backgroundColor: isDark ? "#202022" : "var(--bg-inset)",
+          borderColor: isDark ? "rgba(255, 255, 255, 0.08)" : "var(--border)",
+          color: isDark ? "#E5E5E7" : "var(--text)",
+        }}
+      >
         {/* Left: Page Navigator */}
         <div className="flex items-center space-x-1.5">
           <button
             type="button"
             onClick={() => onPageChange(Math.max(1, activePage - 1))}
             disabled={activePage <= 1}
-            className="p-1 rounded hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="w-7 h-7 flex items-center justify-center rounded-btn border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shadow-2xs"
+            style={{
+              backgroundColor: isDark ? "#292929" : "var(--bg-card)",
+              borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+              color: isDark ? "#FFFFFF" : "var(--text)",
+            }}
             title="Previous page"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
 
-          <span className="px-2 py-0.5 rounded bg-slate-800/80 font-mono text-[11px] text-slate-300 font-semibold border border-slate-700/60">
+          <span
+            className="px-2.5 py-1 rounded-btn font-mono text-[11px] font-semibold border shadow-2xs"
+            style={{
+              backgroundColor: isDark ? "#292929" : "var(--bg-card)",
+              borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+              color: isDark ? "#FFFFFF" : "var(--text)",
+            }}
+          >
             {activePage} / {totalPages}
           </span>
 
@@ -224,7 +246,12 @@ export function DocumentViewer({
             type="button"
             onClick={() => onPageChange(Math.min(totalPages, activePage + 1))}
             disabled={activePage >= totalPages}
-            className="p-1 rounded hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="w-7 h-7 flex items-center justify-center rounded-btn border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shadow-2xs"
+            style={{
+              backgroundColor: isDark ? "#292929" : "var(--bg-card)",
+              borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+              color: isDark ? "#FFFFFF" : "var(--text)",
+            }}
             title="Next page"
           >
             <ChevronRight className="h-4 w-4" />
@@ -234,11 +261,12 @@ export function DocumentViewer({
             <button
               type="button"
               onClick={() => setShowThumbnails(!showThumbnails)}
-              className={`p-1 rounded transition-colors cursor-pointer ${
-                showThumbnails
-                  ? "bg-accent-strong text-white"
-                  : "hover:bg-slate-800 text-slate-300 hover:text-white"
-              }`}
+              className="w-7 h-7 flex items-center justify-center rounded-btn border transition-colors cursor-pointer shadow-2xs ml-1"
+              style={{
+                backgroundColor: showThumbnails ? "var(--accent)" : isDark ? "#292929" : "var(--bg-card)",
+                borderColor: showThumbnails ? "var(--accent)" : isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+                color: showThumbnails ? "var(--ink)" : isDark ? "#FFFFFF" : "var(--text)",
+              }}
               title="Toggle page thumbnails"
             >
               <Layers className="h-3.5 w-3.5" />
@@ -247,11 +275,18 @@ export function DocumentViewer({
         </div>
 
         {/* Center: Zoom Controls & Fit Actions */}
-        <div className="flex items-center space-x-1">
+        <div
+          className="flex items-center space-x-1 p-1 rounded-btn border shadow-2xs"
+          style={{
+            backgroundColor: isDark ? "#292929" : "var(--bg-card)",
+            borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+          }}
+        >
           <button
             type="button"
             onClick={zoomOut}
-            className="p-1 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="w-6 h-6 flex items-center justify-center rounded hover:opacity-80 transition-opacity cursor-pointer"
+            style={{ color: isDark ? "#E5E5E7" : "var(--text)" }}
             title="Zoom out (-)"
           >
             <ZoomOut className="h-3.5 w-3.5" />
@@ -260,7 +295,8 @@ export function DocumentViewer({
           <button
             type="button"
             onClick={resetView}
-            className="px-1.5 py-0.5 rounded hover:bg-slate-800 font-mono text-[11px] text-slate-300 hover:text-white transition-colors cursor-pointer min-w-[42px] text-center"
+            className="px-2 py-0.5 rounded font-mono text-[11px] font-semibold transition-opacity cursor-pointer min-w-[44px] text-center"
+            style={{ color: isDark ? "#FFFFFF" : "var(--text)" }}
             title="Click to reset (90%)"
           >
             {Math.round(scale * 100)}%
@@ -269,18 +305,23 @@ export function DocumentViewer({
           <button
             type="button"
             onClick={zoomIn}
-            className="p-1 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="w-6 h-6 flex items-center justify-center rounded hover:opacity-80 transition-opacity cursor-pointer"
+            style={{ color: isDark ? "#E5E5E7" : "var(--text)" }}
             title="Zoom in (+)"
           >
             <ZoomIn className="h-3.5 w-3.5" />
           </button>
 
-          <div className="h-3.5 w-px bg-slate-700 mx-1" />
+          <div
+            className="h-3.5 w-px mx-1"
+            style={{ backgroundColor: isDark ? "rgba(255, 255, 255, 0.15)" : "var(--border)" }}
+          />
 
           <button
             type="button"
             onClick={handleFitWidth}
-            className="p-1 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center space-x-1"
+            className="w-6 h-6 flex items-center justify-center rounded hover:opacity-80 transition-opacity cursor-pointer"
+            style={{ color: isDark ? "#E5E5E7" : "var(--text)" }}
             title="Fit Width (W)"
           >
             <ArrowLeftRight className="h-3.5 w-3.5" />
@@ -289,7 +330,8 @@ export function DocumentViewer({
           <button
             type="button"
             onClick={handleFitPage}
-            className="p-1 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center space-x-1"
+            className="w-6 h-6 flex items-center justify-center rounded hover:opacity-80 transition-opacity cursor-pointer"
+            style={{ color: isDark ? "#E5E5E7" : "var(--text)" }}
             title="Fit Page (0)"
           >
             <Maximize2 className="h-3.5 w-3.5" />
@@ -298,7 +340,8 @@ export function DocumentViewer({
           <button
             type="button"
             onClick={rotateClockwise}
-            className="p-1 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="w-6 h-6 flex items-center justify-center rounded hover:opacity-80 transition-opacity cursor-pointer"
+            style={{ color: isDark ? "#E5E5E7" : "var(--text)" }}
             title="Rotate 90° (R)"
           >
             <RotateCw className="h-3.5 w-3.5" />
@@ -306,61 +349,46 @@ export function DocumentViewer({
         </div>
 
         {/* Right: Theme, Widescreen & Popout */}
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-1.5">
           <button
             type="button"
-            onClick={() =>
-              setCanvasTheme(canvasTheme === "desk" ? "dark" : "desk")
-            }
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
-            title={
-              canvasTheme === "desk"
-                ? "Switch to Dark Studio"
-                : "Switch to Desk Light"
-            }
+            onClick={() => setCanvasTheme(isDark ? "desk" : "dark")}
+            className="w-7 h-7 flex items-center justify-center rounded-btn border transition-colors cursor-pointer shadow-2xs"
+            style={{
+              backgroundColor: isDark ? "#292929" : "var(--bg-card)",
+              borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+              color: isDark ? "var(--warning)" : "var(--text-secondary)",
+            }}
+            title={isDark ? "Switch to Desk Light" : "Switch to Dark Studio"}
           >
-            {canvasTheme === "desk" ? (
-              <Moon className="h-3.5 w-3.5" />
-            ) : (
-              <Sun className="h-3.5 w-3.5" />
-            )}
+            {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
 
           {onToggleWideMode && (
             <button
               type="button"
               onClick={onToggleWideMode}
-              className={`p-1 rounded transition-colors cursor-pointer ${
-                wideMode
-                  ? "bg-accent-strong text-white"
-                  : "hover:bg-slate-800 text-slate-400 hover:text-white"
-              }`}
-              title={wideMode ? "Standard 50/50 view" : "Wide 65% document view"}
+              className="w-7 h-7 flex items-center justify-center rounded-btn border transition-colors cursor-pointer shadow-2xs"
+              style={{
+                backgroundColor: wideMode ? "var(--ink)" : isDark ? "#292929" : "var(--bg-card)",
+                borderColor: wideMode ? "var(--ink)" : isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+                color: wideMode ? "#FFFFFF" : isDark ? "#FFFFFF" : "var(--text-secondary)",
+              }}
+              title={wideMode ? "Standard 50/50 view" : "Wide 62% document view"}
             >
-              {wideMode ? (
-                <PanelLeftClose className="h-3.5 w-3.5" />
-              ) : (
-                <PanelLeftOpen className="h-3.5 w-3.5" />
-              )}
+              {wideMode ? <PanelLeftClose className="h-3.5 w-3.5" /> : <PanelLeftOpen className="h-3.5 w-3.5" />}
             </button>
-          )}
-
-          {currentImageUrl && (
-            <a
-              href={currentImageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-              title="Open raw image in new tab"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
           )}
 
           <button
             type="button"
             onClick={() => setIsFullscreen(true)}
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            className="w-7 h-7 flex items-center justify-center rounded-btn border transition-colors cursor-pointer shadow-2xs"
+            style={{
+              backgroundColor: isDark ? "#292929" : "var(--bg-card)",
+              borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+              color: isDark ? "#FFFFFF" : "var(--text-secondary)",
+            }}
             title="Fullscreen focus mode"
           >
             <Maximize className="h-3.5 w-3.5" />
@@ -379,17 +407,13 @@ export function DocumentViewer({
         onDoubleClick={handleDoubleClick}
         className={`flex-1 min-h-0 relative overflow-hidden flex items-center justify-center p-6 ${
           isDragging ? "cursor-grabbing" : "cursor-grab"
-        } ${
-          canvasTheme === "desk"
-            ? "bg-slate-200/85"
-            : "bg-slate-950"
         } transition-colors duration-200`}
         style={{
-          backgroundImage:
-            canvasTheme === "desk"
-              ? "radial-gradient(#cbd5e1 1px, transparent 1px)"
-              : "radial-gradient(#1e293b 1px, transparent 1px)",
-          backgroundSize: "20px 20px",
+          backgroundColor: isDark ? "#1A1A1C" : "var(--bg-app)",
+          backgroundImage: isDark
+            ? "radial-gradient(#2E2E34 1.5px, transparent 1.5px)"
+            : "radial-gradient(#D2D4DC 1.5px, transparent 1.5px)",
+          backgroundSize: "24px 24px",
         }}
       >
         {currentImageUrl ? (
@@ -405,21 +429,28 @@ export function DocumentViewer({
               alt={filename || `Invoice page ${activePage}`}
               onLoad={onImageLoad}
               draggable={false}
-              className="max-h-[calc(100vh-10rem)] max-w-[calc(100vw-10rem)] object-contain bg-white rounded-xs shadow-[0_12px_40px_-8px_rgba(0,0,0,0.3),0_2px_10px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 transition-shadow duration-150"
+              className="max-h-[calc(100vh-10rem)] max-w-[calc(100vw-10rem)] object-contain bg-white rounded-xs shadow-[0_16px_48px_-12px_rgba(0,0,0,0.18),0_2px_10px_rgba(0,0,0,0.06)] border border-border/80 transition-shadow duration-150"
               style={{
                 imageRendering: "auto",
               }}
             />
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-slate-400 space-y-2">
-            <FileText className="h-10 w-10 stroke-1 text-slate-400" />
+          <div className="flex flex-col items-center justify-center space-y-2" style={{ color: "var(--text-muted)" }}>
+            <FileText className="h-10 w-10 stroke-1" />
             <p className="text-xs font-medium">No document preview available</p>
           </div>
         )}
 
-        {/* Small floating hint on hover */}
-        <div className="absolute bottom-3 right-3 pointer-events-none opacity-40 hover:opacity-100 transition-opacity bg-slate-900/80 backdrop-blur-xs text-white text-[10px] px-2 py-0.5 rounded-md font-mono flex items-center space-x-2">
+        {/* Floating helper pill */}
+        <div
+          className="absolute bottom-3.5 right-3.5 pointer-events-none opacity-60 hover:opacity-100 transition-opacity backdrop-blur-md text-[11px] font-medium px-3 py-1 rounded-full border shadow-xs flex items-center space-x-2"
+          style={{
+            backgroundColor: isDark ? "rgba(41, 41, 41, 0.85)" : "rgba(255, 255, 255, 0.9)",
+            borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--border)",
+            color: isDark ? "#D1D1D6" : "var(--text-muted)",
+          }}
+        >
           <span>Ctrl + Scroll to zoom</span>
           <span>•</span>
           <span>Drag to pan</span>
@@ -430,7 +461,13 @@ export function DocumentViewer({
 
       {/* 3. Bottom Multi-Page Filmstrip (when toggled or multi-page) */}
       {pages.length > 1 && showThumbnails && (
-        <div className="h-22 shrink-0 bg-slate-900 border-t border-slate-800 flex items-center px-4 space-x-3 overflow-x-auto z-10">
+        <div
+          className="h-22 shrink-0 border-t flex items-center px-4 space-x-3 overflow-x-auto z-10 transition-colors shadow-inner"
+          style={{
+            backgroundColor: isDark ? "#202022" : "var(--bg-card)",
+            borderColor: isDark ? "rgba(255, 255, 255, 0.08)" : "var(--border)",
+          }}
+        >
           {pages.map((p) => {
             const isActive = activePage === p.page_number;
             return (
@@ -438,11 +475,12 @@ export function DocumentViewer({
                 key={p.page_number}
                 type="button"
                 onClick={() => onPageChange(p.page_number)}
-                className={`group relative h-16 w-12 rounded border overflow-hidden shrink-0 transition-all cursor-pointer ${
-                  isActive
-                    ? "border-accent-strong ring-2 ring-accent-strong shadow-md"
-                    : "border-slate-700 opacity-60 hover:opacity-100 hover:border-slate-500"
-                }`}
+                className="group relative h-16 w-12 rounded border overflow-hidden shrink-0 transition-all cursor-pointer shadow-xs"
+                style={{
+                  borderColor: isActive ? "var(--accent)" : isDark ? "rgba(255, 255, 255, 0.15)" : "var(--border)",
+                  boxShadow: isActive ? "0 0 0 2px var(--accent)" : undefined,
+                  opacity: isActive ? 1 : 0.65,
+                }}
               >
                 <img
                   src={p.url}
@@ -450,11 +488,11 @@ export function DocumentViewer({
                   className="h-full w-full object-cover"
                 />
                 <div
-                  className={`absolute bottom-0 inset-x-0 text-[9px] font-mono font-bold text-center py-0.5 ${
-                    isActive
-                      ? "bg-accent-strong text-white"
-                      : "bg-slate-900/80 text-slate-300"
-                  }`}
+                  className="absolute bottom-0 inset-x-0 text-[9px] font-mono font-bold text-center py-0.5"
+                  style={{
+                    backgroundColor: isActive ? "var(--accent)" : isDark ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.85)",
+                    color: isActive ? "var(--ink)" : isDark ? "#FFFFFF" : "var(--text)",
+                  }}
                 >
                   P.{p.page_number}
                 </div>
@@ -466,14 +504,20 @@ export function DocumentViewer({
 
       {/* 4. Fullscreen Lightbox Modal */}
       {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col">
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col">
           {/* Fullscreen Toolbar */}
-          <div className="h-12 bg-slate-900 px-6 flex items-center justify-between border-b border-slate-800 text-white">
+          <div
+            className="h-12 px-6 flex items-center justify-between border-b text-white shrink-0"
+            style={{
+              backgroundColor: "var(--ink)",
+              borderColor: "rgba(255, 255, 255, 0.1)",
+            }}
+          >
             <div className="flex items-center space-x-3">
               <span className="font-semibold text-sm">
                 {filename || "Invoice Document Preview"}
               </span>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs opacity-60 font-mono">
                 Page {activePage} of {totalPages}
               </span>
             </div>
@@ -482,18 +526,18 @@ export function DocumentViewer({
               <button
                 type="button"
                 onClick={zoomOut}
-                className="p-1.5 rounded hover:bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
                 title="Zoom Out"
               >
                 <ZoomOut className="h-4 w-4" />
               </button>
-              <span className="font-mono text-xs w-12 text-center text-slate-300">
+              <span className="font-mono text-xs w-12 text-center">
                 {Math.round(scale * 100)}%
               </span>
               <button
                 type="button"
                 onClick={zoomIn}
-                className="p-1.5 rounded hover:bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
                 title="Zoom In"
               >
                 <ZoomIn className="h-4 w-4" />
@@ -501,7 +545,7 @@ export function DocumentViewer({
               <button
                 type="button"
                 onClick={handleFitWidth}
-                className="p-1.5 rounded hover:bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
                 title="Fit Width"
               >
                 <ArrowLeftRight className="h-4 w-4" />
@@ -509,7 +553,7 @@ export function DocumentViewer({
               <button
                 type="button"
                 onClick={handleFitPage}
-                className="p-1.5 rounded hover:bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
                 title="Fit Page"
               >
                 <Maximize2 className="h-4 w-4" />
@@ -517,16 +561,16 @@ export function DocumentViewer({
               <button
                 type="button"
                 onClick={rotateClockwise}
-                className="p-1.5 rounded hover:bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
                 title="Rotate 90°"
               >
                 <RotateCw className="h-4 w-4" />
               </button>
-              <div className="h-4 w-px bg-slate-700 mx-2" />
+              <div className="h-4 w-px bg-white/20 mx-2" />
               <button
                 type="button"
                 onClick={() => setIsFullscreen(false)}
-                className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white flex items-center space-x-1 px-2.5 text-xs font-semibold cursor-pointer"
+                className="p-1.5 rounded bg-white/10 hover:bg-white/20 flex items-center space-x-1.5 px-3 text-xs font-semibold cursor-pointer transition-colors"
                 title="Close Fullscreen (Esc)"
               >
                 <X className="h-4 w-4" />
@@ -541,7 +585,7 @@ export function DocumentViewer({
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onWheel={handleWheel}
-            className={`flex-1 overflow-hidden flex items-center justify-center p-8 bg-slate-950 ${
+            className={`flex-1 overflow-hidden flex items-center justify-center p-8 ${
               isDragging ? "cursor-grabbing" : "cursor-grab"
             }`}
           >
@@ -556,7 +600,7 @@ export function DocumentViewer({
                   src={currentImageUrl}
                   alt={`Invoice page ${activePage}`}
                   draggable={false}
-                  className="max-h-[85vh] max-w-[85vw] object-contain shadow-2xl rounded-xs ring-1 ring-slate-800"
+                  className="max-h-[85vh] max-w-[85vw] object-contain shadow-2xl rounded-xs ring-1 ring-white/10"
                 />
               </div>
             )}

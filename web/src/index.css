@@ -50,9 +50,9 @@
     --primary-foreground: #FFFFFF;
     --secondary: var(--bg-card);
     --secondary-foreground: var(--text);
-    --muted: var(--bg-card);
+    --muted: var(--bg-app);
     --muted-foreground: var(--text-muted);
-    --accent-token: var(--accent);
+    --accent-token: var(--accent-soft);
     --accent-token-foreground: var(--ink);
     --destructive: var(--danger-strong);
     --destructive-foreground: #FFFFFF;
@@ -77,6 +77,40 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+}
+
+/* Fallback utilities ensuring palette classes are guaranteed regardless of purging */
+@layer utilities {
+  .bg-app { background-color: var(--bg-app); }
+  .bg-card-surface { background-color: var(--bg-card); }
+  .bg-inset { background-color: var(--bg-inset); }
+  .bg-disabled { background-color: var(--bg-disabled); }
+  .bg-ink { background-color: var(--ink); }
+  .hover\:bg-ink-hover:hover { background-color: var(--ink-hover); }
+  .bg-accent { background-color: var(--accent); }
+  .bg-success { background-color: var(--success); }
+  .bg-danger { background-color: var(--danger); }
+  .bg-warning { background-color: var(--warning); }
+  .bg-accent-soft { background-color: var(--accent-soft); }
+  .bg-success-soft { background-color: var(--success-soft); }
+  .bg-danger-soft { background-color: var(--danger-soft); }
+  .bg-warning-soft { background-color: var(--warning-soft); }
+
+  .text-ink { color: var(--ink); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-muted { color: var(--text-muted); }
+  .text-accent-strong { color: var(--accent-strong); }
+  .text-success-strong { color: var(--success-strong); }
+  .text-danger-strong { color: var(--danger-strong); }
+  .text-warning-strong { color: var(--warning-strong); }
+
+  .border-hairline { border-color: var(--border); }
+  .border-accent { border-color: var(--accent); }
+  .border-success { border-color: var(--success); }
+  .border-danger { border-color: var(--danger); }
+  .border-warning { border-color: var(--warning); }
+  .border-danger-strong { border-color: var(--danger-strong); }
+  .border-warning-strong { border-color: var(--warning-strong); }
 }
 
 /* Minimal 120-150ms transitions */

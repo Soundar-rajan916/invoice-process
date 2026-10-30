@@ -7,7 +7,6 @@ import {
   LogOut,
   ShieldCheck,
   Building2,
-  ChevronDown,
   FileSpreadsheet,
 } from "lucide-react";
 
@@ -25,20 +24,38 @@ export function Layout() {
     return "Workspace";
   };
 
-  const userInitials = user?.email ? user.email.slice(0, 2).toUpperCase() : "IF";
+  const userInitials = user?.email ? user.email.slice(0, 2).toUpperCase() : "AD";
   const userDisplayName = user?.email ? user.email.split("@")[0] : "Reviewer";
 
   return (
-    <div className="min-h-screen bg-findeck-app flex font-sans antialiased text-findeck-text">
-      {/* Fixed Left Sidebar (240px wide) */}
-      <aside className="w-60 shrink-0 bg-findeck-card border-r border-findeck-border flex flex-col justify-between p-4 select-none min-h-screen sticky top-0 h-screen overflow-y-auto">
+    <div
+      className="min-h-screen flex font-sans antialiased"
+      style={{
+        backgroundColor: "var(--bg-app)",
+        color: "var(--text)",
+      }}
+    >
+      {/* Fixed Left Sidebar (240px wide) on --bg-card */}
+      <aside
+        className="w-60 shrink-0 border-r flex flex-col justify-between p-4 select-none min-h-screen sticky top-0 h-screen overflow-y-auto"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          borderColor: "var(--border)",
+        }}
+      >
         <div className="space-y-6">
           {/* Brand Logo Header: rounded square in --ink with white glyph */}
           <Link to="/queue" className="flex items-center space-x-2.5 px-2 pt-1">
-            <div className="h-8 w-8 rounded-[10px] bg-ink flex items-center justify-center text-white shadow-2xs">
-              <FileSpreadsheet className="h-4 w-4" />
+            <div
+              className="h-8 w-8 rounded-[10px] flex items-center justify-center shadow-xs"
+              style={{
+                backgroundColor: "var(--ink)",
+                color: "#FFFFFF",
+              }}
+            >
+              <FileSpreadsheet className="h-4 w-4 stroke-[2.2]" />
             </div>
-            <span className="font-semibold text-lg tracking-tight text-findeck-text">
+            <span className="font-semibold text-lg tracking-tight" style={{ color: "var(--text)" }}>
               InvoiceFlow
             </span>
           </Link>
@@ -47,7 +64,10 @@ export function Layout() {
           <div className="space-y-5">
             {/* Group 1: WORKSPACE */}
             <div className="space-y-1">
-              <div className="px-3 text-[11px] font-semibold text-findeck-muted uppercase tracking-wider mb-1.5">
+              <div
+                className="px-3 text-[11px] font-semibold uppercase tracking-wider mb-1.5"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Workspace
               </div>
 
@@ -56,19 +76,30 @@ export function Layout() {
                 className={({ isActive }) =>
                   `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck-border"
-                      : "text-findeck-text-secondary hover:text-findeck-text hover:bg-white/60"
+                      ? "shadow-2xs font-semibold"
+                      : "hover:bg-white/60"
                   }`
                 }
+                style={({ isActive }) => ({
+                  backgroundColor: isActive ? "var(--bg-inset)" : "transparent",
+                  color: isActive ? "var(--text)" : "var(--text-secondary)",
+                  border: isActive ? "1px solid var(--border)" : "1px solid transparent",
+                })}
               >
                 {({ isActive }) => (
                   <div className="flex items-center space-x-2.5">
                     {isActive ? (
-                      <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-ink shrink-0">
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                        style={{
+                          backgroundColor: "var(--accent)",
+                          color: "var(--ink)",
+                        }}
+                      >
                         <ListOrdered className="h-3 w-3 stroke-[2.5]" />
                       </div>
                     ) : (
-                      <ListOrdered className="h-[18px] w-[18px] text-findeck-muted shrink-0" />
+                      <ListOrdered className="h-[18px] w-[18px] shrink-0" style={{ color: "var(--text-muted)" }} />
                     )}
                     <span>Review Queue</span>
                   </div>
@@ -80,19 +111,30 @@ export function Layout() {
                 className={({ isActive }) =>
                   `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck-border"
-                      : "text-findeck-text-secondary hover:text-findeck-text hover:bg-white/60"
+                      ? "shadow-2xs font-semibold"
+                      : "hover:bg-white/60"
                   }`
                 }
+                style={({ isActive }) => ({
+                  backgroundColor: isActive ? "var(--bg-inset)" : "transparent",
+                  color: isActive ? "var(--text)" : "var(--text-secondary)",
+                  border: isActive ? "1px solid var(--border)" : "1px solid transparent",
+                })}
               >
                 {({ isActive }) => (
                   <div className="flex items-center space-x-2.5">
                     {isActive ? (
-                      <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-ink shrink-0">
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                        style={{
+                          backgroundColor: "var(--accent)",
+                          color: "var(--ink)",
+                        }}
+                      >
                         <Inbox className="h-3 w-3 stroke-[2.5]" />
                       </div>
                     ) : (
-                      <Inbox className="h-[18px] w-[18px] text-findeck-muted shrink-0" />
+                      <Inbox className="h-[18px] w-[18px] shrink-0" style={{ color: "var(--text-muted)" }} />
                     )}
                     <span>Inbox</span>
                   </div>
@@ -102,7 +144,10 @@ export function Layout() {
 
             {/* Group 2: OPERATIONS */}
             <div className="space-y-1">
-              <div className="px-3 text-[11px] font-semibold text-findeck-muted uppercase tracking-wider mb-1.5">
+              <div
+                className="px-3 text-[11px] font-semibold uppercase tracking-wider mb-1.5"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Operations
               </div>
 
@@ -111,19 +156,30 @@ export function Layout() {
                 className={({ isActive }) =>
                   `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck-border"
-                      : "text-findeck-text-secondary hover:text-findeck-text hover:bg-white/60"
+                      ? "shadow-2xs font-semibold"
+                      : "hover:bg-white/60"
                   }`
                 }
+                style={({ isActive }) => ({
+                  backgroundColor: isActive ? "var(--bg-inset)" : "transparent",
+                  color: isActive ? "var(--text)" : "var(--text-secondary)",
+                  border: isActive ? "1px solid var(--border)" : "1px solid transparent",
+                })}
               >
                 {({ isActive }) => (
                   <div className="flex items-center space-x-2.5">
                     {isActive ? (
-                      <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-ink shrink-0">
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                        style={{
+                          backgroundColor: "var(--accent)",
+                          color: "var(--ink)",
+                        }}
+                      >
                         <LayoutDashboard className="h-3 w-3 stroke-[2.5]" />
                       </div>
                     ) : (
-                      <LayoutDashboard className="h-[18px] w-[18px] text-findeck-muted shrink-0" />
+                      <LayoutDashboard className="h-[18px] w-[18px] shrink-0" style={{ color: "var(--text-muted)" }} />
                     )}
                     <span>Dashboard</span>
                   </div>
@@ -136,19 +192,30 @@ export function Layout() {
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                       isActive
-                        ? "bg-white text-findeck-text font-semibold shadow-2xs border border-findeck-border"
-                        : "text-findeck-text-secondary hover:text-findeck-text hover:bg-white/60"
+                        ? "shadow-2xs font-semibold"
+                        : "hover:bg-white/60"
                     }`
                   }
+                  style={({ isActive }) => ({
+                    backgroundColor: isActive ? "var(--bg-inset)" : "transparent",
+                    color: isActive ? "var(--text)" : "var(--text-secondary)",
+                    border: isActive ? "1px solid var(--border)" : "1px solid transparent",
+                  })}
                 >
                   {({ isActive }) => (
                     <div className="flex items-center space-x-2.5">
                       {isActive ? (
-                        <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-ink shrink-0">
+                        <div
+                          className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                          style={{
+                            backgroundColor: "var(--accent)",
+                            color: "var(--ink)",
+                          }}
+                        >
                           <ShieldCheck className="h-3 w-3 stroke-[2.5]" />
                         </div>
                       ) : (
-                        <ShieldCheck className="h-[18px] w-[18px] text-findeck-muted shrink-0" />
+                        <ShieldCheck className="h-[18px] w-[18px] shrink-0" style={{ color: "var(--text-muted)" }} />
                       )}
                       <span>Admin</span>
                     </div>
@@ -160,50 +227,84 @@ export function Layout() {
         </div>
 
         {/* Sidebar Footer: User Card and Logout */}
-        <div className="pt-4 border-t border-findeck-border space-y-2">
+        <div
+          className="pt-4 border-t space-y-2.5"
+          style={{ borderColor: "var(--border)" }}
+        >
           {/* User Card */}
-          <div className="bg-white border border-findeck-border rounded-btn p-2 px-2.5 flex items-center justify-between shadow-2xs">
-            <div className="flex items-center space-x-2.5 min-w-0">
-              <div className="h-7 w-7 rounded-full bg-accent text-ink flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+          <div
+            className="border rounded-2xl p-3 flex items-center justify-between shadow-xs hover:shadow-sm transition-all"
+            style={{
+              backgroundColor: "var(--bg-inset)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <div className="flex items-center space-x-3 min-w-0">
+              <div
+                className="h-9 w-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-[0_2px_8px_rgba(155,161,249,0.35)]"
+                style={{
+                  backgroundColor: "var(--accent)",
+                  color: "var(--ink)",
+                }}
+              >
                 {userInitials}
               </div>
               <div className="min-w-0 text-left">
-                <div className="text-xs font-semibold text-findeck-text truncate">
+                <div className="text-xs font-bold truncate" style={{ color: "var(--text)" }}>
                   {userDisplayName}
                 </div>
-                <div className="text-[10px] text-findeck-muted truncate">
+                <div className="text-[11px] font-medium truncate mt-0.5" style={{ color: "var(--text-muted)" }}>
                   {user?.role === "admin" ? "Administrator" : "Reviewer"}
                 </div>
               </div>
             </div>
-            <ChevronDown className="h-3.5 w-3.5 text-findeck-muted shrink-0" />
           </div>
 
           {/* Logout Action */}
           <button
             onClick={() => logout()}
-            className="flex items-center space-x-2 px-2.5 py-1.5 rounded-btn text-xs font-medium text-findeck-muted hover:text-danger-strong hover:bg-danger-soft w-full transition-colors cursor-pointer"
+            className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold w-full transition-all cursor-pointer border border-transparent"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--danger-soft)";
+              e.currentTarget.style.color = "var(--danger-strong)";
+              e.currentTarget.style.borderColor = "rgba(254, 130, 135, 0.25)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "var(--text-muted)";
+              e.currentTarget.style.borderColor = "transparent";
+            }}
             title="Log out"
           >
-            <LogOut className="h-3.5 w-3.5" />
+            <LogOut className="h-4 w-4 stroke-[2.2]" />
             <span>Logout</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Viewport Content Area */}
-      <div className="flex-1 min-w-0 flex flex-col bg-findeck-app min-h-screen">
-        {/* Top Header / Breadcrumbs Bar */}
-        <header className="px-6 sm:px-8 py-3.5 bg-findeck-card border-b border-findeck-border flex items-center justify-between shrink-0">
+      {/* Main Viewport Content Area on --bg-app */}
+      <div
+        className="flex-1 min-w-0 flex flex-col min-h-screen"
+        style={{ backgroundColor: "var(--bg-app)" }}
+      >
+        {/* Top Header / Breadcrumbs Bar on --bg-card */}
+        <header
+          className="px-6 sm:px-8 py-3.5 border-b flex items-center justify-between shrink-0"
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border)",
+          }}
+        >
           {/* Breadcrumb */}
           <div className="flex items-center space-x-2 text-xs">
-            <span className="text-findeck-muted">InvoiceFlow</span>
-            <span className="text-findeck-muted/60">/</span>
-            <span className="font-semibold text-findeck-text">{getPageTitle()}</span>
+            <span style={{ color: "var(--text-muted)" }}>InvoiceFlow</span>
+            <span style={{ color: "var(--text-muted)", opacity: 0.6 }}>/</span>
+            <span className="font-semibold" style={{ color: "var(--text)" }}>{getPageTitle()}</span>
           </div>
 
-          {/* Right User Workspace Chip */}
-          <div className="flex items-center space-x-3 text-xs text-findeck-muted">
+          {/* Right Workspace Chip */}
+          <div className="flex items-center space-x-3 text-xs" style={{ color: "var(--text-muted)" }}>
             <div className="flex items-center space-x-1.5">
               <Building2 className="h-3.5 w-3.5" />
               <span>Accounts Review Workspace</span>

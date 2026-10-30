@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Decimal from "decimal.js";
 import { apiRequest, ConflictError } from "@/lib/api";
+import { StatusPill } from "@/components/StatusPill";
 import { AuditTrailFlowchart } from "@/components/AuditTrailFlowchart";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import {
@@ -471,21 +472,7 @@ export function ReviewDetail() {
               <h2 className="text-16 font-bold text-findeck-text">
                 {invoice?.normalized_invoice_number || invoice?.current_extraction?.invoice_number || "Invoice Review"}
               </h2>
-              <span
-                className={`text-xs px-2.5 py-0.5 rounded-pill font-semibold ${
-                  invoice?.status === "APPROVED"
-                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200/60"
-                    : invoice?.status === "PUSHED"
-                    ? "bg-findeck-pill-up-bg text-findeck-pill-up-text border border-emerald-300/60"
-                    : invoice?.status === "RESEND_REQUESTED"
-                    ? "bg-purple-50 text-warning-strong border border-purple-200/60"
-                    : invoice?.status === "REJECTED" || invoice?.status === "REJECTED_DUPLICATE"
-                    ? "bg-danger text-ink border border-danger/40"
-                    : "bg-amber-50 text-warning-strong border border-amber-200/60"
-                }`}
-              >
-                {invoice?.status?.replace(/_/g, " ")}
-              </span>
+              <StatusPill status={invoice?.status || ""} />
             </div>
             <p className="text-xs text-findeck-muted font-mono mt-0.5">
               ID: {id} • Version: {invoice?.row_version}
@@ -515,8 +502,15 @@ export function ReviewDetail() {
           </button>
 
           {invoice?.status === "RESEND_REQUESTED" ? (
-            <div className="flex items-center space-x-2 text-xs font-semibold text-warning-strong bg-purple-50 px-3 py-1.5 rounded-btn border border-purple-200/60">
-              <RotateCcw className="h-3.5 w-3.5 text-warning-strong" />
+            <div
+              className="flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-btn border"
+              style={{
+                backgroundColor: "var(--accent-soft)",
+                borderColor: "var(--accent)",
+                color: "var(--accent-strong)",
+              }}
+            >
+              <RotateCcw className="h-3.5 w-3.5" style={{ color: "var(--accent-strong)" }} />
               <span>Awaiting Replacement</span>
             </div>
           ) : invoice?.status === "APPROVED" || invoice?.status === "PUSHING" ? (
@@ -545,7 +539,7 @@ export function ReviewDetail() {
                 <>
                   <button
                     onClick={() => setShowResendDialog(true)}
-                    className="px-3 py-1.5 border border-findeck-border bg-white rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-app transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-btn text-xs font-semibold transition-colors cursor-pointer" style={{ backgroundColor: "var(--bg-inset)", border: "1px solid var(--border)", color: "var(--ink)" }}
                   >
                     Request Resend
                   </button>
@@ -587,22 +581,37 @@ export function ReviewDetail() {
 
       {/* Resend Requested Banner */}
       {invoice?.status === "RESEND_REQUESTED" && (
-        <div className="bg-warning-soft border-b border-warning/20 px-6 py-3 flex items-center justify-between shadow-2xs shrink-0">
+        <div
+          className="border-b px-6 py-3 flex items-center justify-between shadow-2xs shrink-0"
+          style={{
+            backgroundColor: "var(--accent-soft)",
+            borderColor: "rgba(155, 161, 249, 0.4)",
+          }}
+        >
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-btn bg-warning flex items-center justify-center text-ink shrink-0">
+            <div
+              className="w-8 h-8 rounded-btn flex items-center justify-center shrink-0"
+              style={{
+                backgroundColor: "var(--accent)",
+                color: "var(--ink)",
+              }}
+            >
               <RotateCcw className="h-4 w-4" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold text-warning-strong uppercase tracking-wide">
+                <span
+                  className="text-xs font-bold uppercase tracking-wide"
+                  style={{ color: "var(--accent-strong)" }}
+                >
                   Resend Requested
                 </span>
-                <span className="text-xs text-warning-strong">
+                <span className="text-xs" style={{ color: "var(--accent-strong)" }}>
                   — Awaiting replacement document from supplier
                 </span>
               </div>
-              <p className="text-xs text-warning-strong font-medium mt-0.5">
-                <span className="font-semibold text-warning-strong">Reason:</span>{" "}
+              <p className="text-xs font-medium mt-0.5" style={{ color: "var(--accent-strong)" }}>
+                <span className="font-semibold">Reason:</span>{" "}
                 {invoice?.status_reason || "Document requires resubmission."}
               </p>
             </div>
@@ -628,7 +637,12 @@ export function ReviewDetail() {
             <button
               onClick={() => cancelResendMutation.mutate()}
               disabled={cancelResendMutation.isPending}
-              className="px-3 py-1.5 bg-white border border-findeck-border bg-white text-findeck-text rounded-btn text-xs font-semibold hover:bg-findeck-app transition-colors cursor-pointer"
+              className="px-3 py-1.5 border rounded-btn text-xs font-semibold transition-colors cursor-pointer"
+              style={{
+                backgroundColor: "var(--bg-inset)",
+                borderColor: "var(--border)",
+                color: "var(--text)",
+              }}
             >
               Cancel Resend
             </button>
@@ -667,7 +681,7 @@ export function ReviewDetail() {
         <div className="flex-1 h-full min-h-0 bg-white rounded-card border border-findeck-border shadow-xs overflow-y-auto">
           {/* Duplicate Banner (R3) */}
           {invoice?.dup_of_id && (
-            <div className="bg-warning-soft border-b border-warning/20 p-4">
+            <div className="p-4 border-b" style={{ backgroundColor: "var(--warning-soft)", borderColor: "var(--warning)", color: "var(--warning-strong)" }}>
               <div className="flex items-start space-x-3">
                 <Copy className="h-5 w-5 text-warning-strong mt-0.5 shrink-0" />
                 <div className="flex-1 text-sm text-warning-strong">
@@ -708,7 +722,7 @@ export function ReviewDetail() {
 
           {/* Validation Issues Alert Banner */}
           {errorIssues.length > 0 && (
-            <div className="bg-danger-soft border-b border-danger/20 p-4">
+            <div className="p-4 border-b" style={{ backgroundColor: "var(--danger-soft)", borderColor: "var(--danger)", color: "var(--danger-strong)" }}>
               <div className="flex items-start space-x-3">
                 <AlertCircle className="h-5 w-5 text-danger-strong mt-0.5 shrink-0" />
                 <div className="flex-1 text-sm text-danger-strong">
@@ -729,7 +743,7 @@ export function ReviewDetail() {
 
           {/* Validation Warnings Alert Banner */}
           {warningIssues.length > 0 && (
-            <div className="bg-warning-soft border-b border-warning/20 p-4">
+            <div className="p-4 border-b" style={{ backgroundColor: "var(--warning-soft)", borderColor: "var(--warning)", color: "var(--warning-strong)" }}>
               <div className="flex items-start space-x-3">
                 <AlertTriangle className="h-5 w-5 text-warning-strong mt-0.5 shrink-0" />
                 <div className="flex-1 text-sm text-warning-strong">
@@ -1108,7 +1122,7 @@ export function ReviewDetail() {
                   setShowResendDialog(false);
                   navigateNext();
                 }}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-btn text-xs font-bold disabled:opacity-50 transition-colors cursor-pointer"
+                className="px-4 py-2 bg-ink text-white rounded-btn text-xs font-bold disabled:opacity-50 transition-colors cursor-pointer hover:bg-ink-hover"
               >
                 Request Resend
               </button>
@@ -1178,23 +1192,23 @@ export function ReviewDetail() {
             <div className="divide-y divide-findeck-border/60 text-xs">
               <div className="py-2 flex justify-between">
                 <span className="text-findeck-muted">Approve & Push</span>
-                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">Ctrl + Enter</kbd>
+                <kbd className="px-2 py-0.5 rounded font-mono font-bold text-xs" style={{ backgroundColor: "var(--bg-app)", color: "var(--text-secondary)" }}>Ctrl + Enter</kbd>
               </div>
               <div className="py-2 flex justify-between">
                 <span className="text-findeck-muted">Next Invoice</span>
-                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">Alt + →</kbd>
+                <kbd className="px-2 py-0.5 rounded font-mono font-bold text-xs" style={{ backgroundColor: "var(--bg-app)", color: "var(--text-secondary)" }}>Alt + →</kbd>
               </div>
               <div className="py-2 flex justify-between">
                 <span className="text-findeck-muted">Previous Invoice</span>
-                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">Alt + ←</kbd>
+                <kbd className="px-2 py-0.5 rounded font-mono font-bold text-xs" style={{ backgroundColor: "var(--bg-app)", color: "var(--text-secondary)" }}>Alt + ←</kbd>
               </div>
               <div className="py-2 flex justify-between">
                 <span className="text-findeck-muted">Reject Invoice</span>
-                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">Alt + R</kbd>
+                <kbd className="px-2 py-0.5 rounded font-mono font-bold text-xs" style={{ backgroundColor: "var(--bg-app)", color: "var(--text-secondary)" }}>Alt + R</kbd>
               </div>
               <div className="py-2 flex justify-between">
                 <span className="text-findeck-muted">Help / Shortcuts</span>
-                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">?</kbd>
+                <kbd className="px-2 py-0.5 rounded font-mono font-bold text-xs" style={{ backgroundColor: "var(--bg-app)", color: "var(--text-secondary)" }}>?</kbd>
               </div>
             </div>
           </div>

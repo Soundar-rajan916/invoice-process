@@ -232,9 +232,9 @@ export function AuditTrailFlowchart({
         title: "Resend Requested",
         desc: payload.reason ? `Reason: "${payload.reason}"` : "Requested supplier/user to resubmit invoice",
         icon: RotateCcw,
-        badgeColor: "bg-purple-500 text-white",
-        cardBorder: "border-purple-200",
-        cardBg: "bg-purple-50/30",
+        badgeColor: "bg-accent text-ink",
+        cardBorder: "border-accent/30",
+        cardBg: "bg-accent-soft",
       };
     }
 

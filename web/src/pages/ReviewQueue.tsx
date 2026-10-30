@@ -6,14 +6,13 @@ import { apiRequest } from "@/lib/api";
 import {
   Search,
   Play,
-  AlertCircle,
-  AlertTriangle,
   ArrowUpDown,
   FileText,
   ChevronLeft,
   ChevronRight,
-  Check,
 } from "lucide-react";
+import { StatusPill } from "@/components/StatusPill";
+import { IssueChip } from "@/components/IssueChip";
 
 export function ReviewQueue() {
   const navigate = useNavigate();
@@ -75,13 +74,37 @@ export function ReviewQueue() {
     return `${days}d ago`;
   };
 
+  const getTabCountStyle = (st: string) => {
+    if (st === "RESEND_REQUESTED") {
+      return { bg: "var(--accent)", text: "var(--ink)" };
+    }
+    if (st === "NEEDS_REVIEW") {
+      return { bg: "var(--warning)", text: "var(--ink)" };
+    }
+    if (st === "PUSHED" || st === "APPROVED") {
+      return { bg: "var(--success)", text: "var(--ink)" };
+    }
+    if (st === "REJECTED") {
+      return { bg: "var(--danger)", text: "var(--ink)" };
+    }
+    return { bg: "var(--bg-app)", text: "var(--ink)" };
+  };
+
   return (
     <div className="w-full space-y-6">
-      {/* Top Banner with Action & Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-findeck-card p-6 rounded-card border border-findeck-border shadow-xs">
+      {/* Top Banner with Action & Title on --bg-card */}
+      <div
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-card border shadow-xs"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          borderColor: "var(--border)",
+        }}
+      >
         <div>
-          <h1 className="text-2xl font-bold text-findeck-text tracking-tight">Review Queue</h1>
-          <p className="text-xs text-findeck-muted mt-1">
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
+            Review Queue
+          </h1>
+          <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
             Accounts team review and approval verification workspace (R2 guarantee).
           </p>
         </div>
@@ -90,47 +113,65 @@ export function ReviewQueue() {
           <button
             onClick={startReviewing}
             disabled={items.length === 0}
-            className="inline-flex items-center space-x-2 px-4 py-2.5 bg-ink hover:bg-ink-hover text-white font-medium text-xs rounded-btn shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-2 px-4 py-2.5 font-semibold text-xs rounded-btn shadow-xs transition-colors cursor-pointer select-none"
+            style={{
+              backgroundColor: items.length === 0 ? "var(--bg-disabled)" : "var(--ink)",
+              color: items.length === 0 ? "var(--text-muted)" : "#FFFFFF",
+              border: items.length === 0 ? "1px solid var(--border)" : "none",
+            }}
           >
-            <Play className="h-3.5 w-3.5 fill-white" />
+            <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
             <span>Start Reviewing</span>
           </button>
         </div>
       </div>
 
-      {/* Filter and Status Summary Pills */}
+      {/* Tabs (ALL, NEEDS REVIEW, PUSHED, REJECTED, RESEND REQUESTED) */}
       <div className="flex items-center space-x-2 overflow-x-auto pb-1">
-        {["ALL", "NEEDS_REVIEW", "PUSHED", "REJECTED", "RESEND_REQUESTED"].map((st) => (
-          <button
-            key={st}
-            onClick={() => {
-              setStatusFilter(st);
-              setPage(1);
-            }}
-            className={`px-3 py-1.5 rounded-pill text-xs font-semibold whitespace-nowrap transition-all border ${
-              statusFilter === st
-                ? "bg-white text-findeck-text border-findeck-border shadow-2xs"
-                : "bg-transparent text-findeck-muted border-transparent hover:bg-white/60 hover:text-findeck-text"
-            }`}
-          >
-            <span>{st.replace(/_/g, " ")}</span>
-            {counts[st] !== undefined && (
-              <span
-                className={`ml-1.5 px-1.5 py-0.2 rounded-pill text-[10px] tabular-nums ${
-                  statusFilter === st ? "bg-accent-soft text-ink font-bold" : "bg-slate-200/60 text-findeck-muted"
-                }`}
-              >
-                {counts[st]}
-              </span>
-            )}
-          </button>
-        ))}
+        {["ALL", "NEEDS_REVIEW", "PUSHED", "REJECTED", "RESEND_REQUESTED"].map((st) => {
+          const isSelected = statusFilter === st;
+          const countStyle = getTabCountStyle(st);
+          return (
+            <button
+              key={st}
+              onClick={() => {
+                setStatusFilter(st);
+                setPage(1);
+              }}
+              className="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer flex items-center"
+              style={{
+                backgroundColor: isSelected ? "var(--ink)" : "transparent",
+                color: isSelected ? "#FFFFFF" : "var(--text-secondary)",
+                borderColor: isSelected ? "var(--ink)" : "transparent",
+              }}
+            >
+              <span>{st.replace(/_/g, " ")}</span>
+              {counts[st] !== undefined && (
+                <span
+                  className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold tabular-nums"
+                  style={{
+                    backgroundColor: countStyle.bg,
+                    color: countStyle.text,
+                  }}
+                >
+                  {counts[st]}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Filter Bar (Search, Flagged toggle, Sort) */}
-      <div className="bg-findeck-card p-4 rounded-card border border-findeck-border shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
+      {/* Filter Bar Card (Search, Flagged toggle, Sort) on --bg-card */}
+      <div
+        className="p-4 rounded-card border shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          borderColor: "var(--border)",
+        }}
+      >
         <div className="relative w-full md:w-80">
-          <Search className="h-4 w-4 absolute left-3 top-3 text-findeck-muted" />
+          <Search className="h-4 w-4 absolute left-3 top-2.5 text-muted pointer-events-none" aria-hidden="true" />
           <input
             type="text"
             placeholder="Search invoice number, GSTIN, file..."
@@ -139,13 +180,18 @@ export function ReviewQueue() {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-9 pr-8 py-2 text-xs bg-white border border-findeck-border rounded-btn focus:outline-none focus:ring-1 focus:ring-accent-strong focus:border-accent-strong transition-all text-findeck-text placeholder:text-findeck-muted"
+            className="w-full pl-9 pr-8 py-2 text-xs rounded-btn outline-none transition-all placeholder:text-muted"
+            style={{
+              backgroundColor: "var(--bg-inset)",
+              border: "1px solid var(--border)",
+              color: "var(--text)",
+            }}
           />
-          <span className="absolute right-2.5 top-2.5 text-[10px] text-findeck-muted font-mono">/</span>
+          <span className="absolute right-2.5 top-2.5 text-[10px] text-muted font-mono">/</span>
         </div>
 
         <div className="flex items-center space-x-4 w-full md:w-auto justify-end">
-          <label className="flex items-center space-x-2 text-xs font-medium text-findeck-text cursor-pointer select-none">
+          <label className="flex items-center space-x-2 text-xs font-medium cursor-pointer select-none" style={{ color: "var(--text)" }}>
             <input
               type="checkbox"
               checked={flaggedOnly}
@@ -153,34 +199,59 @@ export function ReviewQueue() {
                 setFlaggedOnly(e.target.checked);
                 setPage(1);
               }}
-              className="h-4 w-4 rounded-[4px] border-findeck-border text-ink focus:ring-accent-strong"
+              className="h-4 w-4 rounded-[4px] cursor-pointer"
+              style={{
+                accentColor: "var(--accent)",
+              }}
             />
             <span>Flagged issues only</span>
           </label>
 
           <button
             onClick={() => setSortOrder(sortOrder === "oldest" ? "newest" : "oldest")}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 border border-findeck-border rounded-btn text-xs font-medium text-findeck-text hover:bg-white transition-colors cursor-pointer bg-white"
+            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-btn text-xs font-medium transition-colors cursor-pointer"
+            style={{
+              backgroundColor: "var(--bg-inset)",
+              border: "1px solid var(--border)",
+              color: "var(--text)",
+            }}
           >
-            <ArrowUpDown className="h-3.5 w-3.5 text-findeck-muted" />
+            <ArrowUpDown className="h-3.5 w-3.5" style={{ color: "var(--text-muted)" }} aria-hidden="true" />
             <span>Sort: {sortOrder === "oldest" ? "Oldest First" : "Newest First"}</span>
           </button>
         </div>
       </div>
 
-      {/* Main Queue Table Card */}
-      <div className="bg-findeck-card rounded-card border border-findeck-border shadow-xs overflow-hidden">
+      {/* Main Queue Table Card on --bg-card */}
+      <div
+        className="rounded-card border shadow-xs overflow-hidden"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          borderColor: "var(--border)",
+        }}
+      >
         {isLoading ? (
-          <div className="py-20 text-center text-xs text-findeck-muted">Loading invoice queue...</div>
+          <div className="py-20 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+            Loading invoice queue...
+          </div>
         ) : items.length === 0 ? (
           <div className="py-20 text-center">
-            <FileText className="h-10 w-10 text-findeck-muted/40 mx-auto mb-2" />
-            <p className="text-xs font-medium text-findeck-text">No invoices match your filter</p>
+            <FileText className="h-10 w-10 mx-auto mb-2 opacity-40" style={{ color: "var(--text-muted)" }} aria-hidden="true" />
+            <p className="text-xs font-medium" style={{ color: "var(--text)" }}>
+              No invoices match your filter
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-findeck-text">
-              <thead className="bg-white text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-findeck-border">
+            <table className="w-full text-left text-xs" style={{ color: "var(--text)" }}>
+              <thead
+                className="text-[11px] font-semibold uppercase tracking-wider border-b"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  color: "var(--text-secondary)",
+                  borderColor: "var(--border)",
+                }}
+              >
                 <tr>
                   <th className="px-6 py-3.5">Invoice #</th>
                   <th className="px-6 py-3.5">Supplier GSTIN</th>
@@ -190,75 +261,60 @@ export function ReviewQueue() {
                   <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-findeck-border">
+              <tbody>
                 {items.map((inv: any) => (
                   <tr
                     key={inv.id}
-                    className="hover:bg-white transition-colors group cursor-pointer"
+                    className="transition-colors group cursor-pointer"
+                    style={{
+                      borderBottom: "1px solid var(--border)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--accent-soft)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
                     onClick={() => navigate(`/invoices/${inv.id}`)}
                   >
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-findeck-text group-hover:text-accent-strong transition-colors">
+                      <div className="font-semibold" style={{ color: "var(--text)" }}>
                         {inv.normalized_invoice_number || "Unextracted"}
                       </div>
-                      <div className="text-[11px] text-findeck-muted">
+                      <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                         FY: {inv.financial_year || "Pending"}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-mono text-xs text-findeck-text font-medium">
+                      <div className="font-mono text-xs font-medium" style={{ color: "var(--text)" }}>
                         {inv.supplier_gstin || "—"}
                       </div>
-                      <div className="text-[11px] text-findeck-muted">
+                      <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                         {inv.extraction_path ? `${inv.extraction_path} path` : ""}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-pill text-xs font-medium border ${
-                          inv.status === "NEEDS_REVIEW"
-                            ? "bg-warning-soft text-warning-strong border-warning/30"
-                            : inv.status === "APPROVED"
-                            ? "bg-success-soft text-success-strong border-success/30"
-                            : inv.status === "PUSHED"
-                            ? "bg-success-soft text-success-strong border-success/30"
-                            : inv.status === "RESEND_REQUESTED"
-                            ? "bg-warning-soft text-warning-strong border-warning/30"
-                            : inv.status === "REJECTED" || inv.status === "FAILED" || inv.status === "PUSH_FAILED"
-                            ? "bg-danger-soft text-danger-strong border-danger/30"
-                            : inv.status.includes("DUPLICATE")
-                            ? "bg-accent-soft text-ink border-accent/30"
-                            : "bg-findeck-app text-findeck-text border-findeck-border"
-                        }`}
-                      >
-                        {inv.status === "PUSHED" ? (
-                          <Check className="h-3 w-3 text-success-strong" />
-                        ) : (
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full ${
-                              inv.status === "NEEDS_REVIEW"
-                                ? "bg-warning"
-                                : inv.status === "APPROVED" || inv.status === "PUSHED"
-                                ? "bg-success"
-                                : inv.status === "RESEND_REQUESTED"
-                                ? "bg-warning"
-                                : "bg-danger"
-                            }`}
-                          />
-                        )}
-                        <span>{inv.status.replace(/_/g, " ")}</span>
-                      </span>
+                      <StatusPill status={inv.status} />
                     </td>
                     <td className="px-6 py-4 text-xs">
-                      <div className="text-findeck-text font-medium tabular-nums">{formatAge(inv.received_at)}</div>
-                      <div className="text-findeck-muted tabular-nums">
+                      <div className="font-medium tabular-nums" style={{ color: "var(--text)" }}>
+                        {formatAge(inv.received_at)}
+                      </div>
+                      <div className="tabular-nums text-[11px]" style={{ color: "var(--text-muted)" }}>
                         {new Date(inv.received_at).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2">
                         {inv.status === "RESEND_REQUESTED" ? (
-                          <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-btn text-xs font-medium bg-warning-soft text-warning-strong border border-warning/30">
+                          <span
+                            className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-btn text-xs font-medium"
+                            style={{
+                              backgroundColor: "var(--accent-soft)",
+                              color: "var(--accent-strong)",
+                              border: "1px solid var(--accent)",
+                            }}
+                          >
                             <span className="font-semibold">Reason:</span>
                             <span className="truncate max-w-[240px]" title={inv.status_reason || "Pending vendor resubmission"}>
                               {inv.status_reason || "Pending vendor resubmission"}
@@ -266,21 +322,9 @@ export function ReviewQueue() {
                           </span>
                         ) : (
                           <>
-                            {inv.error_count > 0 && (
-                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-pill text-xs font-semibold bg-danger-soft text-danger-strong border border-danger/30">
-                                <AlertCircle className="h-3 w-3" />
-                                <span className="tabular-nums">{inv.error_count} error{inv.error_count > 1 ? "s" : ""}</span>
-                              </span>
-                            )}
-                            {inv.warning_count > 0 && (
-                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-pill text-xs font-semibold bg-warning-soft text-warning-strong border border-warning/30">
-                                <AlertTriangle className="h-3 w-3" />
-                                <span className="tabular-nums">{inv.warning_count} warning{inv.warning_count > 1 ? "s" : ""}</span>
-                              </span>
-                            )}
-                            {inv.error_count === 0 && inv.warning_count === 0 && (
-                              <span className="text-xs text-success-strong font-medium">Valid</span>
-                            )}
+                            {inv.error_count > 0 && <IssueChip type="error" count={inv.error_count} />}
+                            {inv.warning_count > 0 && <IssueChip type="warning" count={inv.warning_count} />}
+                            {inv.error_count === 0 && inv.warning_count === 0 && <IssueChip type="valid" />}
                           </>
                         )}
                       </div>
@@ -289,7 +333,20 @@ export function ReviewQueue() {
                       <Link
                         to={`/invoices/${inv.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center space-x-1 text-xs font-semibold text-accent-strong hover:underline"
+                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-btn text-xs font-semibold transition-all shadow-2xs"
+                        style={{
+                          backgroundColor: "var(--bg-inset)",
+                          border: "1px solid var(--border)",
+                          color: "var(--ink)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "var(--accent-soft)";
+                          e.currentTarget.style.color = "var(--accent-strong)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "var(--bg-inset)";
+                          e.currentTarget.style.color = "var(--ink)";
+                        }}
                       >
                         <span>Review</span>
                       </Link>
@@ -303,10 +360,17 @@ export function ReviewQueue() {
 
         {/* Pagination Bar */}
         {totalPages > 1 && (
-          <div className="px-6 py-3 border-t border-findeck-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-findeck-muted bg-white">
+          <div
+            className="px-6 py-3.5 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
+            style={{
+              backgroundColor: "var(--bg-inset)",
+              borderColor: "var(--border)",
+              color: "var(--text-muted)",
+            }}
+          >
             <div className="tabular-nums">
-              Showing page <strong className="text-findeck-text font-semibold">{page}</strong> of{" "}
-              <strong className="text-findeck-text font-semibold">{totalPages}</strong> ({total} total invoices)
+              Showing page <strong className="font-semibold" style={{ color: "var(--text)" }}>{page}</strong> of{" "}
+              <strong className="font-semibold" style={{ color: "var(--text)" }}>{totalPages}</strong> ({total} total invoices)
             </div>
             <Pagination
               total={totalPages}
@@ -334,7 +398,12 @@ export function ReviewQueue() {
                       type="button"
                       onClick={onNext}
                       disabled={page >= totalPages}
-                      className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-app text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                      className="w-8 h-8 flex items-center justify-center border rounded-btn disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                      style={{
+                        backgroundColor: "var(--bg-inset)",
+                        borderColor: "var(--border)",
+                        color: "var(--text)",
+                      }}
                       title="Next page"
                     >
                       <ChevronRight className="h-4 w-4" />
@@ -349,7 +418,12 @@ export function ReviewQueue() {
                       type="button"
                       onClick={onPrevious}
                       disabled={page <= 1}
-                      className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-app text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                      className="w-8 h-8 flex items-center justify-center border rounded-btn disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                      style={{
+                        backgroundColor: "var(--bg-inset)",
+                        borderColor: "var(--border)",
+                        color: "var(--text)",
+                      }}
                       title="Previous page"
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -361,7 +435,8 @@ export function ReviewQueue() {
                   return (
                     <span
                       key={key}
-                      className="w-8 h-8 flex items-center justify-center text-findeck-muted text-xs font-semibold"
+                      className="w-8 h-8 flex items-center justify-center text-xs font-semibold"
+                      style={{ color: "var(--text-muted)" }}
                     >
                       ...
                     </span>
@@ -374,11 +449,12 @@ export function ReviewQueue() {
                     key={key}
                     type="button"
                     onClick={() => setPage(value)}
-                    className={`w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer ${
-                      isActive
-                        ? "bg-ink text-white border-ink shadow-xs"
-                        : "border-findeck-border bg-white text-findeck-text hover:bg-findeck-app"
-                    }`}
+                    className="w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer"
+                    style={{
+                      backgroundColor: isActive ? "var(--ink)" : "var(--bg-inset)",
+                      color: isActive ? "#FFFFFF" : "var(--text)",
+                      borderColor: isActive ? "var(--ink)" : "var(--border)",
+                    }}
                   >
                     {value}
                   </button>

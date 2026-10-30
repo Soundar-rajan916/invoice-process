@@ -30,7 +30,7 @@ export default {
           foreground: "var(--ink)",
         },
         muted: {
-          DEFAULT: "var(--bg-card)",
+          DEFAULT: "var(--bg-app)",
           foreground: "var(--text-muted)",
         },
         accent: {
@@ -61,7 +61,7 @@ export default {
           DEFAULT: "var(--bg-card)",
           foreground: "var(--text)",
         },
-        // Semantic tokens mapped strictly to Reference B pastel palette
+        // Direct semantic tokens strictly mapped to Reference B pastel palette
         findeck: {
           app: "var(--bg-app)",
           sidebar: "var(--bg-card)",

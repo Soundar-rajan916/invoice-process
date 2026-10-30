@@ -144,6 +144,9 @@ export function Admin() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-suppliers"] });
     },
+    onError: (err: any) => {
+      alert(err.message || "Failed to update supplier status");
+    },
   });
 
   // CSV Import
@@ -217,34 +220,40 @@ export function Admin() {
     <div className="w-full space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-findeck-text tracking-tight">
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
             System Administration
           </h1>
-          <p className="text-xs text-findeck-muted mt-1">
+          <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
             Manage authorized suppliers master directory and reviewer team accounts.
           </p>
         </div>
 
         {/* Tab Switcher - Segmented control */}
-        <div className="flex bg-findeck-card p-1 rounded-pill border border-findeck-border self-start sm:self-auto shadow-2xs">
+        <div
+          className="flex p-1 rounded-full border self-start sm:self-auto shadow-2xs"
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border)",
+          }}
+        >
           <button
             onClick={() => setActiveTab("suppliers")}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-pill text-xs font-medium transition-all cursor-pointer ${
-              activeTab === "suppliers"
-                ? "bg-white text-findeck-text shadow-xs font-semibold"
-                : "text-findeck-muted hover:text-findeck-text"
-            }`}
+            className="flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer"
+            style={{
+              backgroundColor: activeTab === "suppliers" ? "var(--ink)" : "transparent",
+              color: activeTab === "suppliers" ? "#FFFFFF" : "var(--text-muted)",
+            }}
           >
             <Building2 className="h-3.5 w-3.5" />
             <span>Suppliers Master</span>
           </button>
           <button
             onClick={() => setActiveTab("users")}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-pill text-xs font-medium transition-all cursor-pointer ${
-              activeTab === "users"
-                ? "bg-white text-findeck-text shadow-xs font-semibold"
-                : "text-findeck-muted hover:text-findeck-text"
-            }`}
+            className="flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer"
+            style={{
+              backgroundColor: activeTab === "users" ? "var(--ink)" : "transparent",
+              color: activeTab === "users" ? "#FFFFFF" : "var(--text-muted)",
+            }}
           >
             <Users className="h-3.5 w-3.5" />
             <span>User Accounts</span>
@@ -254,13 +263,26 @@ export function Admin() {
 
       {activeTab === "suppliers" && (
         <div className="space-y-6">
-          {/* Add Supplier & CSV Import Form */}
-          <div className="bg-white p-6 rounded-card border border-findeck-border shadow-xs space-y-4">
-            <h3 className="font-semibold text-findeck-text text-sm">
+          {/* Add Supplier & CSV Import Form on --bg-card */}
+          <div
+            className="p-6 rounded-card border shadow-xs space-y-4"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <h3 className="font-semibold text-sm" style={{ color: "var(--text)" }}>
               Add New Verified Supplier
             </h3>
             {supplierError && (
-              <div className="p-3 bg-danger-soft text-danger-strong text-xs rounded-btn border border-danger/30">
+              <div
+                className="p-3 text-xs rounded-btn border"
+                style={{
+                  backgroundColor: "var(--danger-soft)",
+                  borderColor: "var(--danger)",
+                  color: "var(--danger-strong)",
+                }}
+              >
                 {supplierError}
               </div>
             )}
@@ -270,30 +292,49 @@ export function Admin() {
                 placeholder="GSTIN (15 characters, e.g., 27AAPFU0939F1ZV)"
                 value={newGstin}
                 onChange={(e) => setNewGstin(e.target.value)}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs font-mono outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white"
+                className="px-3.5 py-2 border rounded-btn text-xs font-mono outline-none"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  borderColor: "var(--border)",
+                  color: "var(--text)",
+                }}
               />
               <input
                 type="text"
                 placeholder="Supplier Business Name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white"
+                className="px-3.5 py-2 border rounded-btn text-xs outline-none"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  borderColor: "var(--border)",
+                  color: "var(--text)",
+                }}
               />
               <div className="flex space-x-2">
                 <button
                   onClick={() => createSupplierMutation.mutate()}
                   disabled={!newGstin || !newName || createSupplierMutation.isPending}
-                  className="flex-1 inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-ink hover:bg-ink-hover text-white rounded-btn text-xs font-semibold disabled:opacity-50 transition-colors cursor-pointer shadow-xs"
+                  className="flex-1 inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-btn text-xs font-semibold disabled:opacity-50 transition-colors cursor-pointer shadow-xs"
+                  style={{
+                    backgroundColor: "var(--ink)",
+                    color: "#FFFFFF",
+                  }}
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Supplier</span>
                 </button>
                 <button
                   onClick={() => csvInputRef.current?.click()}
-                  className="inline-flex items-center space-x-1.5 px-3 py-2 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-app transition-colors cursor-pointer bg-white"
+                  className="inline-flex items-center space-x-1.5 px-3 py-2 border rounded-btn text-xs font-semibold transition-colors cursor-pointer"
+                  style={{
+                    backgroundColor: "var(--bg-inset)",
+                    borderColor: "var(--border)",
+                    color: "var(--ink)",
+                  }}
                   title="Import CSV"
                 >
-                  <FileSpreadsheet className="h-4 w-4 text-ink" />
+                  <FileSpreadsheet className="h-4 w-4" style={{ color: "var(--ink)" }} />
                   <span>CSV</span>
                 </button>
                 <input
@@ -308,12 +349,18 @@ export function Admin() {
 
             {/* CSV Import Report */}
             {csvResult && (
-              <div className="mt-3 p-4 bg-findeck-app border border-findeck-border rounded-card text-xs space-y-2">
-                <div className="font-semibold text-findeck-text">
+              <div
+                className="mt-3 p-4 border rounded-card text-xs space-y-2"
+                style={{
+                  backgroundColor: "var(--bg-app)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <div className="font-semibold" style={{ color: "var(--text)" }}>
                   Imported {csvResult.imported} supplier(s) successfully.
                 </div>
                 {csvResult.errors?.length > 0 && (
-                  <div className="text-danger-strong space-y-1">
+                  <div className="space-y-1" style={{ color: "var(--danger-strong)" }}>
                     <span className="font-bold">Errors encountered:</span>
                     {csvResult.errors.map((err: any, i: number) => (
                       <div key={i}>
@@ -326,12 +373,25 @@ export function Admin() {
             )}
           </div>
 
-          {/* Suppliers List Table */}
-          <div className="bg-white rounded-card border border-findeck-border shadow-xs overflow-hidden">
-            <div className="px-6 py-3.5 border-b border-findeck-border bg-findeck-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-semibold text-findeck-muted">
+          {/* Suppliers List Table on --bg-card */}
+          <div
+            className="rounded-card border shadow-xs overflow-hidden"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <div
+              className="px-6 py-3.5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-semibold"
+              style={{
+                backgroundColor: "var(--bg-card)",
+                borderColor: "var(--border)",
+                color: "var(--text-muted)",
+              }}
+            >
               <span className="uppercase tracking-wider">Registered Master Suppliers ({suppliers.length})</span>
               <div className="relative w-full sm:w-64">
-                <Search className="h-3.5 w-3.5 absolute left-3 top-2.5 text-findeck-muted" />
+                <Search className="h-3.5 w-3.5 absolute left-3 top-2.5 opacity-60" />
                 <input
                   type="text"
                   placeholder="Filter suppliers by name or GSTIN..."
@@ -340,21 +400,39 @@ export function Admin() {
                     setSupplierSearch(e.target.value);
                     setSupplierPage(1);
                   }}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs font-normal border border-findeck-border rounded-btn outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong bg-white text-findeck-text"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs font-normal border rounded-btn outline-none"
+                  style={{
+                    backgroundColor: "var(--bg-inset)",
+                    borderColor: "var(--border)",
+                    color: "var(--text)",
+                  }}
                 />
               </div>
             </div>
             {loadingSuppliers ? (
-              <div className="p-8 text-center text-xs text-findeck-muted">Loading suppliers...</div>
+              <div className="p-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                Loading suppliers...
+              </div>
             ) : suppliers.length === 0 ? (
-              <div className="p-8 text-center text-xs text-findeck-muted">No suppliers registered.</div>
+              <div className="p-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                No suppliers registered.
+              </div>
             ) : filteredSuppliers.length === 0 ? (
-              <div className="p-8 text-center text-xs text-findeck-muted">No suppliers match your search.</div>
+              <div className="p-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                No suppliers match your search.
+              </div>
             ) : (
               <>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-findeck-text">
-                    <thead className="bg-white text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-findeck-border">
+                  <table className="w-full text-left text-xs" style={{ color: "var(--text)" }}>
+                    <thead
+                      className="text-[11px] font-semibold uppercase tracking-wider border-b"
+                      style={{
+                        backgroundColor: "var(--bg-inset)",
+                        color: "var(--text-secondary)",
+                        borderColor: "var(--border)",
+                      }}
+                    >
                       <tr>
                         <th className="px-6 py-3.5">GSTIN</th>
                         <th className="px-6 py-3.5">Supplier Name</th>
@@ -363,19 +441,31 @@ export function Admin() {
                         <th className="px-6 py-3.5 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-findeck-border">
+                    <tbody>
                       {paginatedSuppliers.map((s: any) => (
-                        <tr key={s.id} className="hover:bg-findeck-app/50 transition-colors">
-                          <td className="px-6 py-3.5 font-mono font-medium text-findeck-text">{s.gstin}</td>
-                          <td className="px-6 py-3.5 font-medium text-findeck-text">{s.name}</td>
-                          <td className="px-6 py-3.5 text-findeck-muted font-medium">{formatStateDisplay(s.state_code)}</td>
+                        <tr
+                          key={s.id}
+                          className="transition-colors text-xs"
+                          style={{ borderBottom: "1px solid var(--border)" }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "var(--accent-soft)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
+                          }}
+                        >
+                          <td className="px-6 py-3.5 font-mono font-medium">{s.gstin}</td>
+                          <td className="px-6 py-3.5 font-medium">{s.name}</td>
+                          <td className="px-6 py-3.5" style={{ color: "var(--text-muted)" }}>
+                            {formatStateDisplay(s.state_code)}
+                          </td>
                           <td className="px-6 py-3.5">
                             <span
-                              className={`px-2.5 py-0.5 rounded-pill text-xs font-medium border ${
-                                s.is_active
-                                  ? "bg-success-soft text-success-strong border-success/30"
-                                  : "bg-danger-soft text-danger-strong border-danger/30"
-                              }`}
+                              className="px-2.5 py-0.5 rounded-full text-xs font-semibold shadow-2xs"
+                              style={{
+                                backgroundColor: s.is_active ? "var(--success)" : "var(--danger)",
+                                color: "var(--ink)",
+                              }}
                             >
                               {s.is_active ? "Active" : "Deactivated"}
                             </span>
@@ -389,11 +479,11 @@ export function Admin() {
                                 })
                               }
                               disabled={toggleSupplierActiveMutation.isPending}
-                              className={`text-xs font-semibold px-2.5 py-1 rounded-btn transition-colors cursor-pointer border ${
-                                s.is_active
-                                  ? "text-danger-strong bg-danger-soft hover:bg-danger/20 border-danger/30"
-                                  : "text-success-strong bg-success-soft hover:bg-success/20 border-success/30"
-                              }`}
+                              className="text-xs font-semibold px-2.5 py-1 rounded-btn transition-colors cursor-pointer shadow-2xs"
+                              style={{
+                                backgroundColor: s.is_active ? "var(--danger)" : "var(--success)",
+                                color: "var(--ink)",
+                              }}
                             >
                               {s.is_active ? "Deactivate" : "Activate"}
                             </button>
@@ -405,24 +495,31 @@ export function Admin() {
                 </div>
 
                 {/* Pagination Controls */}
-                <div className="px-6 py-3.5 border-t border-findeck-border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-findeck-muted">
+                <div
+                  className="px-6 py-3.5 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  style={{
+                    backgroundColor: "var(--bg-inset)",
+                    borderColor: "var(--border)",
+                    color: "var(--text-muted)",
+                  }}
+                >
                   <div className="flex items-center space-x-3">
                     <span className="tabular-nums">
                       Showing{" "}
-                      <strong className="text-findeck-text font-semibold">
+                      <strong className="font-semibold" style={{ color: "var(--text)" }}>
                         {(currentSupplierPage - 1) * supplierPageSize + 1}
                       </strong>
                       –
-                      <strong className="text-findeck-text font-semibold">
+                      <strong className="font-semibold" style={{ color: "var(--text)" }}>
                         {Math.min(currentSupplierPage * supplierPageSize, filteredSuppliers.length)}
                       </strong>{" "}
                       of{" "}
-                      <strong className="text-findeck-text font-semibold">
+                      <strong className="font-semibold" style={{ color: "var(--text)" }}>
                         {filteredSuppliers.length}
                       </strong>{" "}
                       suppliers
                     </span>
-                    <span className="text-findeck-border">|</span>
+                    <span style={{ color: "var(--border)" }}>|</span>
                     <div className="flex items-center space-x-1.5">
                       <span>Per page:</span>
                       <select
@@ -431,7 +528,12 @@ export function Admin() {
                           setSupplierPageSize(Number(e.target.value));
                           setSupplierPage(1);
                         }}
-                        className="px-2 py-0.5 border border-findeck-border rounded-btn text-xs bg-white text-findeck-text outline-none focus:border-accent-strong cursor-pointer"
+                        className="px-2 py-0.5 border rounded-btn text-xs outline-none cursor-pointer"
+                        style={{
+                          backgroundColor: "var(--bg-inset)",
+                          borderColor: "var(--border)",
+                          color: "var(--text)",
+                        }}
                       >
                         <option value={10}>10</option>
                         <option value={20}>20</option>
@@ -468,7 +570,12 @@ export function Admin() {
                               type="button"
                               onClick={onNext}
                               disabled={currentSupplierPage >= totalSupplierPages}
-                              className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-app text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                              className="w-8 h-8 flex items-center justify-center border rounded-btn disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                              style={{
+                                backgroundColor: "var(--bg-inset)",
+                                borderColor: "var(--border)",
+                                color: "var(--text)",
+                              }}
                               title="Next page"
                             >
                               <ChevronRight className="h-4 w-4" />
@@ -483,7 +590,12 @@ export function Admin() {
                               type="button"
                               onClick={onPrevious}
                               disabled={currentSupplierPage <= 1}
-                              className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-app text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                              className="w-8 h-8 flex items-center justify-center border rounded-btn disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                              style={{
+                                backgroundColor: "var(--bg-inset)",
+                                borderColor: "var(--border)",
+                                color: "var(--text)",
+                              }}
                               title="Previous page"
                             >
                               <ChevronLeft className="h-4 w-4" />
@@ -495,7 +607,8 @@ export function Admin() {
                           return (
                             <span
                               key={key}
-                              className="w-8 h-8 flex items-center justify-center text-findeck-muted text-xs font-semibold"
+                              className="w-8 h-8 flex items-center justify-center text-xs font-semibold"
+                              style={{ color: "var(--text-muted)" }}
                             >
                               ...
                             </span>
@@ -508,11 +621,12 @@ export function Admin() {
                             key={key}
                             type="button"
                             onClick={() => setPage(value)}
-                            className={`w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer ${
-                              isActive
-                                ? "bg-ink text-white border-ink shadow-xs"
-                                : "border-findeck-border bg-white text-findeck-text hover:bg-findeck-app"
-                            }`}
+                            className="w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer"
+                            style={{
+                              backgroundColor: isActive ? "var(--ink)" : "var(--bg-inset)",
+                              color: isActive ? "#FFFFFF" : "var(--text)",
+                              borderColor: isActive ? "var(--ink)" : "var(--border)",
+                            }}
                           >
                             {value}
                           </button>
@@ -529,19 +643,39 @@ export function Admin() {
 
       {activeTab === "users" && (
         <div className="space-y-6">
-          {/* Create User Form */}
-          <div className="bg-white p-6 rounded-card border border-findeck-border shadow-xs space-y-4">
-            <h3 className="font-semibold text-findeck-text text-sm">
+          {/* Create User Form on --bg-card */}
+          <div
+            className="p-6 rounded-card border shadow-xs space-y-4"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <h3 className="font-semibold text-sm" style={{ color: "var(--text)" }}>
               Create New Team Member
             </h3>
             {userError && (
-              <div className="p-3 bg-danger-soft text-danger-strong text-xs rounded-btn border border-danger/30">
+              <div
+                className="p-3 text-xs rounded-btn border"
+                style={{
+                  backgroundColor: "var(--danger-soft)",
+                  borderColor: "var(--danger)",
+                  color: "var(--danger-strong)",
+                }}
+              >
                 {userError}
               </div>
             )}
             {userSuccess && (
-              <div className="p-3 bg-success-soft text-success-strong text-xs rounded-btn border border-success/30 flex items-center space-x-2">
-                <Check className="h-4 w-4 text-success-strong shrink-0" />
+              <div
+                className="p-3 text-xs rounded-btn border flex items-center space-x-2"
+                style={{
+                  backgroundColor: "var(--success-soft)",
+                  borderColor: "var(--success)",
+                  color: "var(--success-strong)",
+                }}
+              >
+                <Check className="h-4 w-4 shrink-0" />
                 <span>{userSuccess}</span>
               </div>
             )}
@@ -554,7 +688,12 @@ export function Admin() {
                   setNewUserEmail(e.target.value);
                   setUserError(null);
                 }}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white"
+                className="px-3.5 py-2 border rounded-btn text-xs outline-none"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  borderColor: "var(--border)",
+                  color: "var(--text)",
+                }}
               />
               <input
                 type="password"
@@ -564,12 +703,22 @@ export function Admin() {
                   setNewUserPassword(e.target.value);
                   setUserError(null);
                 }}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white"
+                className="px-3.5 py-2 border rounded-btn text-xs outline-none"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  borderColor: "var(--border)",
+                  color: "var(--text)",
+                }}
               />
               <select
                 value={newUserRole}
                 onChange={(e) => setNewUserRole(e.target.value as any)}
-                className="px-3.5 py-2 border border-findeck-border rounded-btn text-xs outline-none focus:border-accent-strong focus:ring-1 focus:ring-accent-strong text-findeck-text bg-white cursor-pointer"
+                className="px-3.5 py-2 border rounded-btn text-xs outline-none cursor-pointer"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  borderColor: "var(--border)",
+                  color: "var(--text)",
+                }}
               >
                 <option value="reviewer">Reviewer</option>
                 <option value="admin">Administrator</option>
@@ -577,7 +726,11 @@ export function Admin() {
               <button
                 onClick={() => createUserMutation.mutate()}
                 disabled={!newUserEmail || !newUserPassword || createUserMutation.isPending}
-                className="inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-ink hover:bg-ink-hover text-white rounded-btn text-xs font-semibold disabled:opacity-50 transition-colors cursor-pointer shadow-xs"
+                className="inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-btn text-xs font-semibold disabled:opacity-50 transition-colors cursor-pointer shadow-xs"
+                style={{
+                  backgroundColor: "var(--ink)",
+                  color: "#FFFFFF",
+                }}
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Create User</span>
@@ -585,14 +738,34 @@ export function Admin() {
             </div>
           </div>
 
-          {/* Users List Table */}
-          <div className="bg-white rounded-card border border-findeck-border shadow-xs overflow-hidden">
-            <div className="px-6 py-3.5 border-b border-findeck-border bg-findeck-card text-xs font-semibold text-findeck-muted uppercase tracking-wider">
+          {/* Users List Table on --bg-card */}
+          <div
+            className="rounded-card border shadow-xs overflow-hidden"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <div
+              className="px-6 py-3.5 border-b text-xs font-semibold uppercase tracking-wider"
+              style={{
+                backgroundColor: "var(--bg-card)",
+                borderColor: "var(--border)",
+                color: "var(--text-muted)",
+              }}
+            >
               Accounts Team Users ({users.length})
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-findeck-text">
-                <thead className="bg-white text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-findeck-border">
+              <table className="w-full text-left text-xs" style={{ color: "var(--text)" }}>
+                <thead
+                  className="text-[11px] font-semibold uppercase tracking-wider border-b"
+                  style={{
+                    backgroundColor: "var(--bg-inset)",
+                    color: "var(--text-secondary)",
+                    borderColor: "var(--border)",
+                  }}
+                >
                   <tr>
                     <th className="px-6 py-3.5">User Email</th>
                     <th className="px-6 py-3.5">Role</th>
@@ -600,27 +773,45 @@ export function Admin() {
                     <th className="px-6 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-findeck-border">
+                <tbody>
                   {users.map((u: any) => (
-                    <tr key={u.id} className="hover:bg-findeck-app/50 transition-colors">
-                      <td className="px-6 py-3.5 font-medium text-findeck-text">{u.email}</td>
+                    <tr
+                      key={u.id}
+                      className="transition-colors text-xs"
+                      style={{ borderBottom: "1px solid var(--border)" }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "var(--accent-soft)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      <td className="px-6 py-3.5 font-medium">{u.email}</td>
                       <td className="px-6 py-3.5">
-                        <span className="capitalize font-medium text-findeck-text">{u.role}</span>
+                        <span
+                          className="capitalize font-semibold px-2 py-0.5 rounded-full text-[11px] shadow-2xs"
+                          style={{
+                            backgroundColor: u.role === "admin" ? "var(--accent)" : "var(--success)",
+                            color: "var(--ink)",
+                          }}
+                        >
+                          {u.role}
+                        </span>
                       </td>
                       <td className="px-6 py-3.5">
                         <span
-                          className={`px-2.5 py-0.5 rounded-pill text-xs font-medium border ${
-                            u.is_active
-                              ? "bg-success-soft text-success-strong border-success/30"
-                              : "bg-danger-soft text-danger-strong border-danger/30"
-                          }`}
+                          className="px-2.5 py-0.5 rounded-full text-xs font-semibold shadow-2xs"
+                          style={{
+                            backgroundColor: u.is_active ? "var(--success)" : "var(--danger)",
+                            color: "var(--ink)",
+                          }}
                         >
                           {u.is_active ? "Active" : "Deactivated"}
                         </span>
                       </td>
                       <td className="px-6 py-3.5 text-right">
                         {u.email === "admin@invoiceflow.io" ? (
-                          <span className="text-findeck-muted text-xs italic">Primary Admin</span>
+                          <span className="text-xs italic" style={{ color: "var(--text-muted)" }}>Primary Admin</span>
                         ) : (
                           <button
                             onClick={() =>
@@ -629,11 +820,11 @@ export function Admin() {
                                 isActive: !u.is_active,
                               })
                             }
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-btn transition-colors cursor-pointer border ${
-                              u.is_active
-                                ? "text-danger-strong bg-danger-soft hover:bg-danger/20 border-danger/30"
-                                : "text-success-strong bg-success-soft hover:bg-success/20 border-success/30"
-                            }`}
+                            className="text-xs font-semibold px-2.5 py-1 rounded-btn transition-colors cursor-pointer shadow-2xs"
+                            style={{
+                              backgroundColor: u.is_active ? "var(--danger)" : "var(--success)",
+                              color: "var(--ink)",
+                            }}
                           >
                             {u.is_active ? "Deactivate" : "Activate"}
                           </button>
