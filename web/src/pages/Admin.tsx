@@ -1,4 +1,4 @@
-import { Pagination } from '@heroui/react';
+import { Pagination, PaginationItemType } from '@heroui/react';
 import { useState, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
@@ -9,6 +9,8 @@ import {
   FileSpreadsheet,
   Check,
   Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 export const GST_STATE_MAP: Record<string, string> = {
@@ -446,14 +448,76 @@ export function Admin() {
                       page={currentSupplierPage}
                       onChange={(newPage) => setSupplierPage(newPage)}
                       showControls
-                      size="sm"
-                      variant="bordered"
+                      disableCursorAnimation
                       classNames={{
-                        wrapper: "gap-1",
-                        item: "text-xs min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar transition-colors font-medium",
-                        cursor: "bg-findeck-accent text-white font-semibold shadow-xs border-findeck-accent",
-                        prev: "min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar",
-                        next: "min-w-8 h-8 rounded-btn border border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar",
+                        base: "overflow-visible",
+                        wrapper: "gap-1.5",
+                      }}
+                      renderItem={({
+                        ref,
+                        key,
+                        value,
+                        isActive,
+                        onNext,
+                        onPrevious,
+                        setPage,
+                      }) => {
+                        if (value === PaginationItemType.NEXT) {
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={onNext}
+                              disabled={currentSupplierPage >= totalSupplierPages}
+                              className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-bg-sidebar text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                              title="Next page"
+                            >
+                              <ChevronRight className="h-4 w-4" />
+                            </button>
+                          );
+                        }
+
+                        if (value === PaginationItemType.PREV) {
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={onPrevious}
+                              disabled={currentSupplierPage <= 1}
+                              className="w-8 h-8 flex items-center justify-center border border-findeck-border rounded-btn bg-white hover:bg-findeck-bg-sidebar text-findeck-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                              title="Previous page"
+                            >
+                              <ChevronLeft className="h-4 w-4" />
+                            </button>
+                          );
+                        }
+
+                        if (value === PaginationItemType.DOTS) {
+                          return (
+                            <span
+                              key={key}
+                              className="w-8 h-8 flex items-center justify-center text-findeck-muted text-xs font-semibold"
+                            >
+                              ...
+                            </span>
+                          );
+                        }
+
+                        return (
+                          <button
+                            ref={ref}
+                            key={key}
+                            type="button"
+                            onClick={() => setPage(value)}
+                            className={`w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer ${
+                              isActive
+                                ? "bg-findeck-accent text-white border-findeck-accent shadow-xs"
+                                : "border-findeck-border bg-white text-findeck-text hover:bg-findeck-bg-sidebar"
+                            }`}
+                          >
+                            {value}
+                          </button>
+                        );
                       }}
                     />
                   )}
