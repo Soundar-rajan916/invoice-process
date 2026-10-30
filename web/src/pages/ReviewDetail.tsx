@@ -1,32 +1,31 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Decimal from "decimal.js";
-import {
-  TransformWrapper,
-  TransformComponent,
-} from "react-zoom-pan-pinch";
 import { apiRequest, ConflictError } from "@/lib/api";
+import { AuditTrailFlowchart } from "@/components/AuditTrailFlowchart";
+import { DocumentViewer } from "@/components/DocumentViewer";
 import {
-  ZoomIn,
-  ZoomOut,
-  RotateCw,
-  Maximize2,
   Check,
   X,
   AlertTriangle,
   AlertCircle,
-  HelpCircle,
-  History,
   Copy,
+  History,
   ChevronLeft,
+  HelpCircle,
   Plus,
   Trash2,
   Save,
   RefreshCw,
+  FileUp,
+  RotateCcw,
+  CheckCircle2,
+  XCircle,
+  Loader2,
 } from "lucide-react";
 
 // Form Schema with validation matching Phase 3 rules
@@ -61,7 +60,7 @@ export function ReviewDetail() {
   const queryClient = useQueryClient();
 
   const [activePage, setActivePage] = useState(1);
-  const [rotation, setRotation] = useState(0);
+  const [wideDocumentMode, setWideDocumentMode] = useState(false);
   const [conflictMessage, setConflictMessage] = useState<string | null>(null);
   const [showAuditDrawer, setShowAuditDrawer] = useState(false);
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
@@ -77,9 +76,15 @@ export function ReviewDetail() {
     queryKey: ["invoice-detail", id],
     queryFn: () => apiRequest(`/api/v1/invoices/${id}`),
     enabled: !!id,
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === "EXTRACTING" || status === "UPLOADED" || status === "PUSHING"
+        ? 2000
+        : false;
+    },
   });
 
-  // 2. Fetch Review Queue for Next/Previous Navigation
+  // 2. Fetch Review Queue for next/prev navigation
   const { data: queueData } = useQuery({
     queryKey: ["invoices-queue-nav"],
     queryFn: () => apiRequest("/api/v1/invoices?status=NEEDS_REVIEW&page_size=100"),
@@ -92,6 +97,7 @@ export function ReviewDetail() {
     enabled: showAuditDrawer && !!id,
   });
 
+  // Setup React Hook Form
   const {
     register,
     control,
@@ -120,32 +126,32 @@ export function ReviewDetail() {
     name: "line_items",
   });
 
-  // Sync loaded extraction data to form
+  // Populate form with fetched invoice extractions (supporting both current_extraction and direct fields)
   useEffect(() => {
-    if (invoice?.current_extraction) {
-      const ext = invoice.current_extraction;
+    if (invoice) {
+      const ext = invoice.current_extraction || invoice;
       reset({
-        invoice_number: ext.invoice_number || "",
-        invoice_date: ext.invoice_date || "",
+        invoice_number: ext.invoice_number || ext.normalized_invoice_number || "",
+        invoice_date: ext.invoice_date || ext.normalized_invoice_date || "",
         supplier_name: ext.supplier_name || "",
         supplier_gstin: ext.supplier_gstin || "",
-        taxable_value: ext.taxable_value || "",
-        cgst: ext.cgst || "",
-        sgst: ext.sgst || "",
-        igst: ext.igst || "",
-        total: ext.total || "",
+        taxable_value: ext.taxable_value != null ? String(ext.taxable_value) : "",
+        cgst: ext.cgst != null ? String(ext.cgst) : "",
+        sgst: ext.sgst != null ? String(ext.sgst) : "",
+        igst: ext.igst != null ? String(ext.igst) : "",
+        total: ext.total != null ? String(ext.total) : ext.total_amount != null ? String(ext.total_amount) : "",
         line_items: (ext.line_items || []).map((li: any) => ({
           description: li.description || "",
-          quantity: li.quantity ? String(li.quantity) : "",
-          rate: li.rate ? String(li.rate) : "",
-          amount: li.amount ? String(li.amount) : "",
+          quantity: li.quantity != null ? String(li.quantity) : "",
+          rate: li.rate != null ? String(li.rate) : "",
+          amount: li.amount != null ? String(li.amount) : "",
         })),
       });
       setConflictMessage(null);
     }
   }, [invoice, reset]);
 
-  // Real-time calculated total using decimal.js
+  // Real-time Decimal.js calculations for line totals and tax reconciliation
   const watchedLines = watch("line_items");
   const watchedCgst = watch("cgst");
   const watchedSgst = watch("sgst");
@@ -154,48 +160,60 @@ export function ReviewDetail() {
 
   const calculatedTotal = useMemo(() => {
     try {
-      let sum = new Decimal(0);
-      for (const li of watchedLines || []) {
-        if (li.amount) {
-          sum = sum.plus(new Decimal(li.amount));
+      let linesSum = new Decimal(0);
+      for (const item of watchedLines || []) {
+        if (item.amount && !isNaN(Number(item.amount))) {
+          linesSum = linesSum.plus(new Decimal(item.amount));
         }
       }
-      if (watchedCgst) sum = sum.plus(new Decimal(watchedCgst));
-      if (watchedSgst) sum = sum.plus(new Decimal(watchedSgst));
-      if (watchedIgst) sum = sum.plus(new Decimal(watchedIgst));
-      return sum.toFixed(2);
+      const c = watchedCgst && !isNaN(Number(watchedCgst)) ? new Decimal(watchedCgst) : new Decimal(0);
+      const s = watchedSgst && !isNaN(Number(watchedSgst)) ? new Decimal(watchedSgst) : new Decimal(0);
+      const i = watchedIgst && !isNaN(Number(watchedIgst)) ? new Decimal(watchedIgst) : new Decimal(0);
+
+      return linesSum.plus(c).plus(s).plus(i).toFixed(2);
     } catch {
       return "0.00";
     }
   }, [watchedLines, watchedCgst, watchedSgst, watchedIgst]);
 
-  const totalMatches = useMemo(() => {
+  const totalStatus = useMemo(() => {
     try {
-      if (!watchedTotal) return false;
+      if (!watchedTotal) return { status: "missing", text: "Missing", diff: new Decimal(0) };
       const t1 = new Decimal(watchedTotal);
       const t2 = new Decimal(calculatedTotal);
-      return t1.minus(t2).abs().lessThanOrEqualTo(1.0); // Within total rounding tolerance
+      const diff = t1.minus(t2).abs();
+      if (diff.isZero() || diff.lessThanOrEqualTo(1.0)) {
+        return { status: "exact", text: "Matches", diff };
+      }
+      return { status: "mismatch", text: `Mismatch (₹${diff.toFixed(2)})`, diff };
     } catch {
-      return false;
+      return { status: "invalid", text: "Invalid", diff: new Decimal(0) };
     }
   }, [watchedTotal, calculatedTotal]);
 
-  // Next / Previous navigation in queue
+  const totalMatches = totalStatus.status === "exact";
+
+  // Find next invoice in queue
   const queueItems = queueData?.items || [];
-  const currentIndex = queueItems.findIndex((it: any) => it.id === id);
+  const currentIndex = queueItems.findIndex((item: any) => item.id === id);
   const nextInvoiceId = currentIndex >= 0 && currentIndex < queueItems.length - 1 ? queueItems[currentIndex + 1].id : null;
   const prevInvoiceId = currentIndex > 0 ? queueItems[currentIndex - 1].id : null;
 
   const navigateNext = useCallback(() => {
-    if (nextInvoiceId) navigate(`/invoices/${nextInvoiceId}`);
-    else navigate("/queue");
+    if (nextInvoiceId) {
+      navigate(`/invoices/${nextInvoiceId}`);
+    } else {
+      navigate("/queue");
+    }
   }, [nextInvoiceId, navigate]);
 
   const navigatePrev = useCallback(() => {
-    if (prevInvoiceId) navigate(`/invoices/${prevInvoiceId}`);
+    if (prevInvoiceId) {
+      navigate(`/invoices/${prevInvoiceId}`);
+    }
   }, [prevInvoiceId, navigate]);
 
-  // Save Edits Mutation (PATCH /api/v1/invoices/{id}/fields)
+  // Save Edits Mutation
   const saveMutation = useMutation({
     mutationFn: (values: InvoiceFormValues) => {
       const payload = {
@@ -225,22 +243,25 @@ export function ReviewDetail() {
         body: JSON.stringify(payload),
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoice-detail", id] });
+    onSuccess: (updated) => {
+      queryClient.setQueryData(["invoice-detail", id], updated);
       queryClient.invalidateQueries({ queryKey: ["invoices-queue"] });
+      setConflictMessage(null);
     },
     onError: (err: any) => {
       if (err instanceof ConflictError) {
-        setConflictMessage(err.message);
+        setConflictMessage(
+          "Another reviewer updated this invoice while you were reviewing. Please reload to see their changes."
+        );
       } else {
-        alert(err.message || "Failed to save invoice edits");
+        alert(err.message || "Failed to save edits");
       }
     },
   });
 
-  // Approve Mutation (POST /api/v1/invoices/{id}/approve)
+  // Approve & Push Mutation
   const approveMutation = useMutation({
-    mutationFn: (overrideReason?: string) => {
+    mutationFn: async (overrideReason?: string) => {
       return apiRequest(`/api/v1/invoices/${id}/approve`, {
         method: "POST",
         body: JSON.stringify({
@@ -251,30 +272,86 @@ export function ReviewDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invoices-queue"] });
+      queryClient.invalidateQueries({ queryKey: ["invoice", id] });
+      queryClient.invalidateQueries({ queryKey: ["audit-trail", id] });
       navigateNext();
     },
     onError: (err: any) => {
-      if (err.status === 422) {
-        setShowOverrideDialog(true);
-      } else if (err instanceof ConflictError) {
-        setConflictMessage(err.message);
+      if (err instanceof ConflictError) {
+        setConflictMessage(
+          "Another reviewer modified this invoice. Please refresh and review the updated version."
+        );
       } else {
-        setActionError(err.message || "Failed to approve invoice");
+        setActionError(err.message || "Approval failed");
       }
     },
   });
 
-  // Validation issues lookup
-  const issues = invoice?.validation_issues || [];
-  const errorIssues = issues.filter((i: any) => i.severity === "error" && !i.resolved_by_override);
-  const warningIssues = issues.filter((i: any) => i.severity === "warning");
+  // Upload Replacement Document Mutation
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const getIssueForField = (field: string) => {
-    return issues.find((i: any) => i.field === field);
+  const uploadReplacementMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      return apiRequest(`/api/v1/invoices/${id}/upload-replacement`, {
+        method: "POST",
+        body: formData,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoice-detail", id] });
+      queryClient.invalidateQueries({ queryKey: ["invoices-queue"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices-queue-nav"] });
+      queryClient.invalidateQueries({ queryKey: ["invoice-audit", id] });
+      setTimeout(() => {
+        refetch();
+      }, 1000);
+    },
+    onError: (err: any) => {
+      alert(err.message || "Failed to upload replacement document");
+    },
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      uploadReplacementMutation.mutate(file);
+      e.target.value = "";
+    }
+  };
+
+  // Cancel Resend Mutation
+  const cancelResendMutation = useMutation({
+    mutationFn: () => {
+      return apiRequest(`/api/v1/invoices/${id}/cancel-resend`, {
+        method: "POST",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoice-detail", id] });
+      queryClient.invalidateQueries({ queryKey: ["invoices-queue"] });
+      queryClient.invalidateQueries({ queryKey: ["invoice-audit", id] });
+    },
+    onError: (err: any) => {
+      alert(err.message || "Failed to cancel resend request");
+    },
+  });
+
+  // Validation Issues extraction
+  const issues = invoice?.validation_issues || [];
+  const errorIssues = issues.filter(
+    (i: any) => i.severity?.toUpperCase() === "ERROR"
+  );
+  const warningIssues = issues.filter(
+    (i: any) => i.severity?.toUpperCase() === "WARNING"
+  );
+
+  const getIssueForField = (fieldName: string) => {
+    return issues.find((i: any) => i.field === fieldName);
   };
 
   const onApproveClick = () => {
-    setActionError(null);
     if (errorIssues.length > 0) {
       setShowOverrideDialog(true);
     } else {
@@ -282,24 +359,28 @@ export function ReviewDetail() {
     }
   };
 
-  // Keyboard Shortcuts Hook
+  // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
       ) {
-        // Only trigger Ctrl+Enter inside inputs
         if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
           e.preventDefault();
-          onApproveClick();
+          if (invoice?.status === "NEEDS_REVIEW") {
+            onApproveClick();
+          }
         }
         return;
       }
 
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-        e.preventDefault();
-        onApproveClick();
+        if (invoice?.status === "NEEDS_REVIEW") {
+          e.preventDefault();
+          onApproveClick();
+        }
       } else if (e.altKey && e.key === "ArrowRight") {
         e.preventDefault();
         navigateNext();
@@ -321,8 +402,8 @@ export function ReviewDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-12 text-slate-500">
-        <RefreshCw className="h-6 w-6 animate-spin mr-2" />
+      <div className="flex-1 flex items-center justify-center p-12 text-findeck-muted">
+        <RefreshCw className="h-5 w-5 animate-spin mr-2 text-findeck-accent" />
         <span>Loading invoice document and extractions...</span>
       </div>
     );
@@ -343,20 +424,22 @@ export function ReviewDetail() {
     );
   }
 
-  const rawPages = invoice?.pages || [];
-  const pageUrls = rawPages.map((p: any, idx: number) =>
-    typeof p === "string" ? { page_number: idx + 1, url: p } : p
-  );
-  const currentPageImage =
-    pageUrls.find((p: any) => p.page_number === activePage)?.url ||
-    pageUrls[0]?.url ||
-    "";
+  const rawPages: any[] = (invoice?.page_image_urls || []).concat(invoice?.pages || []);
+  const pageUrls: { page_number: number; url: string }[] = rawPages.map((p: any, idx: number) => {
+    if (typeof p === "string") {
+      return { page_number: idx + 1, url: p };
+    }
+    return {
+      page_number: p.page_number ?? idx + 1,
+      url: p.url || "",
+    };
+  });
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-slate-100">
+    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] min-h-0 overflow-hidden bg-findeck-app font-sans">
       {/* Conflict Banner (409 Optimistic Locking) */}
       {conflictMessage && (
-        <div className="bg-amber-600 text-white px-6 py-2.5 flex items-center justify-between text-sm shadow-md animate-bounce">
+        <div className="bg-amber-600 text-white px-6 py-2.5 flex items-center justify-between text-sm shadow-xs animate-bounce shrink-0">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="h-5 w-5" />
             <span className="font-medium">{conflictMessage}</span>
@@ -366,7 +449,7 @@ export function ReviewDetail() {
               refetch();
               setConflictMessage(null);
             }}
-            className="px-3 py-1 bg-white text-amber-800 rounded font-semibold text-xs hover:bg-amber-50"
+            className="px-3 py-1 bg-white text-amber-800 rounded-btn font-semibold text-xs hover:bg-amber-50"
           >
             Reload Latest Version
           </button>
@@ -374,43 +457,47 @@ export function ReviewDetail() {
       )}
 
       {/* Top Action Bar */}
-      <div className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-sm">
+      <div className="bg-white border-b border-findeck-border px-6 py-3 flex items-center justify-between shadow-xs shrink-0">
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate("/queue")}
-            className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600"
+            className="p-1.5 rounded-btn border border-findeck-border hover:bg-findeck-bg-sidebar text-findeck-text transition-colors"
             title="Back to queue"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <div>
             <div className="flex items-center space-x-3">
-              <h2 className="text-base font-bold text-slate-900">
-                {invoice?.normalized_invoice_number || "Invoice Review"}
+              <h2 className="text-16 font-bold text-findeck-text">
+                {invoice?.normalized_invoice_number || invoice?.current_extraction?.invoice_number || "Invoice Review"}
               </h2>
               <span
-                className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${
+                className={`text-xs px-2.5 py-0.5 rounded-pill font-semibold ${
                   invoice?.status === "APPROVED"
-                    ? "bg-blue-100 text-blue-800"
+                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200/60"
                     : invoice?.status === "PUSHED"
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-amber-100 text-amber-800"
+                    ? "bg-findeck-pill-up-bg text-findeck-pill-up-text border border-emerald-300/60"
+                    : invoice?.status === "RESEND_REQUESTED"
+                    ? "bg-purple-50 text-purple-800 border border-purple-200/60"
+                    : invoice?.status === "REJECTED" || invoice?.status === "REJECTED_DUPLICATE"
+                    ? "bg-rose-50 text-rose-800 border border-rose-200/60"
+                    : "bg-amber-50 text-amber-800 border border-amber-200/60"
                 }`}
               >
-                {invoice?.status}
+                {invoice?.status?.replace(/_/g, " ")}
               </span>
             </div>
-            <p className="text-xs text-slate-400 font-mono">
+            <p className="text-xs text-findeck-muted font-mono mt-0.5">
               ID: {id} • Version: {invoice?.row_version}
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={() => setShowShortcutsHelp(true)}
-            className="p-2 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100"
+            className="p-2 text-findeck-muted hover:text-findeck-text rounded-btn hover:bg-findeck-bg-sidebar transition-colors"
             title="Keyboard shortcuts (?)"
           >
             <HelpCircle className="h-4 w-4" />
@@ -421,150 +508,166 @@ export function ReviewDetail() {
               setShowAuditDrawer(true);
               refetchAudit();
             }}
-            className="inline-flex items-center space-x-1 px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center space-x-1 px-3 py-1.5 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
           >
             <History className="h-3.5 w-3.5" />
             <span>Audit Trail</span>
           </button>
 
-          <button
-            onClick={() => setShowResendDialog(true)}
-            className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            Request Resend
-          </button>
+          {invoice?.status === "RESEND_REQUESTED" ? (
+            <div className="flex items-center space-x-2 text-xs font-semibold text-purple-800 bg-purple-50 px-3 py-1.5 rounded-btn border border-purple-200/60">
+              <RotateCcw className="h-3.5 w-3.5 text-purple-600" />
+              <span>Awaiting Replacement</span>
+            </div>
+          ) : invoice?.status === "APPROVED" || invoice?.status === "PUSHING" ? (
+            <div className="flex items-center space-x-2 text-xs font-semibold text-sky-800 bg-sky-50 px-3 py-1.5 rounded-btn border border-sky-200/60">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600" />
+              <span>Dispatching to accounting ledger...</span>
+            </div>
+          ) : invoice?.status === "PUSHED" ? (
+            <div className="flex items-center space-x-2 text-xs font-semibold text-findeck-pill-up-text bg-findeck-pill-up-bg px-3 py-1.5 rounded-btn border border-emerald-200/60">
+              <CheckCircle2 className="h-3.5 w-3.5 text-findeck-accent" />
+              <span>Pushed to Accounting</span>
+              {invoice?.accounting_id && (
+                <span className="font-mono text-11 font-bold text-emerald-800 bg-emerald-100/70 px-1.5 py-0.5 rounded">
+                  {invoice.accounting_id}
+                </span>
+              )}
+            </div>
+          ) : invoice?.status === "REJECTED" || invoice?.status === "REJECTED_DUPLICATE" ? (
+            <div className="flex items-center space-x-2 text-xs font-semibold text-rose-800 bg-rose-50 px-3 py-1.5 rounded-btn border border-rose-200/60">
+              <XCircle className="h-3.5 w-3.5 text-rose-600" />
+              <span>{invoice?.status === "REJECTED_DUPLICATE" ? "Duplicate Rejected" : "Invoice Rejected"}</span>
+            </div>
+          ) : (
+            <>
+              {invoice?.status === "NEEDS_REVIEW" && (
+                <>
+                  <button
+                    onClick={() => setShowResendDialog(true)}
+                    className="px-3 py-1.5 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
+                  >
+                    Request Resend
+                  </button>
 
-          <button
-            onClick={() => setShowRejectDialog(true)}
-            className="px-3 py-1.5 border border-red-200 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-50"
-          >
-            Reject
-          </button>
+                  <button
+                    onClick={() => setShowRejectDialog(true)}
+                    className="px-3 py-1.5 border border-rose-200 text-rose-700 rounded-btn text-xs font-semibold hover:bg-rose-50 transition-colors cursor-pointer"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
 
-          {isDirty && (
-            <button
-              onClick={handleSubmit((data) => saveMutation.mutate(data))}
-              disabled={saveMutation.isPending}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 shadow-sm"
-            >
-              <Save className="h-3.5 w-3.5" />
-              <span>Save Edits</span>
-            </button>
+              {isDirty && invoice?.status === "NEEDS_REVIEW" && (
+                <button
+                  onClick={handleSubmit((data) => saveMutation.mutate(data))}
+                  disabled={saveMutation.isPending}
+                  className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-findeck-text text-white rounded-btn text-xs font-semibold hover:bg-black transition-colors shadow-xs cursor-pointer"
+                >
+                  <Save className="h-3.5 w-3.5" />
+                  <span>Save Edits</span>
+                </button>
+              )}
+
+              {invoice?.status === "NEEDS_REVIEW" && (
+                <button
+                  onClick={onApproveClick}
+                  disabled={approveMutation.isPending}
+                  className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-findeck-accent hover:bg-findeck-accent-hover text-white rounded-btn text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                >
+                  <Check className="h-4 w-4" />
+                  <span>Approve & Push</span>
+                </button>
+              )}
+            </>
           )}
-
-          <button
-            onClick={onApproveClick}
-            disabled={approveMutation.isPending}
-            className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 shadow-md cursor-pointer"
-          >
-            <Check className="h-4 w-4" />
-            <span>Approve & Push</span>
-          </button>
         </div>
       </div>
 
-      {/* Main Split Layout: Left Viewer | Right Form */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Pane: Document Viewer with Zoom/Pan/Rotate */}
-        <div className="w-1/2 flex flex-col bg-slate-900 border-r border-slate-800 relative">
-          <TransformWrapper
-            initialScale={1}
-            minScale={0.5}
-            maxScale={4}
-            centerOnInit
-          >
-            {({ zoomIn, zoomOut, resetTransform }) => (
-              <>
-                {/* Viewer Controls Floating Toolbar */}
-                <div className="absolute top-4 left-4 z-20 flex items-center space-x-1.5 bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-white shadow-lg">
-                  <div className="flex items-center space-x-2 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => zoomIn()}
-                      className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
-                      title="Zoom in"
-                    >
-                      <ZoomIn className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => zoomOut()}
-                      className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
-                      title="Zoom out"
-                    >
-                      <ZoomOut className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => resetTransform()}
-                      className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
-                      title="Reset view"
-                    >
-                      <Maximize2 className="h-4 w-4" />
-                    </button>
-                    <div className="h-4 w-px bg-slate-600 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => setRotation((r) => (r + 90) % 360)}
-                      className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
-                      title="Rotate 90°"
-                    >
-                      <RotateCw className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Interactive Document Pan/Zoom Component */}
-                <div className="flex-1 flex items-center justify-center overflow-hidden">
-                  <TransformComponent
-                    wrapperClass="!w-full !h-full"
-                    contentClass="!w-full !h-full flex items-center justify-center"
-                  >
-                    {currentPageImage ? (
-                      <img
-                        src={currentPageImage}
-                        alt={`Invoice page ${activePage}`}
-                        style={{ transform: `rotate(${rotation}deg)` }}
-                        className="max-h-full max-w-full object-contain shadow-2xl transition-transform duration-200 select-none"
-                      />
-                    ) : (
-                      <div className="text-slate-500 text-sm">No page image available</div>
-                    )}
-                  </TransformComponent>
-                </div>
-              </>
-            )}
-          </TransformWrapper>
-
-          {/* Bottom Page Thumbnail Switcher (R1 multi-page support) */}
-          {pageUrls.length > 1 && (
-            <div className="h-20 bg-slate-800/80 border-t border-slate-700 flex items-center px-4 space-x-3 overflow-x-auto">
-              {pageUrls.map((p: any) => (
-                <button
-                  key={p.page_number}
-                  onClick={() => setActivePage(p.page_number)}
-                  className={`h-14 w-11 rounded border overflow-hidden shrink-0 transition-all ${
-                    activePage === p.page_number
-                      ? "border-indigo-500 ring-2 ring-indigo-400"
-                      : "border-slate-600 opacity-60 hover:opacity-100"
-                  }`}
-                >
-                  <img
-                    src={p.url}
-                    alt={`Thumbnail page ${p.page_number}`}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              ))}
+      {/* Resend Requested Banner */}
+      {invoice?.status === "RESEND_REQUESTED" && (
+        <div className="bg-purple-50/90 border-b border-purple-200/80 px-6 py-3 flex items-center justify-between shadow-2xs shrink-0">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-btn bg-purple-100 flex items-center justify-center text-purple-700 shrink-0">
+              <RotateCcw className="h-4 w-4" />
             </div>
-          )}
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+                  Resend Requested
+                </span>
+                <span className="text-xs text-purple-600">
+                  — Awaiting replacement document from supplier
+                </span>
+              </div>
+              <p className="text-xs text-purple-800 font-medium mt-0.5">
+                <span className="font-semibold text-purple-900">Reason:</span>{" "}
+                {invoice?.status_reason || "Document requires resubmission."}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadReplacementMutation.isPending}
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-purple-600 text-white rounded-btn text-xs font-semibold hover:bg-purple-700 shadow-xs transition-colors cursor-pointer"
+            >
+              {uploadReplacementMutation.isPending ? (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  <span>Uploading & Processing...</span>
+                </>
+              ) : (
+                <>
+                  <FileUp className="h-3.5 w-3.5" />
+                  <span>Upload Replacement File</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => cancelResendMutation.mutate()}
+              disabled={cancelResendMutation.isPending}
+              className="px-3 py-1.5 bg-white border border-purple-300 text-purple-700 rounded-btn text-xs font-semibold hover:bg-purple-100/60 transition-colors cursor-pointer"
+            >
+              Cancel Resend
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden File Input for Replacement Document */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.png,.jpg,.jpeg,.webp,.heic"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
+      {/* Main Split Layout: Left Viewer Card | Right Form Card */}
+      <div className="flex-1 h-full min-h-0 flex overflow-hidden p-4 gap-4">
+        {/* Left Card: Document Viewer */}
+        <div
+          className={`${
+            wideDocumentMode ? "w-[62%]" : "w-1/2"
+          } h-full min-h-0 flex flex-col transition-all duration-200 shrink-0 bg-white rounded-card border border-findeck-border shadow-xs overflow-hidden`}
+        >
+          <DocumentViewer
+            pages={pageUrls}
+            activePage={activePage}
+            onPageChange={setActivePage}
+            wideMode={wideDocumentMode}
+            onToggleWideMode={() => setWideDocumentMode(!wideDocumentMode)}
+            filename={invoice?.original_filename || invoice?.normalized_invoice_number}
+          />
         </div>
 
-        {/* Right Pane: Editable Form & Issue Validation Panel */}
-        <div className="w-1/2 flex flex-col bg-white overflow-y-auto">
+        {/* Right Card: Editable Form & Issue Validation Panel */}
+        <div className="flex-1 h-full min-h-0 bg-white rounded-card border border-findeck-border shadow-xs overflow-y-auto">
           {/* Duplicate Banner (R3) */}
           {invoice?.dup_of_id && (
-            <div className="bg-amber-50 border-b border-amber-200 p-4">
+            <div className="bg-amber-50/70 border-b border-amber-200/80 p-4">
               <div className="flex items-start space-x-3">
                 <Copy className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
                 <div className="flex-1 text-sm text-amber-900">
@@ -586,13 +689,13 @@ export function ReviewDetail() {
                           queryClient.invalidateQueries({ queryKey: ["invoice-detail", id] });
                           navigateNext();
                         }}
-                        className="px-3 py-1 bg-amber-700 hover:bg-amber-800 text-white rounded text-xs font-semibold"
+                        className="px-3 py-1 bg-amber-700 hover:bg-amber-800 text-white rounded-btn text-xs font-semibold cursor-pointer"
                       >
                         Confirm Duplicate (Reject)
                       </button>
                       <button
                         onClick={() => setShowDuplicateOverrideDialog(true)}
-                        className="px-3 py-1 bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 rounded text-xs font-semibold"
+                        className="px-3 py-1 bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 rounded-btn text-xs font-semibold cursor-pointer"
                       >
                         Not a Duplicate (Override)
                       </button>
@@ -605,14 +708,14 @@ export function ReviewDetail() {
 
           {/* Validation Issues Alert Banner */}
           {errorIssues.length > 0 && (
-            <div className="bg-red-50 border-b border-red-200 p-4">
+            <div className="bg-rose-50/80 border-b border-rose-200/80 p-4">
               <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
-                <div className="flex-1 text-sm text-red-900">
+                <AlertCircle className="h-5 w-5 text-rose-600 mt-0.5 shrink-0" />
+                <div className="flex-1 text-sm text-rose-900">
                   <div className="font-bold">
                     {errorIssues.length} Blocking Error{errorIssues.length > 1 ? "s" : ""}
                   </div>
-                  <ul className="mt-1 list-disc list-inside text-xs space-y-0.5 text-red-800">
+                  <ul className="mt-1 list-disc list-inside text-xs space-y-0.5 text-rose-800">
                     {errorIssues.map((iss: any) => (
                       <li key={iss.id}>
                         <strong>{iss.field || iss.code}:</strong> {iss.message}
@@ -626,7 +729,7 @@ export function ReviewDetail() {
 
           {/* Validation Warnings Alert Banner */}
           {warningIssues.length > 0 && (
-            <div className="bg-amber-50 border-b border-amber-200 p-4">
+            <div className="bg-amber-50/70 border-b border-amber-200/80 p-4">
               <div className="flex items-start space-x-3">
                 <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
                 <div className="flex-1 text-sm text-amber-900">
@@ -646,75 +749,78 @@ export function ReviewDetail() {
           )}
 
           {/* Form */}
-          <form className="p-6 space-y-6 flex-1">
+          <form className="p-6 space-y-6">
             {/* Header Fields Section */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-findeck-text uppercase tracking-wider">
                   Invoice Number
                 </label>
                 <input
                   type="text"
                   {...register("invoice_number")}
-                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 font-semibold ${
+                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent font-semibold text-findeck-text ${
                     getIssueForField("invoice_number")
-                      ? "border-red-400 bg-red-50/50"
-                      : "border-slate-200"
+                      ? "border-rose-400 bg-rose-50/50"
+                      : "border-findeck-border"
                   }`}
                 />
                 {errors.invoice_number && (
-                  <p className="text-xs text-red-600 mt-1">{errors.invoice_number.message}</p>
+                  <p className="text-xs text-rose-600 mt-1">{errors.invoice_number.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-findeck-text uppercase tracking-wider">
                   Invoice Date (YYYY-MM-DD)
                 </label>
                 <input
                   type="text"
                   {...register("invoice_date")}
-                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text ${
                     getIssueForField("invoice_date")
-                      ? "border-red-400 bg-red-50/50"
-                      : "border-slate-200"
+                      ? "border-rose-400 bg-rose-50/50"
+                      : "border-findeck-border"
                   }`}
                 />
                 {errors.invoice_date && (
-                  <p className="text-xs text-red-600 mt-1">{errors.invoice_date.message}</p>
+                  <p className="text-xs text-rose-600 mt-1">{errors.invoice_date.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-findeck-text uppercase tracking-wider">
                   Supplier Name
                 </label>
                 <input
                   type="text"
                   {...register("supplier_name")}
-                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text ${
                     getIssueForField("supplier_name")
                       ? "border-amber-400 bg-amber-50/50"
-                      : "border-slate-200"
+                      : "border-findeck-border"
                   }`}
                 />
+                {errors.supplier_name && (
+                  <p className="text-xs text-rose-600 mt-1">{errors.supplier_name.message}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-findeck-text uppercase tracking-wider">
                   Supplier GSTIN
                 </label>
                 <input
                   type="text"
                   {...register("supplier_gstin")}
-                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-lg font-mono font-medium outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  className={`mt-1 block w-full px-3 py-2 text-sm border rounded-btn font-mono font-medium outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text ${
                     getIssueForField("supplier_gstin")
-                      ? "border-red-400 bg-red-50/50"
-                      : "border-slate-200"
+                      ? "border-rose-400 bg-rose-50/50"
+                      : "border-findeck-border"
                   }`}
                 />
                 {errors.supplier_gstin && (
-                  <p className="text-xs text-red-600 mt-1">{errors.supplier_gstin.message}</p>
+                  <p className="text-xs text-rose-600 mt-1">{errors.supplier_gstin.message}</p>
                 )}
               </div>
             </div>
@@ -722,144 +828,150 @@ export function ReviewDetail() {
             {/* Line Items Table */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <h3 className="text-xs font-semibold text-findeck-text uppercase tracking-wider">
                   Line Items ({fields.length})
                 </h3>
                 <button
                   type="button"
                   onClick={() => append({ description: "", quantity: "1", rate: "0", amount: "0.00" })}
-                  className="inline-flex items-center space-x-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                  className="inline-flex items-center space-x-1 text-xs font-semibold text-findeck-accent hover:text-findeck-accent-hover cursor-pointer"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Line</span>
                 </button>
               </div>
 
-              <div className="border border-slate-200 rounded-lg overflow-hidden">
-                <table className="w-full text-left text-xs text-slate-600">
-                  <thead className="bg-slate-50 font-semibold text-slate-500 border-b border-slate-200">
-                    <tr>
-                      <th className="px-3 py-2">Description</th>
-                      <th className="px-2 py-2 w-20">Qty</th>
-                      <th className="px-2 py-2 w-24">Rate</th>
-                      <th className="px-3 py-2 w-28">Amount</th>
-                      <th className="px-2 py-2 w-10 text-center"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {fields.map((field, idx) => (
-                      <tr key={field.id} className="hover:bg-slate-50/50">
-                        <td className="px-3 py-1.5">
-                          <input
-                            type="text"
-                            {...register(`line_items.${idx}.description`)}
-                            className="w-full px-2 py-1 text-xs border border-transparent hover:border-slate-200 focus:border-indigo-500 rounded outline-none"
-                          />
-                        </td>
-                        <td className="px-2 py-1.5">
-                          <input
-                            type="text"
-                            {...register(`line_items.${idx}.quantity`)}
-                            className="w-full px-2 py-1 text-xs border border-transparent hover:border-slate-200 focus:border-indigo-500 rounded outline-none text-right"
-                          />
-                        </td>
-                        <td className="px-2 py-1.5">
-                          <input
-                            type="text"
-                            {...register(`line_items.${idx}.rate`)}
-                            className="w-full px-2 py-1 text-xs border border-transparent hover:border-slate-200 focus:border-indigo-500 rounded outline-none text-right font-mono"
-                          />
-                        </td>
-                        <td className="px-3 py-1.5">
-                          <input
-                            type="text"
-                            {...register(`line_items.${idx}.amount`)}
-                            className="w-full px-2 py-1 text-xs border border-transparent hover:border-slate-200 focus:border-indigo-500 rounded outline-none text-right font-mono font-medium"
-                          />
-                        </td>
-                        <td className="px-2 py-1.5 text-center">
-                          <button
-                            type="button"
-                            onClick={() => remove(idx)}
-                            className="p-1 text-slate-400 hover:text-red-600 rounded"
-                            title="Remove row"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </td>
+              <div className="border border-findeck-border rounded-btn overflow-hidden shadow-xs">
+                <div className="max-h-[360px] overflow-y-auto">
+                  <table className="w-full text-left text-xs text-findeck-text">
+                    <thead className="bg-findeck-bg-sidebar/60 font-semibold text-findeck-muted border-b border-findeck-border sticky top-0 z-10 shadow-xs">
+                      <tr>
+                        <th className="px-3 py-2 bg-findeck-bg-sidebar/80">Description</th>
+                        <th className="px-2 py-2 w-20 bg-findeck-bg-sidebar/80">Qty</th>
+                        <th className="px-2 py-2 w-24 bg-findeck-bg-sidebar/80">Rate</th>
+                        <th className="px-3 py-2 w-28 bg-findeck-bg-sidebar/80">Amount</th>
+                        <th className="px-2 py-2 w-10 text-center bg-findeck-bg-sidebar/80"></th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-findeck-border/60">
+                      {fields.map((field, idx) => (
+                        <tr key={field.id} className="hover:bg-findeck-bg-sidebar/30 transition-colors">
+                          <td className="px-3 py-1.5">
+                            <input
+                              type="text"
+                              {...register(`line_items.${idx}.description`)}
+                              className="w-full px-2 py-1 text-xs border border-transparent hover:border-findeck-border focus:border-findeck-accent focus:bg-white rounded-btn outline-none text-findeck-text"
+                            />
+                          </td>
+                          <td className="px-2 py-1.5">
+                            <input
+                              type="text"
+                              {...register(`line_items.${idx}.quantity`)}
+                              className="w-full px-2 py-1 text-xs border border-transparent hover:border-findeck-border focus:border-findeck-accent focus:bg-white rounded-btn outline-none text-right font-mono tabular-nums text-findeck-text"
+                            />
+                          </td>
+                          <td className="px-2 py-1.5">
+                            <input
+                              type="text"
+                              {...register(`line_items.${idx}.rate`)}
+                              className="w-full px-2 py-1 text-xs border border-transparent hover:border-findeck-border focus:border-findeck-accent focus:bg-white rounded-btn outline-none text-right font-mono tabular-nums text-findeck-text"
+                            />
+                          </td>
+                          <td className="px-3 py-1.5">
+                            <input
+                              type="text"
+                              {...register(`line_items.${idx}.amount`)}
+                              className="w-full px-2 py-1 text-xs border border-transparent hover:border-findeck-border focus:border-findeck-accent focus:bg-white rounded-btn outline-none text-right font-mono tabular-nums font-medium text-findeck-text"
+                            />
+                          </td>
+                          <td className="px-2 py-1.5 text-center">
+                            <button
+                              type="button"
+                              onClick={() => remove(idx)}
+                              className="p-1 text-findeck-muted hover:text-rose-600 rounded-btn transition-colors cursor-pointer"
+                              title="Remove row"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
             {/* Tax Breakdown & Live Total Recalculation (decimal.js) */}
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <div className="bg-findeck-app p-4 rounded-card border border-findeck-border space-y-3">
               <div className="grid grid-cols-4 gap-3 text-xs">
                 <div>
-                  <label className="text-slate-500 font-medium">Taxable Value</label>
+                  <label className="text-findeck-muted font-medium">Taxable Value</label>
                   <input
                     type="text"
                     {...register("taxable_value")}
-                    className="mt-1 w-full px-2.5 py-1.5 border border-slate-200 rounded font-mono text-right"
+                    className="mt-1 w-full px-2.5 py-1.5 border border-findeck-border rounded-btn font-mono tabular-nums text-right text-findeck-text bg-white outline-none focus:border-findeck-accent"
                   />
                 </div>
                 <div>
-                  <label className="text-slate-500 font-medium">CGST</label>
+                  <label className="text-findeck-muted font-medium">CGST</label>
                   <input
                     type="text"
                     {...register("cgst")}
-                    className="mt-1 w-full px-2.5 py-1.5 border border-slate-200 rounded font-mono text-right"
+                    className="mt-1 w-full px-2.5 py-1.5 border border-findeck-border rounded-btn font-mono tabular-nums text-right text-findeck-text bg-white outline-none focus:border-findeck-accent"
                   />
                 </div>
                 <div>
-                  <label className="text-slate-500 font-medium">SGST</label>
+                  <label className="text-findeck-muted font-medium">SGST</label>
                   <input
                     type="text"
                     {...register("sgst")}
-                    className="mt-1 w-full px-2.5 py-1.5 border border-slate-200 rounded font-mono text-right"
+                    className="mt-1 w-full px-2.5 py-1.5 border border-findeck-border rounded-btn font-mono tabular-nums text-right text-findeck-text bg-white outline-none focus:border-findeck-accent"
                   />
                 </div>
                 <div>
-                  <label className="text-slate-500 font-medium">IGST</label>
+                  <label className="text-findeck-muted font-medium">IGST</label>
                   <input
                     type="text"
                     {...register("igst")}
-                    className="mt-1 w-full px-2.5 py-1.5 border border-slate-200 rounded font-mono text-right"
+                    className="mt-1 w-full px-2.5 py-1.5 border border-findeck-border rounded-btn font-mono tabular-nums text-right text-findeck-text bg-white outline-none focus:border-findeck-accent"
                   />
                 </div>
               </div>
 
               {/* Total & Match Indicator */}
-              <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+              <div className="pt-3 border-t border-findeck-border flex items-center justify-between">
                 <div>
-                  <div className="text-xs text-slate-500 font-medium">Calculated Sum (Lines + Tax)</div>
-                  <div className="text-base font-bold font-mono text-slate-800">
+                  <div className="text-xs text-findeck-muted font-medium">Calculated Sum (Lines + Tax)</div>
+                  <div className="text-base font-bold font-mono tabular-nums text-findeck-text">
                     ₹{calculatedTotal}
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-3">
                   <div className="text-right">
-                    <label className="text-xs font-bold text-slate-700">Invoice Total</label>
+                    <label className="text-xs font-semibold text-findeck-text">Invoice Total</label>
                     <input
                       type="text"
                       {...register("total")}
-                      className="mt-0.5 px-3 py-1.5 border border-slate-300 rounded font-mono font-bold text-right text-base w-36 outline-none focus:ring-2 focus:ring-indigo-500"
+                      className={`mt-0.5 px-3 py-1.5 border rounded-btn font-mono tabular-nums font-bold text-right text-base w-36 outline-none focus:ring-1 ${
+                        totalStatus.status === "mismatch"
+                          ? "border-rose-300 bg-rose-50/50 text-rose-900 focus:border-rose-400 focus:ring-rose-400"
+                          : "border-findeck-border bg-white text-findeck-text focus:border-findeck-accent focus:ring-findeck-accent"
+                      }`}
                     />
                   </div>
 
                   <div className="mt-4">
                     {totalMatches ? (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-pill text-xs font-semibold bg-findeck-pill-up-bg text-findeck-pill-up-text border border-emerald-200/60">
                         <Check className="h-3.5 w-3.5" />
                         <span>Matches</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-300">
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-pill text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200/60">
                         <X className="h-3.5 w-3.5" />
-                        <span>Mismatch</span>
+                        <span>{totalStatus.text}</span>
                       </span>
                     )}
                   </div>
@@ -872,13 +984,13 @@ export function ReviewDetail() {
 
       {/* Override Reason Dialog for Blocking Errors (R2 guarantee) */}
       {showOverrideDialog && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center space-x-3 text-red-600">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-card max-w-md w-full p-6 shadow-xl border border-findeck-border space-y-4">
+            <div className="flex items-center space-x-3 text-rose-600">
               <AlertCircle className="h-6 w-6" />
-              <h3 className="text-lg font-bold text-slate-900">Approve with Remaining Errors</h3>
+              <h3 className="text-lg font-bold text-findeck-text">Approve with Remaining Errors</h3>
             </div>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-findeck-muted">
               This invoice has unresolved validation errors. R2 policy requires an audit override reason (at least 10 characters) to push to accounting.
             </p>
             <textarea
@@ -886,16 +998,16 @@ export function ReviewDetail() {
               placeholder="e.g., Verified difference against revised credit note received via email..."
               value={dialogReason}
               onChange={(e) => setDialogReason(e.target.value)}
-              className="w-full p-3 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-findeck-text"
             />
-            {actionError && <p className="text-xs text-red-600">{actionError}</p>}
-            <div className="flex justify-end space-x-3">
+            {actionError && <p className="text-xs text-rose-600">{actionError}</p>}
+            <div className="flex justify-end space-x-2.5">
               <button
                 onClick={() => {
                   setShowOverrideDialog(false);
                   setDialogReason("");
                 }}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -906,7 +1018,7 @@ export function ReviewDetail() {
                   setShowOverrideDialog(false);
                   setDialogReason("");
                 }}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold disabled:opacity-50"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-btn text-xs font-bold disabled:opacity-50 transition-colors cursor-pointer"
               >
                 Confirm Override & Approve
               </button>
@@ -917,10 +1029,10 @@ export function ReviewDetail() {
 
       {/* Reject Reason Dialog */}
       {showRejectDialog && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Reject Invoice</h3>
-            <p className="text-xs text-slate-600">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-card max-w-md w-full p-6 shadow-xl border border-findeck-border space-y-4">
+            <h3 className="text-lg font-bold text-findeck-text">Reject Invoice</h3>
+            <p className="text-xs text-findeck-muted">
               Please enter the reason for rejection (mandatory for accounts audit trail).
             </p>
             <textarea
@@ -928,15 +1040,15 @@ export function ReviewDetail() {
               placeholder="Reason for rejection..."
               value={dialogReason}
               onChange={(e) => setDialogReason(e.target.value)}
-              className="w-full p-3 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text"
             />
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end space-x-2.5">
               <button
                 onClick={() => {
                   setShowRejectDialog(false);
                   setDialogReason("");
                 }}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -951,7 +1063,7 @@ export function ReviewDetail() {
                   setShowRejectDialog(false);
                   navigateNext();
                 }}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold disabled:opacity-50"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-btn text-xs font-bold disabled:opacity-50 transition-colors cursor-pointer"
               >
                 Reject Invoice
               </button>
@@ -962,10 +1074,10 @@ export function ReviewDetail() {
 
       {/* Request Resend Dialog */}
       {showResendDialog && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Request Resend</h3>
-            <p className="text-xs text-slate-600">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-card max-w-md w-full p-6 shadow-xl border border-findeck-border space-y-4">
+            <h3 className="text-lg font-bold text-findeck-text">Request Resend</h3>
+            <p className="text-xs text-findeck-muted">
               Request the supplier to re-send this invoice (e.g., blurry image, missing pages, or unreadable fields).
             </p>
             <textarea
@@ -973,15 +1085,15 @@ export function ReviewDetail() {
               placeholder="Reason for requesting resend..."
               value={dialogReason}
               onChange={(e) => setDialogReason(e.target.value)}
-              className="w-full p-3 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text"
             />
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end space-x-2.5">
               <button
                 onClick={() => {
                   setShowResendDialog(false);
                   setDialogReason("");
                 }}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -996,7 +1108,7 @@ export function ReviewDetail() {
                   setShowResendDialog(false);
                   navigateNext();
                 }}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold disabled:opacity-50"
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-btn text-xs font-bold disabled:opacity-50 transition-colors cursor-pointer"
               >
                 Request Resend
               </button>
@@ -1007,10 +1119,10 @@ export function ReviewDetail() {
 
       {/* Duplicate Override Dialog */}
       {showDuplicateOverrideDialog && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Override Duplicate Flag</h3>
-            <p className="text-xs text-slate-600">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-card max-w-md w-full p-6 shadow-xl border border-findeck-border space-y-4">
+            <h3 className="text-lg font-bold text-findeck-text">Override Duplicate Flag</h3>
+            <p className="text-xs text-findeck-muted">
               Explain why this invoice is legitimate despite matching an existing business key (e.g., replacement invoice or supplementary billing).
             </p>
             <textarea
@@ -1018,15 +1130,15 @@ export function ReviewDetail() {
               placeholder="Mandatory reason for override..."
               value={dialogReason}
               onChange={(e) => setDialogReason(e.target.value)}
-              className="w-full p-3 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 border border-findeck-border rounded-btn text-sm outline-none focus:border-findeck-accent focus:ring-1 focus:ring-findeck-accent text-findeck-text"
             />
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end space-x-2.5">
               <button
                 onClick={() => {
                   setShowDuplicateOverrideDialog(false);
                   setDialogReason("");
                 }}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 border border-findeck-border rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-bg-sidebar transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -1041,7 +1153,7 @@ export function ReviewDetail() {
                   setShowDuplicateOverrideDialog(false);
                   setDialogReason("");
                 }}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold disabled:opacity-50"
+                className="px-4 py-2 bg-findeck-accent hover:bg-findeck-accent-hover text-white rounded-btn text-xs font-bold disabled:opacity-50 transition-colors cursor-pointer"
               >
                 Save Override
               </button>
@@ -1052,72 +1164,51 @@ export function ReviewDetail() {
 
       {/* Keyboard Shortcuts Dialog */}
       {showShortcutsHelp && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-card max-w-sm w-full p-6 shadow-xl border border-findeck-border space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-slate-900 text-base">Keyboard Shortcuts</h3>
+              <h3 className="font-bold text-findeck-text text-15">Keyboard Shortcuts</h3>
               <button
                 onClick={() => setShowShortcutsHelp(false)}
-                className="p-1 hover:bg-slate-100 rounded text-slate-500"
+                className="p-1 hover:bg-findeck-bg-sidebar rounded text-findeck-muted"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="divide-y divide-slate-100 text-xs">
+            <div className="divide-y divide-findeck-border/60 text-xs">
               <div className="py-2 flex justify-between">
-                <span className="text-slate-600">Approve & Push</span>
-                <kbd className="px-2 py-0.5 bg-slate-100 rounded font-mono font-bold">Ctrl + Enter</kbd>
+                <span className="text-findeck-muted">Approve & Push</span>
+                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">Ctrl + Enter</kbd>
               </div>
               <div className="py-2 flex justify-between">
-                <span className="text-slate-600">Next Invoice</span>
-                <kbd className="px-2 py-0.5 bg-slate-100 rounded font-mono font-bold">Alt + →</kbd>
+                <span className="text-findeck-muted">Next Invoice</span>
+                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">Alt + →</kbd>
               </div>
               <div className="py-2 flex justify-between">
-                <span className="text-slate-600">Previous Invoice</span>
-                <kbd className="px-2 py-0.5 bg-slate-100 rounded font-mono font-bold">Alt + ←</kbd>
+                <span className="text-findeck-muted">Previous Invoice</span>
+                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">Alt + ←</kbd>
               </div>
               <div className="py-2 flex justify-between">
-                <span className="text-slate-600">Reject Invoice</span>
-                <kbd className="px-2 py-0.5 bg-slate-100 rounded font-mono font-bold">Alt + R</kbd>
+                <span className="text-findeck-muted">Reject Invoice</span>
+                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">Alt + R</kbd>
               </div>
               <div className="py-2 flex justify-between">
-                <span className="text-slate-600">Help / Shortcuts</span>
-                <kbd className="px-2 py-0.5 bg-slate-100 rounded font-mono font-bold">?</kbd>
+                <span className="text-findeck-muted">Help / Shortcuts</span>
+                <kbd className="px-2 py-0.5 bg-findeck-bg-sidebar rounded font-mono font-bold text-findeck-text">?</kbd>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Audit Trail Drawer (Right Slide-over) */}
+      {/* Audit Trail Flowchart Drawer */}
       {showAuditDrawer && (
-        <div className="fixed inset-0 z-50 bg-slate-900/30 backdrop-blur-xs flex justify-end">
-          <div className="bg-white w-96 h-full shadow-2xl border-l border-slate-200 p-6 flex flex-col">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <h3 className="font-bold text-slate-900 text-base">Audit Trail</h3>
-              <button
-                onClick={() => setShowAuditDrawer(false)}
-                className="p-1 hover:bg-slate-100 rounded text-slate-500"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto py-4 space-y-4">
-              {(auditTrail || []).map((ev: any) => (
-                <div key={ev.id} className="text-xs border-l-2 border-indigo-500 pl-3 py-1 space-y-1">
-                  <div className="flex justify-between items-center text-slate-400">
-                    <span className="font-bold text-slate-700 uppercase tracking-wider">{ev.action}</span>
-                    <span>{new Date(ev.created_at).toLocaleTimeString()}</span>
-                  </div>
-                  <div className="text-slate-600 font-mono text-[11px] bg-slate-50 p-2 rounded">
-                    {JSON.stringify(ev.payload, null, 2)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <AuditTrailFlowchart
+          events={auditTrail || []}
+          onClose={() => setShowAuditDrawer(false)}
+          invoiceNumber={invoice?.normalized_invoice_number}
+          currentStatus={invoice?.status}
+        />
       )}
     </div>
   );

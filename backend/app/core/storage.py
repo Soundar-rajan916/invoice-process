@@ -97,10 +97,17 @@ class StorageService:
             return storage_key
 
     def download_bytes(self, storage_key: str) -> bytes:
+        candidate_dirs = (
+            self._local_fallback_dir,
+            Path("data/storage_fallback"),
+            Path("/app/data/storage_fallback"),
+            Path("../data/storage_fallback"),
+        )
         if self._s3_available is False:
-            local_path = self._local_fallback_dir / storage_key
-            if local_path.exists():
-                return local_path.read_bytes()
+            for base in candidate_dirs:
+                local_path = base / storage_key
+                if local_path.exists():
+                    return local_path.read_bytes()
             raise FileNotFoundError(f"Storage key '{storage_key}' not found in local fallback")
 
         try:
@@ -108,9 +115,10 @@ class StorageService:
             return response["Body"].read()
         except Exception as e:
             self._s3_available = False
-            local_path = self._local_fallback_dir / storage_key
-            if local_path.exists():
-                return local_path.read_bytes()
+            for base in candidate_dirs:
+                local_path = base / storage_key
+                if local_path.exists():
+                    return local_path.read_bytes()
             raise FileNotFoundError(
                 f"Storage key '{storage_key}' not found in S3 or local fallback"
             ) from e

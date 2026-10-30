@@ -4,58 +4,64 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --bg-app: #F7F8FA;
+    --bg-sidebar: #F2F3F7;
+    --bg-card: #FFFFFF;
+    --border: #E6EAE7;
+    --text: #0F1A12;
+    --text-muted: #6B766F;
+    --accent: #00A843;
+    --accent-hover: #00933A;
+    --accent-soft: #DFF4E1;
+    --accent-soft-border: #BFE6B8;
+    --danger: #D93636;
+    --danger-soft: #FFEAE6;
+    --warning: #F5A524;
+    --warning-soft: #FEF7DB;
+    --info: #2563EB;
+    --info-soft: #E8EFFD;
+    --radius-card: 16px;
+    --radius-btn: 10px;
+    --radius-pill: 9999px;
+
+    /* Shadcn / Tailwind compatible mapping */
+    --background: 210 20% 98%;
+    --foreground: 140 15% 8%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --card-foreground: 140 15% 8%;
+    --primary: 144 100% 33%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 140 15% 8%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 140 5% 44%;
+    --accent-token: 144 100% 33%;
+    --accent-token-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --radius: 0.625rem;
   }
 
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 224 71% 4%;
-    --card-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-  }
-}
-
-@layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
+
   body {
-    @apply bg-background text-foreground antialiased font-sans;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: var(--bg-app);
+    color: var(--text);
+    font-family: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Financial and numerical data use tabular numerals */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Custom scrollbars for viewer and queue */
+/* Subtle, sleek custom scrollbar matching Findeck feel */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -64,9 +70,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
-  border-radius: 3px;
+  background: #D1D5DB;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: #9CA3AF;
 }

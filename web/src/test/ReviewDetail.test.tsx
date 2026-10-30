@@ -6,24 +6,6 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ReviewDetail } from "../pages/ReviewDetail";
 import * as apiModule from "../lib/api";
 
-// Mock react-zoom-pan-pinch for jsdom
-vi.mock("react-zoom-pan-pinch", () => ({
-  TransformWrapper: ({ children }: any) => (
-    <div data-testid="transform-wrapper">
-      {typeof children === "function"
-        ? children({
-            zoomIn: vi.fn(),
-            zoomOut: vi.fn(),
-            resetTransform: vi.fn(),
-          })
-        : children}
-    </div>
-  ),
-  TransformComponent: ({ children }: any) => (
-    <div data-testid="transform-component">{children}</div>
-  ),
-}));
-
 // Mock the API module
 vi.mock("../lib/api", async () => {
   const actual = await vi.importActual("../lib/api");

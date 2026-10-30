@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component, ErrorInfo, ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
@@ -10,11 +10,8 @@ import { ReviewDetail } from "@/pages/ReviewDetail";
 import { Dashboard } from "@/pages/Dashboard";
 import { Admin } from "@/pages/Admin";
 
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; error: Error | null }
-> {
-  constructor(props: { children: React.ReactNode }) {
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
@@ -23,28 +20,40 @@ class ErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("ErrorBoundary caught error:", error, errorInfo);
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("ErrorBoundary caught:", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 text-slate-800">
-          <div className="max-w-md w-full bg-white p-6 rounded-2xl shadow-xl border border-red-200 space-y-4">
-            <h2 className="text-lg font-bold text-red-600">Something went wrong</h2>
-            <p className="text-xs text-slate-600 bg-red-50 p-3 rounded-lg font-mono">
-              {this.state.error?.message || "An unexpected error occurred."}
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-red-200 p-6 text-center space-y-4">
+            <div className="inline-flex p-3 rounded-full bg-red-100 text-red-600 font-bold text-xl">⚠️</div>
+            <h2 className="text-lg font-bold text-slate-900">Something went wrong</h2>
+            <p className="text-xs text-red-600 font-mono bg-red-50 p-3 rounded-lg overflow-x-auto text-left">
+              {this.state.error?.message || "An unexpected error occurred"}
             </p>
-            <button
-              onClick={() => {
-                this.setState({ hasError: false, error: null });
-                window.location.href = "/queue";
-              }}
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700"
-            >
-              Return to Queue
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.href = "/queue";
+                }}
+                className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+              >
+                Return to Queue
+              </button>
+              <button
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.reload();
+                }}
+                className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg transition"
+              >
+                Reload Page
+              </button>
+            </div>
           </div>
         </div>
       );

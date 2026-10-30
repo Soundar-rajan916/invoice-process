@@ -27,16 +27,21 @@ export function Inbox() {
   const [uploading, setUploading] = useState(false);
   const [uploadResults, setUploadResults] = useState<UploadFileResult[]>([]);
 
-  // Fetch recent invoices with automatic polling if anything is PROCESSING
+  // Fetch recent invoices with automatic polling if anything is PROCESSING or in uploadResults
   const { data: queueData, isFetching, refetch } = useQuery({
     queryKey: ["recent-invoices"],
-    queryFn: () => apiRequest("/api/v1/invoices?sort=newest&page=1&page_size=15"),
+    queryFn: () => apiRequest("/api/v1/invoices?sort=newest&page=1&page_size=20"),
     refetchInterval: (query) => {
       const items = query.state.data?.items || [];
       const hasProcessing = items.some(
         (inv: any) => inv.status === "PROCESSING" || inv.status === "RECEIVED"
       );
-      return hasProcessing ? 3000 : 15000;
+      const hasRecentPendingUpload = uploadResults.some((res) => {
+        if (!res.invoice_id || res.status === "duplicate_skipped") return false;
+        const matching = items.find((i: any) => i.id === res.invoice_id);
+        return !matching || matching.status === "PROCESSING" || matching.status === "RECEIVED";
+      });
+      return hasProcessing || hasRecentPendingUpload ? 2000 : 10000;
     },
   });
 
@@ -109,11 +114,10 @@ export function Inbox() {
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${
-          dragActive
-            ? "border-indigo-600 bg-indigo-50/50 scale-[1.01]"
-            : "border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50/50"
-        }`}
+        className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${dragActive
+          ? "border-indigo-600 bg-indigo-50/50 scale-[1.01]"
+          : "border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50/50"
+          }`}
       >
         <input
           ref={fileInputRef}
@@ -149,48 +153,92 @@ export function Inbox() {
             </button>
           </div>
           <div className="divide-y divide-slate-100">
-            {uploadResults.map((res, idx) => (
-              <div key={idx} className="px-6 py-3.5 flex items-center justify-between text-sm">
-                <div className="flex items-center space-x-3">
-                  {res.status === "created" && (
-                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  )}
-                  {res.status === "duplicate_skipped" && (
-                    <Clock className="h-5 w-5 text-amber-500" />
-                  )}
-                  {res.status === "failed" && (
-                    <AlertTriangle className="h-5 w-5 text-red-500" />
-                  )}
-                  <span className="font-medium text-slate-700">{res.file_name}</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                      res.status === "created"
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                        : res.status === "duplicate_skipped"
-                        ? "bg-amber-50 text-amber-700 border border-amber-200"
-                        : "bg-red-50 text-red-700 border border-red-200"
-                    }`}
-                  >
-                    {res.status === "created"
-                      ? "Queued for Processing"
-                      : res.status === "duplicate_skipped"
-                      ? "Duplicate File Skipped"
-                      : "Upload Failed"}
-                  </span>
-                  {res.invoice_id && (
-                    <Link
-                      to={`/invoices/${res.invoice_id}`}
-                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1"
+            {uploadResults.map((res: any, idx) => {
+              const fileName = res.file_name || res.filename || "Uploaded File";
+              const isDuplicate = res.status === "duplicate_skipped" || res.is_duplicate;
+              const liveInvoice = recentItems.find((inv: any) => inv.id === res.invoice_id);
+              const status = liveInvoice
+                ? liveInvoice.status
+                : res.status === "created" || res.status === "RECEIVED"
+                  ? "RECEIVED"
+                  : res.status;
+
+              let badgeColor = "bg-blue-50 text-blue-700 border-blue-200";
+              let badgeText = "Queued for Processing";
+              let StatusIcon = Clock;
+
+              if (isDuplicate) {
+                badgeColor = "bg-amber-50 text-amber-700 border-amber-200";
+                badgeText = "Duplicate File Skipped";
+                StatusIcon = Clock;
+              } else if (status === "PROCESSING") {
+                badgeColor = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                badgeText = "Extracting & Validating...";
+                StatusIcon = RefreshCw;
+              } else if (status === "NEEDS_REVIEW") {
+                badgeColor = "bg-amber-50 text-amber-800 border-amber-200";
+                badgeText =
+                  liveInvoice?.error_count > 0
+                    ? `Ready for Review (${liveInvoice.error_count} error${liveInvoice.error_count > 1 ? "s" : ""
+                    })`
+                    : "Ready for Review";
+                StatusIcon = CheckCircle2;
+              } else if (status === "APPROVED" || status === "PUSHED") {
+                badgeColor = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                badgeText = status === "PUSHED" ? "Pushed to Accounting" : "Approved";
+                StatusIcon = CheckCircle2;
+              } else if (status === "RESEND_REQUESTED") {
+                badgeColor = "bg-purple-50 text-purple-700 border-purple-200";
+                badgeText = "Resend Requested";
+                StatusIcon = AlertTriangle;
+              } else if (status === "REJECTED") {
+                badgeColor = "bg-rose-50 text-rose-700 border-rose-200";
+                badgeText = "Rejected";
+                StatusIcon = AlertTriangle;
+              } else if (status === "FAILED" || res.status === "failed") {
+                badgeColor = "bg-red-50 text-red-700 border-red-200";
+                badgeText = "Processing Failed";
+                StatusIcon = AlertTriangle;
+              }
+
+              return (
+                <div key={idx} className="px-6 py-3.5 flex items-center justify-between text-sm">
+                  <div className="flex items-center space-x-3">
+                    <StatusIcon
+                      className={`h-5 w-5 ${status === "PROCESSING"
+                        ? "animate-spin text-indigo-500"
+                        : isDuplicate
+                          ? "text-amber-500"
+                          : status === "NEEDS_REVIEW"
+                            ? "text-amber-600"
+                            : status === "APPROVED" || status === "PUSHED"
+                              ? "text-emerald-500"
+                              : status === "FAILED" || res.status === "failed"
+                                ? "text-red-500"
+                                : "text-blue-500"
+                        }`}
+                    />
+                    <span className="font-medium text-slate-700">{fileName}</span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium border ${badgeColor}`}
                     >
-                      <span>View</span>
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  )}
+                      {badgeText}
+                    </span>
+                    {res.invoice_id && (
+                      <Link
+                        to={`/invoices/${res.invoice_id}`}
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1"
+                      >
+                        <span>View</span>
+                        <ArrowRight className="h-3 w-3" />
+                      </Link>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -240,17 +288,16 @@ export function Inbox() {
                     </td>
                     <td className="px-6 py-3.5">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                          inv.status === "NEEDS_REVIEW"
-                            ? "bg-amber-100 text-amber-800"
-                            : inv.status === "APPROVED"
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${inv.status === "NEEDS_REVIEW"
+                          ? "bg-amber-100 text-amber-800"
+                          : inv.status === "APPROVED"
                             ? "bg-blue-100 text-blue-800"
                             : inv.status === "PUSHED"
-                            ? "bg-emerald-100 text-emerald-800"
-                            : inv.status === "PROCESSING"
-                            ? "bg-purple-100 text-purple-800 animate-pulse"
-                            : "bg-slate-100 text-slate-700"
-                        }`}
+                              ? "bg-emerald-100 text-emerald-800"
+                              : inv.status === "PROCESSING"
+                                ? "bg-purple-100 text-purple-800 animate-pulse"
+                                : "bg-slate-100 text-slate-700"
+                          }`}
                       >
                         {inv.status}
                       </span>

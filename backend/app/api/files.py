@@ -72,3 +72,31 @@ async def upload_files(
         "count": len(results),
         "results": results,
     }
+
+
+@router.get("/raw/{file_path:path}")
+async def get_raw_file(file_path: str) -> Response:
+    """Serves raw files (e.g. rendered page images or original documents) from storage."""
+    from app.core.storage import storage_service
+
+    try:
+        data = storage_service.download_bytes(file_path)
+    except FileNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
+
+    content_type = "application/octet-stream"
+    lower_path = file_path.lower()
+    if lower_path.endswith(".jpg") or lower_path.endswith(".jpeg"):
+        content_type = "image/jpeg"
+    elif lower_path.endswith(".png"):
+        content_type = "image/png"
+    elif lower_path.endswith(".pdf"):
+        content_type = "application/pdf"
+    elif lower_path.endswith(".webp"):
+        content_type = "image/webp"
+
+    return Response(
+        content=data,
+        media_type=content_type,
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
