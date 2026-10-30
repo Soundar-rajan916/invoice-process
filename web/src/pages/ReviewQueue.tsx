@@ -84,7 +84,7 @@ export function ReviewQueue() {
   };
 
   const getTabCountStyle = (st: string) => {
-    if (st === "RESEND_REQUESTED") {
+    if (st === "RESEND_REQUESTED" || st === "WAITING_PROVIDER") {
       return { bg: "var(--accent)", text: "var(--ink)" };
     }
     if (st === "NEEDS_REVIEW") {
@@ -135,9 +135,9 @@ export function ReviewQueue() {
         </div>
       </div>
 
-      {/* Tabs (ALL, NEEDS REVIEW, PUSHED, REJECTED, RESEND REQUESTED) */}
+      {/* Tabs (ALL, NEEDS REVIEW, WAITING PROVIDER, PUSHED, REJECTED, RESEND REQUESTED) */}
       <div className="flex items-center space-x-2 overflow-x-auto pb-1">
-        {["ALL", "NEEDS_REVIEW", "PUSHED", "REJECTED", "RESEND_REQUESTED"].map((st) => {
+        {["ALL", "NEEDS_REVIEW", "WAITING_PROVIDER", "PUSHED", "REJECTED", "RESEND_REQUESTED"].map((st) => {
           const isSelected = statusFilter === st;
           const countStyle = getTabCountStyle(st);
           return (

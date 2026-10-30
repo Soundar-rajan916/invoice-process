@@ -8,6 +8,8 @@ import {
   ShieldCheck,
   Building2,
   FileSpreadsheet,
+  AlertTriangle,
+  Scale,
 } from "lucide-react";
 
 export function Layout() {
@@ -20,7 +22,9 @@ export function Layout() {
     if (location.pathname === "/queue") return "Review Queue";
     if (location.pathname === "/inbox") return "Inbox";
     if (location.pathname === "/dashboard") return "Dashboard";
-    if (location.pathname === "/admin") return "Admin";
+    if (location.pathname === "/admin") return "Master Data";
+    if (location.pathname === "/admin/dead-letters") return "Dead Letters";
+    if (location.pathname === "/admin/reconciliation") return "Reconciliation";
     return "Workspace";
   };
 
@@ -187,40 +191,112 @@ export function Layout() {
               </NavLink>
 
               {user?.role === "admin" && (
-                <NavLink
-                  to="/admin"
-                  className={({ isActive }) =>
-                    `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
-                      isActive
-                        ? "shadow-2xs font-semibold"
-                        : "hover:bg-white/60"
-                    }`
-                  }
-                  style={({ isActive }) => ({
-                    backgroundColor: isActive ? "var(--bg-inset)" : "transparent",
-                    color: isActive ? "var(--text)" : "var(--text-secondary)",
-                    border: isActive ? "1px solid var(--border)" : "1px solid transparent",
-                  })}
-                >
-                  {({ isActive }) => (
-                    <div className="flex items-center space-x-2.5">
-                      {isActive ? (
-                        <div
-                          className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
-                          style={{
-                            backgroundColor: "var(--accent)",
-                            color: "var(--ink)",
-                          }}
-                        >
-                          <ShieldCheck className="h-3 w-3 stroke-[2.5]" />
-                        </div>
-                      ) : (
-                        <ShieldCheck className="h-[18px] w-[18px] shrink-0" style={{ color: "var(--text-muted)" }} />
-                      )}
-                      <span>Admin</span>
-                    </div>
-                  )}
-                </NavLink>
+                <>
+                  <NavLink
+                    to="/admin"
+                    className={({ isActive }) =>
+                      `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
+                        isActive
+                          ? "shadow-2xs font-semibold"
+                          : "hover:bg-white/60"
+                      }`
+                    }
+                    style={({ isActive }) => ({
+                      backgroundColor: isActive ? "var(--bg-inset)" : "transparent",
+                      color: isActive ? "var(--text)" : "var(--text-secondary)",
+                      border: isActive ? "1px solid var(--border)" : "1px solid transparent",
+                    })}
+                  >
+                    {({ isActive }) => (
+                      <div className="flex items-center space-x-2.5">
+                        {isActive ? (
+                          <div
+                            className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                            style={{
+                              backgroundColor: "var(--accent)",
+                              color: "var(--ink)",
+                            }}
+                          >
+                            <ShieldCheck className="h-3 w-3 stroke-[2.5]" />
+                          </div>
+                        ) : (
+                          <ShieldCheck className="h-[18px] w-[18px] shrink-0" style={{ color: "var(--text-muted)" }} />
+                        )}
+                        <span>Master Data</span>
+                      </div>
+                    )}
+                  </NavLink>
+
+                  <NavLink
+                    to="/admin/dead-letters"
+                    className={({ isActive }) =>
+                      `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
+                        isActive
+                          ? "shadow-2xs font-semibold"
+                          : "hover:bg-white/60"
+                      }`
+                    }
+                    style={({ isActive }) => ({
+                      backgroundColor: isActive ? "var(--bg-inset)" : "transparent",
+                      color: isActive ? "var(--text)" : "var(--text-secondary)",
+                      border: isActive ? "1px solid var(--border)" : "1px solid transparent",
+                    })}
+                  >
+                    {({ isActive }) => (
+                      <div className="flex items-center space-x-2.5">
+                        {isActive ? (
+                          <div
+                            className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                            style={{
+                              backgroundColor: "var(--danger)",
+                              color: "var(--ink)",
+                            }}
+                          >
+                            <AlertTriangle className="h-3 w-3 stroke-[2.5]" />
+                          </div>
+                        ) : (
+                          <AlertTriangle className="h-[18px] w-[18px] shrink-0" style={{ color: "var(--text-muted)" }} />
+                        )}
+                        <span>Dead Letters</span>
+                      </div>
+                    )}
+                  </NavLink>
+
+                  <NavLink
+                    to="/admin/reconciliation"
+                    className={({ isActive }) =>
+                      `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
+                        isActive
+                          ? "shadow-2xs font-semibold"
+                          : "hover:bg-white/60"
+                      }`
+                    }
+                    style={({ isActive }) => ({
+                      backgroundColor: isActive ? "var(--bg-inset)" : "transparent",
+                      color: isActive ? "var(--text)" : "var(--text-secondary)",
+                      border: isActive ? "1px solid var(--border)" : "1px solid transparent",
+                    })}
+                  >
+                    {({ isActive }) => (
+                      <div className="flex items-center space-x-2.5">
+                        {isActive ? (
+                          <div
+                            className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                            style={{
+                              backgroundColor: "var(--warning)",
+                              color: "var(--ink)",
+                            }}
+                          >
+                            <Scale className="h-3 w-3 stroke-[2.5]" />
+                          </div>
+                        ) : (
+                          <Scale className="h-[18px] w-[18px] shrink-0" style={{ color: "var(--text-muted)" }} />
+                        )}
+                        <span>Reconciliation</span>
+                      </div>
+                    )}
+                  </NavLink>
+                </>
               )}
             </div>
           </div>

@@ -69,19 +69,33 @@ class InvoiceExtraction(BaseModel):
 
         # Normalize supplier / seller aliases
         if not data.get("supplier_name"):
-            data["supplier_name"] = data.get("seller_name") or data.get("vendor_name") or data.get("issuer_name")
+            data["supplier_name"] = (
+                data.get("seller_name") or data.get("vendor_name") or data.get("issuer_name")
+            )
         if not data.get("supplier_gstin"):
-            data["supplier_gstin"] = data.get("seller_gstin") or data.get("vendor_gstin") or data.get("issuer_gstin")
+            data["supplier_gstin"] = (
+                data.get("seller_gstin") or data.get("vendor_gstin") or data.get("issuer_gstin")
+            )
 
         # Normalize buyer / customer aliases
         if not data.get("buyer_name"):
-            data["buyer_name"] = data.get("customer_name") or data.get("recipient_name") or data.get("billed_to_name")
+            data["buyer_name"] = (
+                data.get("customer_name")
+                or data.get("recipient_name")
+                or data.get("billed_to_name")
+            )
         if not data.get("buyer_gstin"):
-            data["buyer_gstin"] = data.get("customer_gstin") or data.get("recipient_gstin") or data.get("billed_to_gstin")
+            data["buyer_gstin"] = (
+                data.get("customer_gstin")
+                or data.get("recipient_gstin")
+                or data.get("billed_to_gstin")
+            )
 
         # Normalize invoice number aliases
         if not data.get("invoice_number"):
-            data["invoice_number"] = data.get("invoice_no") or data.get("bill_no") or data.get("bill_number")
+            data["invoice_number"] = (
+                data.get("invoice_no") or data.get("bill_no") or data.get("bill_number")
+            )
 
         return data
 

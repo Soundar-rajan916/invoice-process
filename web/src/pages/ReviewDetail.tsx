@@ -151,6 +151,50 @@ export function ReviewDetail() {
     },
   });
 
+  // Claim takeover mutation (R4 review leases)
+  const takeoverMutation = useMutation({
+    mutationFn: () => {
+      return apiRequest(`/api/v1/invoices/${id}/takeover`, {
+        method: "POST",
+      });
+    },
+    onSuccess: () => {
+      setConflictMessage(null);
+      refetch();
+    },
+    onError: (err: any) => {
+      setActionError(err.message || "Failed to take over review lease");
+    },
+  });
+
+  // Review lease heartbeat & release (R4)
+  useEffect(() => {
+    if (!id) return;
+    const heartbeatInterval = setInterval(async () => {
+      if (document.hidden) return;
+      try {
+        const res = await apiRequest(`/api/v1/invoices/${id}/heartbeat`, { method: "POST" });
+        if (res && res.status === "not_claimed_by_user") {
+          setConflictMessage("Your review lease was taken over by another reviewer.");
+          refetch();
+        }
+      } catch {
+        // Ignored
+      }
+    }, 45000);
+
+    const handleBeforeUnload = () => {
+      navigator.sendBeacon?.(`/api/v1/invoices/${id}/release`);
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      apiRequest(`/api/v1/invoices/${id}/release`, { method: "POST" }).catch(() => {});
+    };
+  }, [id, refetch]);
+
   // Populate form with fetched invoice extractions (supporting both current_extraction and direct fields)
   useEffect(() => {
     if (invoice) {
@@ -543,8 +587,8 @@ export function ReviewDetail() {
           {invoice?.page_count > 1 && (
             <button
               onClick={() => splitPagesMutation.mutate()}
-              disabled={splitPagesMutation.isPending}
-              className="inline-flex items-center space-x-1 px-3 py-1.5 border border-findeck-border bg-white rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-app transition-colors cursor-pointer"
+              disabled={splitPagesMutation.isPending || invoice?.is_claim_locked}
+              className="inline-flex items-center space-x-1 px-3 py-1.5 border border-findeck-border bg-white rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-app transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               title="Split multi-page invoice into individual invoices"
             >
               <Split className="h-3.5 w-3.5" />
@@ -590,14 +634,16 @@ export function ReviewDetail() {
                 <>
                   <button
                     onClick={() => setShowResendDialog(true)}
-                    className="px-3 py-1.5 rounded-btn text-xs font-semibold transition-colors cursor-pointer" style={{ backgroundColor: "var(--bg-inset)", border: "1px solid var(--border)", color: "var(--ink)" }}
+                    disabled={invoice?.is_claim_locked}
+                    className="px-3 py-1.5 rounded-btn text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--bg-inset)", border: "1px solid var(--border)", color: "var(--ink)" }}
                   >
                     Request Resend
                   </button>
 
                   <button
                     onClick={() => setShowRejectDialog(true)}
-                    className="px-3 py-1.5 border border-danger/30 text-danger-strong bg-danger-soft rounded-btn text-xs font-semibold hover:bg-danger/20 transition-colors cursor-pointer"
+                    disabled={invoice?.is_claim_locked}
+                    className="px-3 py-1.5 border border-danger/30 text-danger-strong bg-danger-soft rounded-btn text-xs font-semibold hover:bg-danger/20 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Reject
                   </button>
@@ -607,8 +653,8 @@ export function ReviewDetail() {
               {isDirty && invoice?.status === "NEEDS_REVIEW" && (
                 <button
                   onClick={handleSubmit((data) => saveMutation.mutate(data))}
-                  disabled={saveMutation.isPending}
-                  className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-ink text-white rounded-btn text-xs font-semibold hover:bg-ink-hover transition-colors shadow-xs cursor-pointer"
+                  disabled={saveMutation.isPending || invoice?.is_claim_locked}
+                  className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-ink text-white rounded-btn text-xs font-semibold hover:bg-ink-hover transition-colors shadow-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="h-3.5 w-3.5" />
                   <span>Save Edits</span>
@@ -618,8 +664,8 @@ export function ReviewDetail() {
               {invoice?.status === "NEEDS_REVIEW" && (
                 <button
                   onClick={onApproveClick}
-                  disabled={approveMutation.isPending}
-                  className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-ink hover:bg-ink-hover text-white rounded-btn text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                  disabled={approveMutation.isPending || invoice?.is_claim_locked}
+                  className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-ink hover:bg-ink-hover text-white rounded-btn text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Check className="h-4 w-4" />
                   <span>Approve & Push</span>
@@ -629,6 +675,37 @@ export function ReviewDetail() {
           )}
         </div>
       </div>
+
+      {/* Review Lease Claim Banner (R4) */}
+      {invoice?.is_claim_locked && (
+        <div
+          className="border-b px-6 py-2.5 flex items-center justify-between shadow-2xs shrink-0"
+          style={{
+            backgroundColor: "var(--accent-soft)",
+            borderColor: "rgba(155, 161, 249, 0.4)",
+            color: "var(--ink)",
+          }}
+        >
+          <div className="flex items-center space-x-2.5 text-xs font-medium">
+            <AlertCircle className="h-4 w-4 shrink-0" style={{ color: "var(--accent-strong)" }} />
+            <span>
+              Being reviewed by <strong>{invoice.claimed_by_email || "another reviewer"}</strong>. Editing and approval actions are currently locked.
+            </span>
+          </div>
+          <button
+            onClick={() => takeoverMutation.mutate()}
+            disabled={takeoverMutation.isPending}
+            className="px-3 py-1 rounded-btn text-xs font-semibold cursor-pointer border shadow-xs transition-colors"
+            style={{
+              backgroundColor: "var(--ink)",
+              color: "#FFFFFF",
+              borderColor: "transparent",
+            }}
+          >
+            {takeoverMutation.isPending ? "Taking over..." : "Take over review"}
+          </button>
+        </div>
+      )}
 
       {/* Resend Requested Banner */}
       {invoice?.status === "RESEND_REQUESTED" && (

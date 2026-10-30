@@ -245,17 +245,16 @@ async def queue_resend_notification(
     R2/Security Rule: Message wording never includes invoice amounts.
     """
     if not recipient:
-        logger.warning("Cannot queue resend notification: recipient missing", invoice_id=str(invoice.id))
+        logger.warning(
+            "Cannot queue resend notification: recipient missing", invoice_id=str(invoice.id)
+        )
         return None
 
     # Check 24-hour rate limit
     cutoff = datetime.now(UTC) - timedelta(days=1)
-    stmt = (
-        select(func.count(OutboundMessage.id))
-        .where(
-            OutboundMessage.recipient == recipient,
-            OutboundMessage.created_at >= cutoff,
-        )
+    stmt = select(func.count(OutboundMessage.id)).where(
+        OutboundMessage.recipient == recipient,
+        OutboundMessage.created_at >= cutoff,
     )
     count = (await session.execute(stmt)).scalar() or 0
     if count >= settings.RESEND_MAX_PER_SENDER_PER_DAY:
@@ -330,8 +329,12 @@ async def dispatch_pending_outbox_messages(session: AsyncSession, limit: int = 5
                 external_id = await notifier.send_whatsapp(
                     recipient=msg.recipient,
                     body=msg.body,
-                    template_name=settings.WHATSAPP_RESEND_TEMPLATE if msg.template_key != "whatsapp_resend.txt" else None,
-                    template_params=[msg.body] if msg.template_key != "whatsapp_resend.txt" else None,
+                    template_name=settings.WHATSAPP_RESEND_TEMPLATE
+                    if msg.template_key != "whatsapp_resend.txt"
+                    else None,
+                    template_params=[msg.body]
+                    if msg.template_key != "whatsapp_resend.txt"
+                    else None,
                 )
             else:
                 external_id = f"custom-{uuid.uuid4()}"
@@ -342,7 +345,9 @@ async def dispatch_pending_outbox_messages(session: AsyncSession, limit: int = 5
             sent_count += 1
             logger.info("Outbox message sent successfully", id=str(msg.id), channel=msg.channel)
         except Exception as e:
-            logger.error("Failed to send outbox message", id=str(msg.id), error=str(e), attempts=msg.attempts)
+            logger.error(
+                "Failed to send outbox message", id=str(msg.id), error=str(e), attempts=msg.attempts
+            )
             if msg.attempts >= 3:
                 msg.status = "failed"
 

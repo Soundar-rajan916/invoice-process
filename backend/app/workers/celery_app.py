@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from celery import Celery
+from kombu import Queue
 
 from app.core.config import settings
 
@@ -20,6 +21,24 @@ celery_app.conf.update(
     task_default_retry_delay=5,
     task_max_retries=3,
     broker_connection_retry_on_startup=True,
+    task_queues=[
+        Queue("ingest", routing_key="ingest.#"),
+        Queue("extract", routing_key="extract.#"),
+        Queue("push", routing_key="push.#"),
+        Queue("notify", routing_key="notify.#"),
+        Queue("maintenance", routing_key="maintenance.#"),
+    ],
+    task_default_queue="extract",
+    task_routes={
+        "app.workers.tasks.process_whatsapp_message_task": {"queue": "ingest"},
+        "app.workers.tasks.process_invoice_task": {"queue": "extract"},
+        "app.workers.tasks.push_invoice_task": {"queue": "push"},
+        "app.workers.tasks.dispatch_outbox_task": {"queue": "notify"},
+        "app.workers.tasks.poll_mailbox_task": {"queue": "maintenance"},
+        "app.workers.tasks.watchdog_stuck_invoices_task": {"queue": "maintenance"},
+        "app.workers.tasks.reconcile_accounting_task": {"queue": "maintenance"},
+        "app.workers.tasks.verify_invariants_task": {"queue": "maintenance"},
+    },
     beat_schedule={
         "poll-mailbox-every-interval": {
             "task": "app.workers.tasks.poll_mailbox_task",
@@ -28,6 +47,14 @@ celery_app.conf.update(
         "dispatch-outbox-every-30s": {
             "task": "app.workers.tasks.dispatch_outbox_task",
             "schedule": 30.0,
+        },
+        "watchdog-stuck-invoices-every-60s": {
+            "task": "app.workers.tasks.watchdog_stuck_invoices_task",
+            "schedule": 60.0,
+        },
+        "reconcile-accounting-daily": {
+            "task": "app.workers.tasks.reconcile_accounting_task",
+            "schedule": 86400.0,  # Run daily
         },
     },
 )

@@ -1,4 +1,4 @@
-.PHONY: help up down logs migrate seed seed-admin seed-suppliers check test eval gen-data lint typecheck frontend-test
+.PHONY: help up down logs migrate seed seed-admin seed-suppliers check test eval gen-data lint typecheck frontend-test invariants
 
 PYTHON := .venv/bin/python
 ifeq ($(OS),Windows_NT)
@@ -17,6 +17,7 @@ help:
 	@echo "  make check       - Run lint, type-check, backend & frontend tests"
 	@echo "  make test        - Run backend test suite with coverage"
 	@echo "  make eval        - Run extraction evaluation harness"
+	@echo "  make invariants  - Run operational consistency invariant checks"
 
 up:
 	docker compose up -d
@@ -55,6 +56,9 @@ eval:
 	$(PYTHON) -m eval.run --manifest data/synthetic/manifest.jsonl --inputs data/synthetic/pdfs --extractor mock --limit 200 --out eval/reports/
 	$(PYTHON) -m eval.check --report eval/reports/report.json
 
+invariants:
+	$(PYTHON) -m backend.app.cli.invariants
+
 frontend-test:
 	cd web && npm run test:run
 
@@ -64,4 +68,4 @@ frontend-lint:
 frontend-build:
 	cd web && npm run build
 
-check: lint typecheck test frontend-lint frontend-test frontend-build
+check: lint typecheck test invariants frontend-lint frontend-test frontend-build

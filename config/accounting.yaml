@@ -1,0 +1,21 @@
+url: "http://localhost:8001/api/invoices"
+timeout_seconds: 15.0
+retry_policy:
+  max_attempts: 3
+  backoff_factor: 2.0
+  initial_delay_seconds: 1.0
+  retryable_status_codes:
+    - 429
+    - 500
+    - 502
+    - 503
+    - 504
+error_mapping:
+  400: "Invalid invoice schema or rejected financial values"
+  401: "Authentication failed with accounting provider"
+  403: "Insufficient permissions to push to ledger"
+  409: "Duplicate accounting payload detected"
+  422: "Unprocessable accounting entity"
+custom_headers:
+  X-Accounting-System: "InvoiceFlow-Core"
+  X-Client-Version: "1.0.0"

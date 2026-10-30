@@ -81,6 +81,11 @@ async def create_invoice(
     return record
 
 
+@app.get("/api/invoices")
+async def list_invoices() -> list[dict[str, Any]]:
+    return list(INVOICES_DB.values())
+
+
 @app.get("/api/invoices/{accounting_id}")
 async def get_invoice(accounting_id: str) -> dict[str, Any]:
     if accounting_id not in INVOICES_DB:

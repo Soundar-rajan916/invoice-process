@@ -6,6 +6,8 @@ import {
   TrendingUp,
   Activity,
   Info,
+  Building2,
+  Cpu,
 } from "lucide-react";
 
 export function Dashboard() {
@@ -306,6 +308,172 @@ export function Dashboard() {
             })}
           </div>
         )}
+      </div>
+
+      {/* Grid: Worst 5 Suppliers and LLM Cost & Usage */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Worst 5 Suppliers by Human Edit Rate */}
+        <div
+          className="rounded-[20px] border shadow-xs p-6 flex flex-col justify-between"
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <div>
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="flex items-center space-x-2.5">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                  style={{
+                    backgroundColor: "var(--warning-soft)",
+                    color: "var(--warning-strong)",
+                  }}
+                >
+                  <Building2 className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm" style={{ color: "var(--text)" }}>
+                    Worst Suppliers by Human Edit Rate
+                  </h3>
+                  <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                    Suppliers with highest frequency of manual reviewer corrections.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {(!metrics?.worst_suppliers || metrics.worst_suppliers.length === 0) ? (
+              <div className="py-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                No supplier corrections recorded.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {metrics.worst_suppliers.map((s: any) => {
+                  const ratePct = (s.edit_rate * 100).toFixed(1);
+                  return (
+                    <div
+                      key={s.gstin}
+                      className="p-3 rounded-xl border flex items-center justify-between transition-all"
+                      style={{
+                        backgroundColor: "var(--bg-inset)",
+                        borderColor: "var(--border)",
+                      }}
+                    >
+                      <div className="min-w-0 pr-3">
+                        <div className="text-xs font-semibold truncate" style={{ color: "var(--text)" }}>
+                          {s.name}
+                        </div>
+                        <div className="text-[11px] font-mono mt-0.5" style={{ color: "var(--text-muted)" }}>
+                          {s.gstin} • {s.total_invoices} invoices ({s.edit_count} edits)
+                        </div>
+                      </div>
+                      <span
+                        className="px-2.5 py-1 rounded-full text-xs font-bold font-mono tabular-nums shrink-0"
+                        style={{
+                          backgroundColor: "var(--warning)",
+                          color: "var(--ink)",
+                        }}
+                      >
+                        {ratePct}%
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* LLM Cost & Token Usage */}
+        <div
+          className="rounded-[20px] border shadow-xs p-6 flex flex-col justify-between"
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <div>
+            <div className="flex items-center space-x-2.5 mb-4">
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                style={{
+                  backgroundColor: "var(--accent-soft)",
+                  color: "var(--accent-strong)",
+                }}
+              >
+                <Cpu className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm" style={{ color: "var(--text)" }}>
+                  LLM Extraction Cost & Quality
+                </h3>
+                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Token consumption, model efficiency, and estimated extraction spend.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div
+                className="p-3.5 rounded-xl border"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <div className="text-[11px] font-medium" style={{ color: "var(--text-muted)" }}>
+                  Estimated Total Cost
+                </div>
+                <div className="text-xl font-bold font-mono tabular-nums mt-1" style={{ color: "var(--text)" }}>
+                  ${(metrics?.cost_and_usage?.estimated_total_cost_usd ?? 0).toFixed(4)}
+                </div>
+                <div className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>
+                  avg ${(metrics?.cost_and_usage?.estimated_cost_per_invoice_usd ?? 0).toFixed(4)} / invoice
+                </div>
+              </div>
+
+              <div
+                className="p-3.5 rounded-xl border"
+                style={{
+                  backgroundColor: "var(--bg-inset)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <div className="text-[11px] font-medium" style={{ color: "var(--text-muted)" }}>
+                  Total Tokens Processed
+                </div>
+                <div className="text-xl font-bold font-mono tabular-nums mt-1" style={{ color: "var(--text)" }}>
+                  {(metrics?.cost_and_usage?.total_tokens ?? 0).toLocaleString()}
+                </div>
+                <div className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>
+                  avg {(metrics?.cost_and_usage?.avg_tokens_per_invoice ?? 0).toLocaleString()} / invoice
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="p-3.5 rounded-xl border text-xs space-y-2"
+              style={{
+                backgroundColor: "var(--bg-inset)",
+                borderColor: "var(--border)",
+              }}
+            >
+              <div className="flex items-center justify-between text-[11px]">
+                <span style={{ color: "var(--text-muted)" }}>Prompt Tokens</span>
+                <span className="font-mono font-semibold" style={{ color: "var(--text)" }}>
+                  {(metrics?.cost_and_usage?.prompt_tokens ?? 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-[11px]">
+                <span style={{ color: "var(--text-muted)" }}>Completion Tokens</span>
+                <span className="font-mono font-semibold" style={{ color: "var(--text)" }}>
+                  {(metrics?.cost_and_usage?.completion_tokens ?? 0).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

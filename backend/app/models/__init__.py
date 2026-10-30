@@ -5,6 +5,8 @@ from app.models.entities import (
     Invoice,
     OutboundMessage,
     PushAttempt,
+    ReconciliationFinding,
+    ReconciliationRun,
     ReviewEvent,
     SourceFile,
     Supplier,
@@ -24,4 +26,6 @@ __all__ = [
     "ValidationIssue",
     "ReviewEvent",
     "PushAttempt",
+    "ReconciliationRun",
+    "ReconciliationFinding",
 ]

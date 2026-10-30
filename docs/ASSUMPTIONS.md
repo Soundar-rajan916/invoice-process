@@ -82,3 +82,28 @@ This document records all domain, technical, and operational assumptions made du
 4. **Safety Net Grounding (R2):**
    - Digital PDFs with text streams run a strict grounding verification pass: all extracted financial amounts, invoice numbers, and GSTINs must appear in the normalized document text, or raise a blocking `not_in_source` error.
    - When `SECOND_OPINION_ENABLED=true`, disagreement on total amount between primary and secondary extraction models raises an `extractors_disagree` warning and preserves both models' outputs for human review.
+
+---
+
+## 5. Phase 5 Assumptions (Reliability, Scale, and Invariants)
+
+1. **Review Leases (R4 Reviewer Isolation):**
+   - Review leases default to 120 seconds TTL with a client heartbeat interval of 45 seconds.
+   - Any concurrent write operation on an invoice claimed by another reviewer fails with HTTP 409 Conflict.
+   - Reviewers may explicitly claim, release, or take over expired or active leases (with audit logging of takeovers).
+   - The UI displays an `--accent-soft` warning banner when another user holds an active claim.
+
+2. **Adaptive Limiter & Circuit Breaker (R4 Backpressure):**
+   - Rate limiting uses AIMD (Additive Increase, Multiplicative Decrease): backs off by 50% on HTTP 429 and steps up capacity gradually upon sustained HTTP 200 responses.
+   - Circuit breakers for external APIs (Groq, Accounting API) enter `OPEN` state after 5 consecutive failures, fast-failing downstream requests directly to `PUSH_FAILED` or `WAITING_PROVIDER` to prevent resource exhaustion.
+   - Recovery follows half-open canary probes after a cooldown window (default 30 seconds).
+
+3. **Queue Topology & Watchdog Recovery (R4 Resilience):**
+   - Celery tasks are partitioned into isolated queues: `ingest`, `extract`, `push`, `notify`, `maintenance`.
+   - The watchdog periodic task sweeps invoices stuck in `PROCESSING` (> 5 min) or `PUSHING` (> 2 min). It requeues up to 3 times before transitioning the invoice to `FAILED` with `status_reason="watchdog_timeout"`.
+
+4. **Reconciliation & Dead-Letter Auditing (R2 Accounting Safety):**
+   - Nightly reconciliation queries the accounting API and compares its ledger against local `PUSHED` invoices.
+   - Discrepancies (unregistered pushes, amount mismatches, status divergences) produce persistent `reconciliation_findings` records.
+   - Invoices in `PUSH_FAILED` and `FAILED` can be reviewed and retried or discarded from the Admin Dead-Letter interface with mandatory audit reasons.
+

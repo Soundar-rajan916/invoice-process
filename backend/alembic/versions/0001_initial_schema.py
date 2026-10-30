@@ -62,9 +62,7 @@ def upgrade() -> None:
         sa.Column("storage_key", sa.String(500), nullable=False),
         sa.Column("source", sa.String(50), nullable=False, server_default="upload"),
         sa.Column("received_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column(
-            "uploaded_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True
-        ),
+        sa.Column("uploaded_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
     )
@@ -84,9 +82,7 @@ def upgrade() -> None:
         sa.Column("raw_response", JSON_TYPE, nullable=True),
         sa.Column("token_usage", JSON_TYPE, nullable=True),
         sa.Column("latency_ms", sa.Integer(), nullable=True),
-        sa.Column(
-            "created_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True
-        ),
+        sa.Column("created_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
     )
@@ -117,16 +113,12 @@ def upgrade() -> None:
             sa.ForeignKey("extractions.id"),
             nullable=True,
         ),
-        sa.Column(
-            "approved_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True
-        ),
+        sa.Column("approved_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True),
         sa.Column("approved_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("supplier_gstin", sa.String(15), nullable=True),
         sa.Column("normalized_invoice_number", sa.String(100), nullable=True),
         sa.Column("financial_year", sa.String(10), nullable=True),
-        sa.Column(
-            "dup_of_id", UUID_TYPE, sa.ForeignKey("invoices.id"), nullable=True
-        ),
+        sa.Column("dup_of_id", UUID_TYPE, sa.ForeignKey("invoices.id"), nullable=True),
         sa.Column("dup_overridden", sa.Boolean(), nullable=False, server_default=sa.false()),
         sa.Column("dup_override_reason", sa.Text(), nullable=True),
         sa.Column("accounting_id", sa.String(100), nullable=True),
@@ -213,9 +205,7 @@ def upgrade() -> None:
             sa.ForeignKey("invoices.id"),
             nullable=False,
         ),
-        sa.Column(
-            "actor_id", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True
-        ),
+        sa.Column("actor_id", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True),
         sa.Column("action", sa.String(50), nullable=False),
         sa.Column("payload", JSON_TYPE, nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),

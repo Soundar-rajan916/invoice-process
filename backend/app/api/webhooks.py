@@ -86,7 +86,9 @@ async def handle_whatsapp_webhook(
                 )
                 existing = (await session.execute(stmt)).scalar_one_or_none()
                 if existing:
-                    logger.info("WhatsApp message already recorded, ignoring duplicate", message_id=msg_id)
+                    logger.info(
+                        "WhatsApp message already recorded, ignoring duplicate", message_id=msg_id
+                    )
                     processed_messages.append(msg_id)
                     continue
 
@@ -138,9 +140,10 @@ async def handle_whatsapp_webhook(
                             msg_id, sender, media_id, msg_type, filename, mime_type
                         )
                     except Exception as e:
-                        logger.warning("Could not enqueue Celery task for WhatsApp message", error=str(e))
+                        logger.warning(
+                            "Could not enqueue Celery task for WhatsApp message", error=str(e)
+                        )
 
                 processed_messages.append(msg_id)
 
     return {"status": "ok", "processed": processed_messages}
-

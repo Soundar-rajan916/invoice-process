@@ -53,7 +53,10 @@ class FakeWhatsAppClient:
         self.media_store: dict[str, tuple[str, bytes]] = {}  # media_id -> (url, bytes)
 
     def register_media(self, media_id: str, content: bytes, url: str | None = None) -> None:
-        self.media_store[media_id] = (url or f"https://lookaside.fbsbx.com/whatsapp/{media_id}", content)
+        self.media_store[media_id] = (
+            url or f"https://lookaside.fbsbx.com/whatsapp/{media_id}",
+            content,
+        )
 
     async def get_media_url(self, media_id: str) -> str:
         if media_id in self.media_store:
@@ -80,7 +83,9 @@ def get_whatsapp_client() -> WhatsAppClient:
     return active_whatsapp_client
 
 
-def verify_webhook_signature(payload_bytes: bytes, signature_header: str | None, app_secret: str) -> bool:
+def verify_webhook_signature(
+    payload_bytes: bytes, signature_header: str | None, app_secret: str
+) -> bool:
     """Verifies X-Hub-Signature-256 HMAC header using constant-time comparison."""
     if not signature_header or not app_secret:
         return False

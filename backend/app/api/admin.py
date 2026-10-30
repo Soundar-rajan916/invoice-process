@@ -5,7 +5,7 @@ import io
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -322,3 +322,187 @@ async def retry_invoice(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Only FAILED or PUSH_FAILED invoices can be retried (current status: {invoice.status})",
         )
+
+
+# Dead-Letter Management Endpoints (Phase 5)
+class DiscardRequest(BaseModel):
+    reason: str = Field(min_length=3)
+
+
+@router.get("/dead-letters")
+async def list_dead_letters(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=100),
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    """Lists invoices currently stuck in unrecoverable or failed states (PUSH_FAILED, FAILED)."""
+    from sqlalchemy import func
+
+    base_query = select(Invoice).where(Invoice.status.in_(["FAILED", "PUSH_FAILED"]))
+
+    count_stmt = select(func.count(Invoice.id)).where(Invoice.status.in_(["FAILED", "PUSH_FAILED"]))
+    total = (await db.execute(count_stmt)).scalar() or 0
+
+    stmt = (
+        base_query.order_by(Invoice.updated_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    )
+    items = (await db.execute(stmt)).scalars().all()
+
+    return {
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "items": [
+            {
+                "id": str(inv.id),
+                "status": inv.status,
+                "status_reason": inv.status_reason,
+                "supplier_gstin": inv.supplier_gstin,
+                "normalized_invoice_number": inv.normalized_invoice_number,
+                "watchdog_requeue_count": inv.watchdog_requeue_count,
+                "created_at": inv.created_at.isoformat(),
+                "updated_at": inv.updated_at.isoformat(),
+            }
+            for inv in items
+        ],
+    }
+
+
+@router.post("/dead-letters/{invoice_id}/retry")
+async def retry_dead_letter(
+    invoice_id: uuid.UUID,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, str]:
+    """Retries a dead-letter invoice, resetting watchdog counters."""
+    invoice = await db.get(Invoice, invoice_id)
+    if not invoice or invoice.status not in ("FAILED", "PUSH_FAILED"):
+        raise HTTPException(status_code=404, detail="Dead-letter invoice not found")
+
+    invoice.watchdog_requeue_count = 0
+    return await retry_invoice(invoice_id, user, db, _)
+
+
+@router.post("/dead-letters/{invoice_id}/discard")
+async def discard_dead_letter(
+    invoice_id: uuid.UUID,
+    body: DiscardRequest,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, str]:
+    """Permanently discards an unrecoverable invoice with an audit explanation."""
+    invoice = await db.get(Invoice, invoice_id)
+    if not invoice or invoice.status not in ("FAILED", "PUSH_FAILED"):
+        raise HTTPException(status_code=404, detail="Dead-letter invoice not found")
+
+    prev_status = invoice.status
+    invoice.status = "REJECTED"
+    invoice.status_reason = f"Discarded from dead-letter queue: {body.reason}"
+    invoice.row_version += 1
+
+    db.add(
+        ReviewEvent(
+            invoice_id=invoice.id,
+            actor_id=user.id,
+            action="status_change",
+            payload={
+                "from_status": prev_status,
+                "to_status": "REJECTED",
+                "action": "dead_letter_discard",
+                "reason": body.reason,
+            },
+        )
+    )
+    await db.commit()
+    return {"message": "Invoice successfully discarded from dead-letter queue"}
+
+
+# Reconciliation Admin Endpoints (Phase 5)
+@router.get("/reconciliation/runs")
+async def list_reconciliation_runs(
+    limit: int = Query(20, ge=1, le=100),
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+) -> list[dict[str, Any]]:
+    from app.models.entities import ReconciliationRun
+
+    stmt = select(ReconciliationRun).order_by(ReconciliationRun.started_at.desc()).limit(limit)
+    runs = (await db.execute(stmt)).scalars().all()
+    return [
+        {
+            "id": str(r.id),
+            "started_at": r.started_at.isoformat(),
+            "completed_at": r.completed_at.isoformat() if r.completed_at else None,
+            "status": r.status,
+            "total_checked": r.total_checked,
+            "total_matched": r.total_matched,
+            "total_discrepancies": r.total_discrepancies,
+            "summary": r.summary,
+        }
+        for r in runs
+    ]
+
+
+@router.get("/reconciliation/runs/{run_id}")
+async def get_reconciliation_run_detail(
+    run_id: uuid.UUID,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    from app.models.entities import ReconciliationFinding, ReconciliationRun
+
+    run = await db.get(ReconciliationRun, run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="Reconciliation run not found")
+
+    findings_stmt = (
+        select(ReconciliationFinding)
+        .where(ReconciliationFinding.run_id == run.id)
+        .order_by(ReconciliationFinding.created_at.desc())
+    )
+    findings = (await db.execute(findings_stmt)).scalars().all()
+
+    return {
+        "id": str(run.id),
+        "started_at": run.started_at.isoformat(),
+        "completed_at": run.completed_at.isoformat() if run.completed_at else None,
+        "status": run.status,
+        "total_checked": run.total_checked,
+        "total_matched": run.total_matched,
+        "total_discrepancies": run.total_discrepancies,
+        "summary": run.summary,
+        "findings": [
+            {
+                "id": str(f.id),
+                "invoice_id": str(f.invoice_id) if f.invoice_id else None,
+                "finding_type": f.finding_type,
+                "severity": f.severity,
+                "details": f.details,
+                "resolved": f.resolved,
+                "created_at": f.created_at.isoformat(),
+            }
+            for f in findings
+        ],
+    }
+
+
+@router.post("/reconciliation/trigger")
+async def trigger_reconciliation(
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, Any]:
+    from app.services.reconciliation import run_accounting_reconciliation
+
+    run = await run_accounting_reconciliation(db)
+    return {
+        "status": "triggered",
+        "run_id": str(run.id),
+        "total_matched": run.total_matched,
+        "total_discrepancies": run.total_discrepancies,
+    }

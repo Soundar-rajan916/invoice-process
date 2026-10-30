@@ -211,7 +211,9 @@ async def test_whatsapp_webhook_verification_endpoint(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_whatsapp_webhook_post_idempotency_and_signature(client: AsyncClient, db_session: AsyncSession):
+async def test_whatsapp_webhook_post_idempotency_and_signature(
+    client: AsyncClient, db_session: AsyncSession
+):
     """POST /api/v1/webhooks/whatsapp rejects bad HMAC and idempotently registers inbound message."""
     secret = settings.WHATSAPP_APP_SECRET
     payload = {
@@ -265,7 +267,9 @@ async def test_whatsapp_webhook_post_idempotency_and_signature(client: AsyncClie
     assert ok_res.json()["status"] == "ok"
 
     # Inbound message recorded
-    stmt = select(InboundMessage).where(InboundMessage.external_id == "wamid.HBgMOTE5ODc2NTQzMjEwFQIAEhgWM0EB")
+    stmt = select(InboundMessage).where(
+        InboundMessage.external_id == "wamid.HBgMOTE5ODc2NTQzMjEwFQIAEhgWM0EB"
+    )
     inbound = (await db_session.execute(stmt)).scalar_one_or_none()
     assert inbound is not None
     assert inbound.channel == "whatsapp"
@@ -419,17 +423,23 @@ async def test_outbox_sender_daily_rate_limiting(db_session: AsyncSession):
 
     try:
         # Send 1
-        m1 = await queue_resend_notification(db_session, invoice=inv, channel="email", recipient=sender, reason="blur 1")
+        m1 = await queue_resend_notification(
+            db_session, invoice=inv, channel="email", recipient=sender, reason="blur 1"
+        )
         assert m1 is not None
         await db_session.commit()
 
         # Send 2
-        m2 = await queue_resend_notification(db_session, invoice=inv, channel="email", recipient=sender, reason="blur 2")
+        m2 = await queue_resend_notification(
+            db_session, invoice=inv, channel="email", recipient=sender, reason="blur 2"
+        )
         assert m2 is not None
         await db_session.commit()
 
         # Send 3 -> Exceeds daily max, must return None and not create outbox row
-        m3 = await queue_resend_notification(db_session, invoice=inv, channel="email", recipient=sender, reason="blur 3")
+        m3 = await queue_resend_notification(
+            db_session, invoice=inv, channel="email", recipient=sender, reason="blur 3"
+        )
         assert m3 is None
 
         # Check total created in DB
@@ -468,7 +478,14 @@ def test_grounding_safety_net_catches_hallucinated_values():
         invoice_date=date(2026, 3, 12),
         supplier_name="Acme Industrial Supplies",
         supplier_gstin="27AAPFU0939F1ZV",
-        line_items=[LineItem(description="Steel Bolts 100pk", quantity=Decimal("10"), rate=Decimal("50.00"), amount=Decimal("500.00"))],
+        line_items=[
+            LineItem(
+                description="Steel Bolts 100pk",
+                quantity=Decimal("10"),
+                rate=Decimal("50.00"),
+                amount=Decimal("500.00"),
+            )
+        ],
         taxable_value=Decimal("500.00"),
         igst=Decimal("90.00"),
         total=Decimal("590.00"),
@@ -482,7 +499,14 @@ def test_grounding_safety_net_catches_hallucinated_values():
         invoice_date=date(2026, 3, 12),
         supplier_name="Acme Industrial Supplies",
         supplier_gstin="27AAPFU0939F1ZV",
-        line_items=[LineItem(description="Steel Bolts 100pk", quantity=Decimal("10"), rate=Decimal("50.00"), amount=Decimal("500.00"))],
+        line_items=[
+            LineItem(
+                description="Steel Bolts 100pk",
+                quantity=Decimal("10"),
+                rate=Decimal("50.00"),
+                amount=Decimal("500.00"),
+            )
+        ],
         taxable_value=Decimal("500.00"),
         igst=Decimal("90.00"),
         total=Decimal("890.00"),  # Hallucinated!
@@ -510,7 +534,9 @@ async def test_second_opinion_disagreement_detection(db_session: AsyncSession):
     settings.SECOND_OPINION_ENABLED = True
 
     class DisagreeingExtractor(MockExtractor):
-        async def extract(self, pages: list[PageInput], validation_feedback: list[str] | None = None) -> ExtractionResult:
+        async def extract(
+            self, pages: list[PageInput], validation_feedback: list[str] | None = None
+        ) -> ExtractionResult:
             res = await super().extract(pages, validation_feedback)
             # Alter total by 500 Rs
             res.extraction.total = (res.extraction.total or Decimal("100.00")) + Decimal("500.00")
@@ -540,9 +566,13 @@ async def test_second_opinion_disagreement_detection(db_session: AsyncSession):
 
         # Mock storage_service.download_bytes to return dummy bytes
         from unittest.mock import patch
-        with patch("app.services.pipeline.storage_service.download_bytes", return_value=b"%PDF-1.4 mock"):
+
+        with patch(
+            "app.services.pipeline.storage_service.download_bytes", return_value=b"%PDF-1.4 mock"
+        ):
             with patch.object(Preprocessor, "process") as mock_prep:
                 from app.extraction.preprocess import ProcessedPage
+
                 mock_prep.return_value = [
                     ProcessedPage(
                         page_number=1,
@@ -556,7 +586,9 @@ async def test_second_opinion_disagreement_detection(db_session: AsyncSession):
                 processed_inv = await process_invoice_pipeline(db_session, inv.id)
                 assert processed_inv is not None
                 await db_session.refresh(processed_inv, ["validation_issues"])
-                assert any(vi.code == "extractors_disagree" for vi in processed_inv.validation_issues)
+                assert any(
+                    vi.code == "extractors_disagree" for vi in processed_inv.validation_issues
+                )
     finally:
         settings.SECOND_OPINION_ENABLED = old_flag
         set_second_opinion_extractor(None)

@@ -158,7 +158,7 @@ class ImapMailboxClient:
 
             attachments.append(
                 MailAttachment(
-                    filename=filename or f"attachment_{len(attachments)+1}",
+                    filename=filename or f"attachment_{len(attachments) + 1}",
                     content=payload,
                     content_type=content_type,
                     is_inline=is_inline,
@@ -244,7 +244,10 @@ def is_usable_attachment(att: MailAttachment) -> tuple[bool, str]:
     """Applies strict filtering to separate real invoice documents from signature logos."""
     # 1. Size filter: tiny inline attachments (< EMAIL_MIN_ATTACHMENT_BYTES)
     if att.size_bytes < settings.EMAIL_MIN_ATTACHMENT_BYTES and att.is_inline:
-        return False, f"Inline image below minimum size ({att.size_bytes}B < {settings.EMAIL_MIN_ATTACHMENT_BYTES}B)"
+        return (
+            False,
+            f"Inline image below minimum size ({att.size_bytes}B < {settings.EMAIL_MIN_ATTACHMENT_BYTES}B)",
+        )
 
     # 2. Filename pattern check for inline images
     if att.is_inline and LOGO_PATTERN.match(att.filename):
@@ -262,13 +265,19 @@ def is_usable_attachment(att: MailAttachment) -> tuple[bool, str]:
             with Image.open(io.BytesIO(att.content)) as im:
                 w, h = im.size
                 if w < settings.EMAIL_MIN_IMAGE_PIXELS or h < settings.EMAIL_MIN_IMAGE_PIXELS:
-                    return False, f"Image dimensions too small ({w}x{h} < {settings.EMAIL_MIN_IMAGE_PIXELS}px)"
+                    return (
+                        False,
+                        f"Image dimensions too small ({w}x{h} < {settings.EMAIL_MIN_IMAGE_PIXELS}px)",
+                    )
         except Exception as e:
             return False, f"Corrupt image file: {e}"
 
     # 5. Over-limit size check
     if att.size_bytes > settings.EMAIL_MAX_ATTACHMENT_BYTES:
-        return False, f"Attachment exceeds max size limit ({att.size_bytes} > {settings.EMAIL_MAX_ATTACHMENT_BYTES})"
+        return (
+            False,
+            f"Attachment exceeds max size limit ({att.size_bytes} > {settings.EMAIL_MAX_ATTACHMENT_BYTES})",
+        )
 
     return True, "Usable invoice attachment"
 
@@ -314,8 +323,14 @@ class EmailIngestor:
         )
         existing = (await self.session.execute(stmt)).scalar_one_or_none()
         if existing:
-            logger.info("Email message already recorded, skipping re-poll", message_id=msg.message_id)
-            return {"status": "skipped", "reason": "Already processed", "message_id": msg.message_id}
+            logger.info(
+                "Email message already recorded, skipping re-poll", message_id=msg.message_id
+            )
+            return {
+                "status": "skipped",
+                "reason": "Already processed",
+                "message_id": msg.message_id,
+            }
 
         # 2. Check sender domain allowlist
         sender_email = msg.sender
@@ -324,7 +339,9 @@ class EmailIngestor:
 
         if settings.EMAIL_ALLOWED_SENDER_DOMAINS:
             domain = sender_email.split("@")[-1].lower() if "@" in sender_email else ""
-            allowed = [d.strip().lower() for d in settings.EMAIL_ALLOWED_SENDER_DOMAINS if d.strip()]
+            allowed = [
+                d.strip().lower() for d in settings.EMAIL_ALLOWED_SENDER_DOMAINS if d.strip()
+            ]
             if domain not in allowed:
                 inbound_rec = InboundMessage(
                     id=uuid.uuid4(),
@@ -340,7 +357,11 @@ class EmailIngestor:
                 )
                 self.session.add(inbound_rec)
                 await self.session.commit()
-                return {"status": "ignored", "reason": "Domain not in allowlist", "message_id": msg.message_id}
+                return {
+                    "status": "ignored",
+                    "reason": "Domain not in allowlist",
+                    "message_id": msg.message_id,
+                }
 
         # 3. Filter attachments
         kept_attachments: list[MailAttachment] = []
@@ -361,7 +382,11 @@ class EmailIngestor:
             )
             self.session.add(inbound_rec)
             await self.session.commit()
-            return {"status": "ignored", "reason": "Too many attachments", "message_id": msg.message_id}
+            return {
+                "status": "ignored",
+                "reason": "Too many attachments",
+                "message_id": msg.message_id,
+            }
 
         for att in msg.attachments:
             usable, reason = is_usable_attachment(att)
@@ -379,13 +404,18 @@ class EmailIngestor:
                 subject=msg.subject,
                 received_at=msg.received_at,
                 status="ignored",
-                status_reason="No usable invoice attachment found. " + "; ".join(ignored_reasons[:3]),
+                status_reason="No usable invoice attachment found. "
+                + "; ".join(ignored_reasons[:3]),
                 source_file_ids=[],
                 raw_meta=msg.raw_meta,
             )
             self.session.add(inbound_rec)
             await self.session.commit()
-            return {"status": "ignored", "reason": "No usable attachments", "message_id": msg.message_id}
+            return {
+                "status": "ignored",
+                "reason": "No usable attachments",
+                "message_id": msg.message_id,
+            }
 
         # 4. Ingest valid attachments
         created_file_ids: list[str] = []

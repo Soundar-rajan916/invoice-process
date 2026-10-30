@@ -21,7 +21,10 @@ class MockExtractor:
         if not target.exists():
             candidates = [
                 Path("/app/data/synthetic/manifest.jsonl"),
-                Path(__file__).resolve().parent.parent.parent.parent / "data" / "synthetic" / "manifest.jsonl",
+                Path(__file__).resolve().parent.parent.parent.parent
+                / "data"
+                / "synthetic"
+                / "manifest.jsonl",
                 Path("data/synthetic/manifest.jsonl").resolve(),
             ]
             for c in candidates:

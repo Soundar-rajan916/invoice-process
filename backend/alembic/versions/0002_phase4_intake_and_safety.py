@@ -34,7 +34,9 @@ def upgrade() -> None:
         sa.Column("sender", sa.String(255), nullable=False),
         sa.Column("subject", sa.String(500), nullable=True),
         sa.Column("received_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("status", sa.String(30), nullable=False, server_default="received"),  # received | ignored | ingested | failed
+        sa.Column(
+            "status", sa.String(30), nullable=False, server_default="received"
+        ),  # received | ignored | ingested | failed
         sa.Column("status_reason", sa.Text(), nullable=True),
         sa.Column("source_file_ids", JSON_TYPE, nullable=False, server_default="[]"),
         sa.Column("raw_meta", JSON_TYPE, nullable=False, server_default="{}"),
@@ -58,7 +60,9 @@ def upgrade() -> None:
         sa.Column("recipient", sa.String(255), nullable=False),
         sa.Column("template_key", sa.String(100), nullable=False),
         sa.Column("body", sa.Text(), nullable=False),
-        sa.Column("status", sa.String(30), nullable=False, server_default="pending"),  # pending | sent | failed
+        sa.Column(
+            "status", sa.String(30), nullable=False, server_default="pending"
+        ),  # pending | sent | failed
         sa.Column("attempts", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("external_id", sa.String(255), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
@@ -71,7 +75,9 @@ def upgrade() -> None:
     # 3. Add columns to invoices table (expand-first, all nullable)
     op.add_column(
         "invoices",
-        sa.Column("inbound_message_id", UUID_TYPE, sa.ForeignKey("inbound_messages.id"), nullable=True),
+        sa.Column(
+            "inbound_message_id", UUID_TYPE, sa.ForeignKey("inbound_messages.id"), nullable=True
+        ),
     )
     op.add_column(
         "invoices",
@@ -98,4 +104,3 @@ def downgrade() -> None:
     op.drop_column("invoices", "inbound_message_id")
     op.drop_table("outbound_messages")
     op.drop_table("inbound_messages")
-

@@ -135,8 +135,14 @@ class Invoice(Base, TimestampMixin):
     claimed_by: Mapped[uuid.UUID | None] = mapped_column(
         GUID, ForeignKey("users.id"), nullable=True, index=True
     )
-    claim_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    claim_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     sender: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    # Phase 5 Reliability & Watchdog
+    watchdog_requeue_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     current_extraction_id: Mapped[uuid.UUID | None] = mapped_column(
         GUID,
@@ -276,3 +282,47 @@ class PushAttempt(Base, TimestampMixin):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     invoice = relationship("Invoice", back_populates="push_attempts")
+
+
+class ReconciliationRun(Base, TimestampMixin):
+    __tablename__ = "reconciliation_runs"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    status: Mapped[str] = mapped_column(
+        String(30), default="running", nullable=False
+    )  # running | completed | failed
+    total_checked: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    total_matched: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    total_discrepancies: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    summary: Mapped[dict[str, Any]] = mapped_column(JSONType, default=dict, nullable=False)
+
+    findings = relationship(
+        "ReconciliationFinding", back_populates="run", cascade="all, delete-orphan"
+    )
+
+
+class ReconciliationFinding(Base, TimestampMixin):
+    __tablename__ = "reconciliation_findings"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        GUID, ForeignKey("reconciliation_runs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    invoice_id: Mapped[uuid.UUID | None] = mapped_column(
+        GUID, ForeignKey("invoices.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    finding_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # missing_in_accounting | missing_in_invoiceflow | amount_mismatch | status_mismatch
+    severity: Mapped[str] = mapped_column(
+        String(20), default="warning", nullable=False
+    )  # warning | error
+    details: Mapped[dict[str, Any]] = mapped_column(JSONType, default=dict, nullable=False)
+    resolved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    run = relationship("ReconciliationRun", back_populates="findings")
+    invoice = relationship("Invoice", foreign_keys=[invoice_id])

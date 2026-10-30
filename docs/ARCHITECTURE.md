@@ -180,3 +180,62 @@ flowchart LR
 - Moving an invoice to `RESEND_REQUESTED` queues an outbox row atomically.
 - Dedicated worker task delivers notifications with daily sender rate limiting (`RESEND_MAX_PER_SENDER_PER_DAY = 3`).
 - Notification bodies render rejection reasons without disclosing financial figures or amounts.
+
+---
+
+## 6. Phase 5 Architecture: Scale, Reliability & Operational Invariants
+
+```mermaid
+flowchart TD
+    subgraph Celery Queue Partitioning
+        Q1[Queue: ingest] --> W1[Worker Ingestion Pool]
+        Q2[Queue: extract] --> W2[Worker Extraction Pool]
+        Q3[Queue: push] --> W3[Worker Push Pool]
+        Q4[Queue: notify] --> W4[Worker Outbox Pool]
+        Q5[Queue: maintenance] --> W5[Watchdog & Reconciliation]
+    end
+
+    subgraph Protective Resiliency
+        EXT_CALL[LLM API Request] --> AIMD[Adaptive Rate Limiter<br/>AIMD Scaling]
+        AIMD --> CB_LLM{LLM Breaker<br/>CLOSED?}
+        CB_LLM -- OPEN --> FAIL_WP[Status: WAITING_PROVIDER]
+        
+        PUSH_CALL[Accounting Push] --> CB_ACC{Accounting Breaker<br/>CLOSED?}
+        CB_ACC -- OPEN --> FAIL_PF[Status: PUSH_FAILED]
+    end
+
+    subgraph Operational Invariants & Sweeper
+        W5 --> WATCH[Watchdog Sweep<br/>stuck >5m processing / >2m pushing]
+        WATCH --> REQUEUE{Requeue Count <= 3?}
+        REQUEUE -- Yes --> RETRY_TASK[Re-enqueue Task]
+        REQUEUE -- No --> ESCALATE[Status: FAILED<br/>Reason: watchdog_timeout]
+        W5 --> RECON[Nightly Reconciliation<br/>Ledger vs Remote Accounting]
+        RECON --> FINDINGS[(reconciliation_findings)]
+    end
+
+    subgraph Reviewer Concurrency
+        REV1[Reviewer 1] --> CLAIM[Heartbeat Lease<br/>120s TTL]
+        REV2[Reviewer 2] --> CONFLICT{Claimed by Other?}
+        CONFLICT -- Yes --> LOCK[HTTP 409 Conflict<br/>UI Accent Banner]
+        CONFLICT -- Expired / Force --> TAKEOVER[Takeover Audit Event]
+    end
+```
+
+### 6.1 Review Concurrency & Heartbeat Leases
+- Reviewers claim invoices upon opening the review workspace (`claimed_by`, `claim_expires_at`).
+- Periodic heartbeats (every 45s) extend the lease window.
+- Concurrent modifications by another user yield HTTP 409 Conflict.
+- Leases can be explicitly released or superseded via audited takeover.
+
+### 6.2 Backpressure & Circuit Breakers
+- **Adaptive Limiter:** Adjusts concurrent request ceilings using AIMD algorithms based on HTTP 429 signals and sustained HTTP 200 successes.
+- **Circuit Breakers:** Guard upstream LLM providers and downstream accounting APIs against cascade failure. When open, requests fast-fail without burning network sockets.
+
+### 6.3 Watchdogs & Operational Invariants
+- Watchdog sweep identifies orphaned or crashed tasks and re-enqueues them up to 3 times before dead-lettering.
+- Invariants CLI validates the 4 core guarantees:
+  1. No unreviewed financial data reaches accounting (`check_approved_before_push`).
+  2. Idempotent deduplication layers are intact.
+  3. No orphaned processing states exist without active queue tasks.
+  4. Database audit logs remain strictly append-only.
+

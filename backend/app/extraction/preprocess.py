@@ -73,8 +73,12 @@ def compute_quality_metrics(img_cv: np.ndarray) -> QualityMetrics:
     elif brightness > 230.0:
         brightness_penalty = max(0.2, (255.0 - brightness) / 25.0)
 
-    composite_score = (0.45 * norm_blur + 0.35 * norm_contrast + 0.20 * norm_res) * brightness_penalty
-    is_acceptable = blur >= settings.BLUR_REJECT_THRESHOLD and brightness >= 30.0 and contrast >= 15.0
+    composite_score = (
+        0.45 * norm_blur + 0.35 * norm_contrast + 0.20 * norm_res
+    ) * brightness_penalty
+    is_acceptable = (
+        blur >= settings.BLUR_REJECT_THRESHOLD and brightness >= 30.0 and contrast >= 15.0
+    )
 
     return QualityMetrics(
         blur_score=round(blur, 2),
@@ -114,7 +118,9 @@ def correct_perspective(img_cv: np.ndarray) -> np.ndarray:
     scale = 1.0
     if max(h, w) > max_dim:
         scale = max_dim / max(h, w)
-        small_gray = cv2.resize(gray, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+        small_gray = cv2.resize(
+            gray, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA
+        )
     else:
         small_gray = gray
 
@@ -161,7 +167,9 @@ def correct_perspective(img_cv: np.ndarray) -> np.ndarray:
                         dtype="float32",
                     )
                     m = cv2.getPerspectiveTransform(rect, dst)
-                    warped = cv2.warpPerspective(img_cv, m, (maxWidth, maxHeight), flags=cv2.INTER_CUBIC)
+                    warped = cv2.warpPerspective(
+                        img_cv, m, (maxWidth, maxHeight), flags=cv2.INTER_CUBIC
+                    )
                     return warped
 
     return img_cv
@@ -177,7 +185,9 @@ def normalize_shadows_and_background(img_cv: np.ndarray) -> np.ndarray:
         bg = cv2.morphologyEx(l_chan, cv2.MORPH_DILATE, kernel)
         bg = cv2.medianBlur(bg, 21)
         diff = 255 - cv2.absdiff(l_chan, bg)
-        norm_l = cv2.normalize(diff, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)  # type: ignore[call-overload]
+        norm_l = cv2.normalize(
+            diff, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U
+        )  # type: ignore[call-overload]
         merged = cv2.merge((norm_l, a_chan, b_chan))
         return cv2.cvtColor(merged, cv2.COLOR_LAB2BGR)
     else:
@@ -185,7 +195,9 @@ def normalize_shadows_and_background(img_cv: np.ndarray) -> np.ndarray:
         bg = cv2.morphologyEx(img_cv, cv2.MORPH_DILATE, kernel)
         bg = cv2.medianBlur(bg, 21)
         diff = 255 - cv2.absdiff(img_cv, bg)
-        norm = cv2.normalize(diff, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)  # type: ignore[call-overload]
+        norm = cv2.normalize(
+            diff, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U
+        )  # type: ignore[call-overload]
         return norm
 
 

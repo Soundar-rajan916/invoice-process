@@ -111,7 +111,10 @@ def validate_grounding(extraction: InvoiceExtraction, source_text: str) -> list[
         if amount is not None and amount > Decimal("0.00"):
             str_val_2dec = f"{amount:.2f}"
             str_val_0dec = f"{amount:.0f}"
-            if not (is_value_in_text(str_val_2dec, norm_text) or is_value_in_text(str_val_0dec, norm_text)):
+            if not (
+                is_value_in_text(str_val_2dec, norm_text)
+                or is_value_in_text(str_val_0dec, norm_text)
+            ):
                 issues.append(
                     ValidationIssueDto(
                         "not_in_source",
@@ -132,7 +135,7 @@ def validate_grounding(extraction: InvoiceExtraction, source_text: str) -> list[
                         "not_in_source",
                         f"line_items[{idx}].amount",
                         "error",
-                        f"Line item {idx+1} amount '₹{item.amount:.2f}' not found in document text",
+                        f"Line item {idx + 1} amount '₹{item.amount:.2f}' not found in document text",
                     )
                 )
 
@@ -225,7 +228,7 @@ def validate_extraction(
                         "line_amount_mismatch",
                         f"line_items[{idx}].amount",
                         "error",
-                        f"Line item {idx+1} amount ({item.amount:.2f}) != qty ({item.quantity:.2f}) * rate ({item.rate:.2f}) = {expected_amt:.2f}",
+                        f"Line item {idx + 1} amount ({item.amount:.2f}) != qty ({item.quantity:.2f}) * rate ({item.rate:.2f}) = {expected_amt:.2f}",
                     )
                 )
         if item.amount is not None:

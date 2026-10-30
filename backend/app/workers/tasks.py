@@ -217,3 +217,120 @@ def process_whatsapp_message_task(
             await task_engine.dispose()
 
     return asyncio.run(_run())
+
+
+async def _execute_watchdog_sweep_on_session(session: AsyncSession) -> dict[str, Any]:
+    from datetime import UTC, datetime, timedelta
+
+    from sqlalchemy import or_, select
+
+    from app.models.entities import Invoice, ReviewEvent
+
+    requeued: list[str] = []
+    escalated: list[str] = []
+    now = datetime.now(UTC)
+    proc_cutoff = now - timedelta(minutes=5)
+    push_cutoff = now - timedelta(minutes=2)
+
+    stmt = select(Invoice).where(
+        or_(
+            (Invoice.status == "PROCESSING")
+            & (
+                or_(
+                    (Invoice.heartbeat_at.is_not(None)) & (Invoice.heartbeat_at < proc_cutoff),
+                    (Invoice.heartbeat_at.is_(None)) & (Invoice.updated_at < proc_cutoff),
+                )
+            ),
+            (Invoice.status == "PUSHING")
+            & (
+                or_(
+                    (Invoice.heartbeat_at.is_not(None)) & (Invoice.heartbeat_at < push_cutoff),
+                    (Invoice.heartbeat_at.is_(None)) & (Invoice.updated_at < push_cutoff),
+                )
+            ),
+        )
+    )
+    stuck_invoices = (await session.execute(stmt)).scalars().all()
+
+    for inv in stuck_invoices:
+        prev_status = inv.status
+        if inv.watchdog_requeue_count < 3:
+            inv.watchdog_requeue_count += 1
+            inv.heartbeat_at = now
+            if inv.status == "PROCESSING":
+                inv.status = "RECEIVED"
+                try:
+                    process_invoice.delay(str(inv.id))
+                except Exception:
+                    pass
+            elif inv.status == "PUSHING":
+                inv.status = "APPROVED"
+                try:
+                    from app.workers.tasks import push_invoice_task
+
+                    push_invoice_task.delay(str(inv.id))
+                except Exception:
+                    pass
+
+            session.add(
+                ReviewEvent(
+                    invoice_id=inv.id,
+                    action="watchdog_requeue",
+                    payload={
+                        "previous_status": prev_status,
+                        "requeue_count": inv.watchdog_requeue_count,
+                        "cutoff": proc_cutoff.isoformat()
+                        if prev_status == "PROCESSING"
+                        else push_cutoff.isoformat(),
+                    },
+                )
+            )
+            requeued.append(str(inv.id))
+        else:
+            inv.status = "FAILED"
+            inv.status_reason = "watchdog_timeout"
+            session.add(
+                ReviewEvent(
+                    invoice_id=inv.id,
+                    action="status_change",
+                    payload={
+                        "previous_status": prev_status,
+                        "reason": "watchdog_timeout",
+                        "requeue_count": inv.watchdog_requeue_count,
+                    },
+                )
+            )
+            escalated.append(str(inv.id))
+
+    if stuck_invoices:
+        await session.commit()
+    return {"requeued": requeued, "escalated": escalated}
+
+
+async def run_watchdog_sweep(session: AsyncSession | None = None) -> dict[str, Any]:
+    """Sweeps for stuck PROCESSING or PUSHING invoices and requeues or escalates them."""
+    if session is not None:
+        return await _execute_watchdog_sweep_on_session(session)
+
+    maker, task_engine = _get_worker_session()
+    try:
+        async with maker() as sess:
+            return await _execute_watchdog_sweep_on_session(sess)
+    finally:
+        await task_engine.dispose()
+
+
+@celery_app.task(
+    name="app.workers.tasks.watchdog_stuck_invoices_task",
+    acks_late=True,
+)
+def watchdog_stuck_invoices_task() -> dict[str, Any]:
+    """Watchdog task (R4 scale & reliability).
+    Requeues stuck PROCESSING (older than 5 min) or PUSHING (older than 2 min) invoices.
+    After 3 requeues, escalates to FAILED with reason 'watchdog_timeout'.
+    """
+    res = asyncio.run(run_watchdog_sweep())
+    logger.info(
+        "Watchdog sweep finished", requeued=len(res["requeued"]), escalated=len(res["escalated"])
+    )
+    return res

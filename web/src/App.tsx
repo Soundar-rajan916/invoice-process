@@ -9,6 +9,8 @@ import { ReviewQueue } from "@/pages/ReviewQueue";
 import { ReviewDetail } from "@/pages/ReviewDetail";
 import { Dashboard } from "@/pages/Dashboard";
 import { Admin } from "@/pages/Admin";
+import { DeadLetters } from "@/pages/DeadLetters";
+import { Reconciliation } from "@/pages/Reconciliation";
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   constructor(props: { children: ReactNode }) {
@@ -130,6 +132,22 @@ export function App() {
                   element={
                     <AdminRoute>
                       <Admin />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/dead-letters"
+                  element={
+                    <AdminRoute>
+                      <DeadLetters />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/reconciliation"
+                  element={
+                    <AdminRoute>
+                      <Reconciliation />
                     </AdminRoute>
                   }
                 />
