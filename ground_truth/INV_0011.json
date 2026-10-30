@@ -1,0 +1,44 @@
+{
+  "file": "INV_0011.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "K25011",
+  "invoice_date": "2025-11-20",
+  "invoice_date_printed": "20 Nov 2025",
+  "supplier_name": "Khurana-Rajagopal",
+  "supplier_gstin": "08BPCCK8300E9ZR",
+  "line_items": [
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 90,
+      "rate": 2280.77,
+      "amount": 205269.3
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 127,
+      "rate": 396.14,
+      "amount": 50309.78
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 160,
+      "rate": 1199.05,
+      "amount": 191848.0
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 193,
+      "rate": 794.93,
+      "amount": 153421.49
+    }
+  ],
+  "taxable_value": 600848.57,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 168237.6,
+  "total": 769086.17,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

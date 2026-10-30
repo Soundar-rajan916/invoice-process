@@ -1,0 +1,50 @@
+{
+  "file": "INV_0079.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "GST002103",
+  "invoice_date": "2025-11-23",
+  "invoice_date_printed": "23/11/2025",
+  "supplier_name": "Peri LLC",
+  "supplier_gstin": "24LDNCP7201S6Z8",
+  "line_items": [
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 126,
+      "rate": 3693.03,
+      "amount": 465321.78
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 12,
+      "rate": 1308.28,
+      "amount": 15699.36
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 184,
+      "rate": 374.23,
+      "amount": 68858.32
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 62,
+      "rate": 354.88,
+      "amount": 22002.56
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 40,
+      "rate": 626.02,
+      "amount": 25040.8
+    }
+  ],
+  "taxable_value": 596922.82,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 107446.11,
+  "total": 704368.93,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

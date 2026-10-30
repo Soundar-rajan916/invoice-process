@@ -1,0 +1,68 @@
+{
+  "file": "INV_0047.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "SI-9291",
+  "invoice_date": "2025-09-26",
+  "invoice_date_printed": "26 Sep 2025",
+  "supplier_name": "Wason and Sons",
+  "supplier_gstin": "32TDGCW1434F7ZU",
+  "line_items": [
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 102,
+      "rate": 2412.85,
+      "amount": 246110.7
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 110,
+      "rate": 141.7,
+      "amount": 15587.0
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 46,
+      "rate": 233.01,
+      "amount": 10718.46
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 21,
+      "rate": 676.77,
+      "amount": 14212.17
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 100,
+      "rate": 306.97,
+      "amount": 30697.0
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12) - Economy",
+      "quantity": 16,
+      "rate": 679.68,
+      "amount": 10874.88
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 74,
+      "rate": 485.11,
+      "amount": 35898.14
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 161,
+      "rate": 333.29,
+      "amount": 53659.69
+    }
+  ],
+  "taxable_value": 417758.04,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 75196.45,
+  "total": 492954.49,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

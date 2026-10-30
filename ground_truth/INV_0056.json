@@ -1,0 +1,38 @@
+{
+  "file": "INV_0056.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "INV-2026-09204",
+  "invoice_date": "2026-09-19",
+  "invoice_date_printed": "19-09-2026",
+  "supplier_name": "Acharya Ltd",
+  "supplier_gstin": "24UBRCA0404M3Z2",
+  "line_items": [
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 17,
+      "rate": 177.4,
+      "amount": 3015.8
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 170,
+      "rate": 1299.88,
+      "amount": 220979.6
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 195,
+      "rate": 1777.65,
+      "amount": 346641.75
+    }
+  ],
+  "taxable_value": 570637.15,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 102714.69,
+  "total": 673351.84,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

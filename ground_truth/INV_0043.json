@@ -1,0 +1,50 @@
+{
+  "file": "INV_0043.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "BL26043",
+  "invoice_date": "2026-10-08",
+  "invoice_date_printed": "2026-10-08",
+  "supplier_name": "Badal Ltd",
+  "supplier_gstin": "09JFSFB1843F4ZQ",
+  "line_items": [
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 174,
+      "rate": 878.09,
+      "amount": 152787.66
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 153,
+      "rate": 187.69,
+      "amount": 28716.57
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 35,
+      "rate": 667.79,
+      "amount": 23372.65
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 155,
+      "rate": 264.49,
+      "amount": 40995.95
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 69,
+      "rate": 473.62,
+      "amount": 32679.78
+    }
+  ],
+  "taxable_value": 278552.61,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 33426.31,
+  "total": 311978.92,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

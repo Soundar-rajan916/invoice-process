@@ -1,0 +1,26 @@
+{
+  "file": "INV_0095.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "SI-3909",
+  "invoice_date": "2025-10-30",
+  "invoice_date_printed": "30-10-2025",
+  "supplier_name": "Rama, Shah and Vasa",
+  "supplier_gstin": "37ITICR6258X4ZN",
+  "line_items": [
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 120,
+      "rate": 157.71,
+      "amount": 18925.2
+    }
+  ],
+  "taxable_value": 18925.2,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 3406.54,
+  "total": 22331.74,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

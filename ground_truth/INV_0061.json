@@ -1,0 +1,26 @@
+{
+  "file": "INV_0061.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "G26061",
+  "invoice_date": "2026-10-27",
+  "invoice_date_printed": "27-10-2026",
+  "supplier_name": "Garde-Kohli",
+  "supplier_gstin": "09PZHCG6958K8ZU",
+  "line_items": [
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 180,
+      "rate": 2172.13,
+      "amount": 390983.4
+    }
+  ],
+  "taxable_value": 390983.4,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 46918.01,
+  "total": 437901.41,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

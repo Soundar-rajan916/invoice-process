@@ -188,9 +188,27 @@ async def test_invoice_reject_and_request_resend(
     reviewer_client: AsyncClient, db_session: AsyncSession
 ):
     """Test POST /api/v1/invoices/{id}/reject and /request-resend."""
-    inv1 = Invoice(id=uuid.uuid4(), source_file_id=uuid.uuid4(), status="NEEDS_REVIEW")
-    inv2 = Invoice(id=uuid.uuid4(), source_file_id=uuid.uuid4(), status="NEEDS_REVIEW")
-    db_session.add_all([inv1, inv2])
+    sf1 = SourceFile(
+        id=uuid.uuid4(),
+        sha256="s1_hash",
+        original_filename="f1.pdf",
+        content_type="application/pdf",
+        size_bytes=10,
+        storage_key="k1",
+        source="upload",
+    )
+    sf2 = SourceFile(
+        id=uuid.uuid4(),
+        sha256="s2_hash",
+        original_filename="f2.pdf",
+        content_type="application/pdf",
+        size_bytes=10,
+        storage_key="k2",
+        source="upload",
+    )
+    inv1 = Invoice(id=uuid.uuid4(), source_file_id=sf1.id, status="NEEDS_REVIEW")
+    inv2 = Invoice(id=uuid.uuid4(), source_file_id=sf2.id, status="NEEDS_REVIEW")
+    db_session.add_all([sf1, sf2, inv1, inv2])
     await db_session.flush()
 
     # Reject without reason -> 422/400
@@ -208,8 +226,8 @@ async def test_invoice_reject_and_request_resend(
         headers={"X-Requested-With": "XMLHttpRequest"},
     )
     assert r_ok.status_code == 200
-    await db_session.refresh(inv1)
-    assert inv1.status == "REJECTED"
+    inv1_db = await db_session.get(Invoice, inv1.id)
+    assert inv1_db.status == "REJECTED"
 
     # Request resend
     resend_ok = await reviewer_client.post(
@@ -218,8 +236,56 @@ async def test_invoice_reject_and_request_resend(
         headers={"X-Requested-With": "XMLHttpRequest"},
     )
     assert resend_ok.status_code == 200
-    await db_session.refresh(inv2)
-    assert inv2.status == "RESEND_REQUESTED"
+    inv2_db = await db_session.get(Invoice, inv2.id)
+    assert inv2_db.status == "RESEND_REQUESTED"
+
+    # Test Cancel Resend
+    cancel_resp = await reviewer_client.post(
+        f"/api/v1/invoices/{inv2.id}/cancel-resend",
+        headers={"X-Requested-With": "XMLHttpRequest"},
+    )
+    assert cancel_resp.status_code == 200
+    inv2_db = await db_session.get(Invoice, inv2.id)
+    assert inv2_db.status == "NEEDS_REVIEW"
+
+    # Cancel resend again -> 400
+    cancel_fail = await reviewer_client.post(
+        f"/api/v1/invoices/{inv2.id}/cancel-resend",
+        headers={"X-Requested-With": "XMLHttpRequest"},
+    )
+    assert cancel_fail.status_code == 400
+
+    # Put back in RESEND_REQUESTED
+    await reviewer_client.post(
+        f"/api/v1/invoices/{inv2.id}/request-resend",
+        json={"reason": "Blurry lines"},
+        headers={"X-Requested-With": "XMLHttpRequest"},
+    )
+    inv2_db = await db_session.get(Invoice, inv2.id)
+    assert inv2_db.status == "RESEND_REQUESTED"
+
+    inv2_id = inv2.id
+    # Test Upload Replacement
+    with patch("app.core.storage.storage_service.upload_bytes"):
+        fake_pdf = b"%PDF-1.4 header and mock content for replacement"
+        files = {"file": ("replacement.pdf", fake_pdf, "application/pdf")}
+        upload_resp = await reviewer_client.post(
+            f"/api/v1/invoices/{inv2_id}/upload-replacement",
+            files=files,
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        assert upload_resp.status_code == 200
+        db_session.expire_all()
+        inv2_db = await db_session.get(Invoice, inv2_id)
+        assert inv2_db.status in ("RECEIVED", "NEEDS_REVIEW", "PROCESSING")
+
+    # Verify audit trail logs the resend lifecycle actions
+    audit_resp = await reviewer_client.get(f"/api/v1/invoices/{inv2_id}/audit")
+    assert audit_resp.status_code == 200
+    actions = [e["action"] for e in audit_resp.json()]
+    assert "request_resend" in actions
+    assert "cancel_resend" in actions
+    assert "resend_fulfilled" in actions
 
 
 @pytest.mark.asyncio
@@ -514,13 +580,17 @@ async def test_direct_invoice_router_functions(db_session: AsyncSession, reviewe
         )
         assert appr["status"] == "APPROVED"
 
-    # 5. reject_invoice
+    # 5. reject_invoice (requires NEEDS_REVIEW)
+    inv.status = "NEEDS_REVIEW"
+    await db_session.flush()
     rej = await reject_invoice(
         inv.id, ReasonRequest(reason="Damaged copy"), user=reviewer_user, db=db_session, _=None
     )
     assert rej["message"] == "Invoice rejected"
 
-    # 6. request_resend_invoice
+    # 6. request_resend_invoice (requires NEEDS_REVIEW)
+    inv.status = "NEEDS_REVIEW"
+    await db_session.flush()
     resend = await request_resend_invoice(
         inv.id,
         ReasonRequest(reason="Please resend clean image"),

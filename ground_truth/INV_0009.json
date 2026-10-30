@@ -1,0 +1,374 @@
+{
+  "file": "INV_0009.pdf",
+  "layout": "banner",
+  "pages": 2,
+  "invoice_number": "GST002300",
+  "invoice_date": "2026-07-16",
+  "invoice_date_printed": "16-Jul-26",
+  "supplier_name": "Khanna, Upadhyay and Biswas",
+  "supplier_gstin": "37WERCK8905M7ZN",
+  "line_items": [
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 122,
+      "rate": 1477.68,
+      "amount": 180276.96
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 178,
+      "rate": 2227.67,
+      "amount": 396525.26
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 172,
+      "rate": 2227.08,
+      "amount": 383057.76
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 199,
+      "rate": 241.87,
+      "amount": 48132.13
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 57,
+      "rate": 2218.9,
+      "amount": 126477.3
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 181,
+      "rate": 2165.6,
+      "amount": 391973.6
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 157,
+      "rate": 164.71,
+      "amount": 25859.47
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 119,
+      "rate": 223.81,
+      "amount": 26633.39
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Grade B",
+      "quantity": 198,
+      "rate": 207.56,
+      "amount": 41096.88
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 95,
+      "rate": 1039.58,
+      "amount": 98760.1
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 145,
+      "rate": 822.69,
+      "amount": 119290.05
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 138,
+      "rate": 365.16,
+      "amount": 50392.08
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 183,
+      "rate": 193.24,
+      "amount": 35362.92
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 114,
+      "rate": 348.48,
+      "amount": 39726.72
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 118,
+      "rate": 3999.1,
+      "amount": 471893.8
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Premium",
+      "quantity": 11,
+      "rate": 152.27,
+      "amount": 1674.97
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 67,
+      "rate": 204.2,
+      "amount": 13681.4
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 115,
+      "rate": 628.39,
+      "amount": 72264.85
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Grade A",
+      "quantity": 2,
+      "rate": 1208.0,
+      "amount": 2416.0
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Economy",
+      "quantity": 163,
+      "rate": 177.61,
+      "amount": 28950.43
+    },
+    {
+      "description": "Tea Powder 1 kg pack - Economy",
+      "quantity": 101,
+      "rate": 583.67,
+      "amount": 58950.67
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Retail",
+      "quantity": 176,
+      "rate": 4103.82,
+      "amount": 722272.32
+    },
+    {
+      "description": "Plastic Bucket 20 L - Type 2",
+      "quantity": 82,
+      "rate": 168.43,
+      "amount": 13811.26
+    },
+    {
+      "description": "Detergent Powder 5 kg - Grade A",
+      "quantity": 122,
+      "rate": 604.28,
+      "amount": 73722.16
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 194,
+      "rate": 1906.8,
+      "amount": 369919.2
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Bulk",
+      "quantity": 174,
+      "rate": 836.97,
+      "amount": 145632.78
+    },
+    {
+      "description": "Detergent Powder 5 kg - Type 2",
+      "quantity": 159,
+      "rate": 637.84,
+      "amount": 101416.56
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Type 2",
+      "quantity": 48,
+      "rate": 2541.92,
+      "amount": 122012.16
+    },
+    {
+      "description": "Cement 50 kg bag - Grade B",
+      "quantity": 178,
+      "rate": 426.25,
+      "amount": 75872.5
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 197,
+      "rate": 1809.37,
+      "amount": 356445.89
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Retail",
+      "quantity": 124,
+      "rate": 2329.49,
+      "amount": 288856.76
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Type 2",
+      "quantity": 71,
+      "rate": 163.06,
+      "amount": 11577.26
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Type 1",
+      "quantity": 64,
+      "rate": 752.11,
+      "amount": 48135.04
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 199,
+      "rate": 519.79,
+      "amount": 103438.21
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Type 2",
+      "quantity": 78,
+      "rate": 195.69,
+      "amount": 15263.82
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 161,
+      "rate": 462.46,
+      "amount": 74456.06
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Grade B",
+      "quantity": 160,
+      "rate": 988.06,
+      "amount": 158089.6
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 189,
+      "rate": 182.03,
+      "amount": 34403.67
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Grade B",
+      "quantity": 132,
+      "rate": 2199.35,
+      "amount": 290314.2
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Premium",
+      "quantity": 200,
+      "rate": 206.87,
+      "amount": 41374.0
+    },
+    {
+      "description": "Detergent Powder 5 kg - Bulk",
+      "quantity": 145,
+      "rate": 579.96,
+      "amount": 84094.2
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Type 2",
+      "quantity": 125,
+      "rate": 491.25,
+      "amount": 61406.25
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Grade A",
+      "quantity": 34,
+      "rate": 202.69,
+      "amount": 6891.46
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 97,
+      "rate": 1440.01,
+      "amount": 139680.97
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Grade B",
+      "quantity": 54,
+      "rate": 508.4,
+      "amount": 27453.6
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Bulk",
+      "quantity": 18,
+      "rate": 153.67,
+      "amount": 2766.06
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Grade A",
+      "quantity": 155,
+      "rate": 307.43,
+      "amount": 47651.65
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Economy",
+      "quantity": 35,
+      "rate": 3289.36,
+      "amount": 115127.6
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Premium",
+      "quantity": 174,
+      "rate": 1547.69,
+      "amount": 269298.06
+    },
+    {
+      "description": "Extension Board 4-socket - Type 2",
+      "quantity": 16,
+      "rate": 276.48,
+      "amount": 4423.68
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Premium",
+      "quantity": 64,
+      "rate": 711.38,
+      "amount": 45528.32
+    },
+    {
+      "description": "Extension Board 4-socket - Retail",
+      "quantity": 74,
+      "rate": 401.47,
+      "amount": 29708.78
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Type 1",
+      "quantity": 36,
+      "rate": 155.78,
+      "amount": 5608.08
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Premium",
+      "quantity": 83,
+      "rate": 1653.46,
+      "amount": 137237.18
+    },
+    {
+      "description": "Plastic Bucket 20 L - Bulk",
+      "quantity": 89,
+      "rate": 195.8,
+      "amount": 17426.2
+    },
+    {
+      "description": "Extension Board 4-socket - Type 1",
+      "quantity": 39,
+      "rate": 305.64,
+      "amount": 11919.96
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 153,
+      "rate": 268.1,
+      "amount": 41019.3
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Premium",
+      "quantity": 133,
+      "rate": 841.03,
+      "amount": 111856.99
+    },
+    {
+      "description": "Detergent Powder 5 kg - Grade B",
+      "quantity": 46,
+      "rate": 568.23,
+      "amount": 26138.58
+    }
+  ],
+  "taxable_value": 6845647.11,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 1232216.48,
+  "total": 8077863.59,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

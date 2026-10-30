@@ -25,6 +25,11 @@ class SupplierCreateRequest(BaseModel):
     state_code: str | None = None
 
 
+class SupplierUpdateRequest(BaseModel):
+    name: str | None = None
+    is_active: bool | None = None
+
+
 class UserCreateRequest(BaseModel):
     email: str
     password: str = Field(min_length=6)
@@ -93,6 +98,33 @@ async def create_supplier(
         "name": supplier.name,
         "state_code": supplier.state_code,
         "is_active": supplier.is_active,
+    }
+
+
+@router.patch("/suppliers/{supplier_id}")
+async def update_supplier(
+    supplier_id: uuid.UUID,
+    req: SupplierUpdateRequest,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, Any]:
+    target_supplier = await db.get(Supplier, supplier_id)
+    if not target_supplier:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+
+    if req.name is not None:
+        target_supplier.name = req.name.strip()
+    if req.is_active is not None:
+        target_supplier.is_active = req.is_active
+
+    await db.commit()
+    return {
+        "id": str(target_supplier.id),
+        "gstin": target_supplier.gstin,
+        "name": target_supplier.name,
+        "state_code": target_supplier.state_code,
+        "is_active": target_supplier.is_active,
     }
 
 

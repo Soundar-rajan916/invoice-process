@@ -1,0 +1,56 @@
+{
+  "file": "INV_0094.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "S/25-26/6250",
+  "invoice_date": "2025-11-10",
+  "invoice_date_printed": "10 Nov 2025",
+  "supplier_name": "Shere-Kumer",
+  "supplier_gstin": "24SYIFS3046E8ZE",
+  "line_items": [
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 175,
+      "rate": 772.06,
+      "amount": 135110.5
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 83,
+      "rate": 2298.53,
+      "amount": 190777.99
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 62,
+      "rate": 228.22,
+      "amount": 14149.64
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 31,
+      "rate": 210.35,
+      "amount": 6520.85
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 163,
+      "rate": 178.14,
+      "amount": 29036.82
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Bulk",
+      "quantity": 196,
+      "rate": 1933.18,
+      "amount": 378903.28
+    }
+  ],
+  "taxable_value": 754499.08,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 37724.95,
+  "total": 792224.03,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

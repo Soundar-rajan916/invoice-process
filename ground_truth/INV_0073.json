@@ -1,0 +1,38 @@
+{
+  "file": "INV_0073.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "C25073",
+  "invoice_date": "2025-12-28",
+  "invoice_date_printed": "28-12-2025",
+  "supplier_name": "Chand-Nanda",
+  "supplier_gstin": "09IPQCC9904Y6ZY",
+  "line_items": [
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 145,
+      "rate": 439.58,
+      "amount": 63739.1
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 65,
+      "rate": 247.41,
+      "amount": 16081.65
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 4,
+      "rate": 582.48,
+      "amount": 2329.92
+    }
+  ],
+  "taxable_value": 82150.67,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 9858.08,
+  "total": 92008.75,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

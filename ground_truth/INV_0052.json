@@ -1,0 +1,50 @@
+{
+  "file": "INV_0052.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI-9087",
+  "invoice_date": "2026-08-13",
+  "invoice_date_printed": "13/08/2026",
+  "supplier_name": "Tiwari, Zacharia and Viswanathan",
+  "supplier_gstin": "03DARFT8464D2ZS",
+  "line_items": [
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 40,
+      "rate": 140.81,
+      "amount": 5632.4
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 137,
+      "rate": 736.58,
+      "amount": 100911.46
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 25,
+      "rate": 237.08,
+      "amount": 5927.0
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 34,
+      "rate": 2422.85,
+      "amount": 82376.9
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 182,
+      "rate": 2003.3,
+      "amount": 364600.6
+    }
+  ],
+  "taxable_value": 559448.36,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 100700.7,
+  "total": 660149.06,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

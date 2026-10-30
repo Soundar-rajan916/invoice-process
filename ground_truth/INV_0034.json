@@ -1,0 +1,68 @@
+{
+  "file": "INV_0034.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "GST008446",
+  "invoice_date": "2026-08-04",
+  "invoice_date_printed": "04-Aug-26",
+  "supplier_name": "Mahajan Ltd",
+  "supplier_gstin": "03LRGFM2154S5ZM",
+  "line_items": [
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 156,
+      "rate": 187.14,
+      "amount": 29193.84
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 166,
+      "rate": 458.47,
+      "amount": 76106.02
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 46,
+      "rate": 191.86,
+      "amount": 8825.56
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 61,
+      "rate": 312.23,
+      "amount": 19046.03
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 106,
+      "rate": 2014.89,
+      "amount": 213578.34
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 34,
+      "rate": 121.45,
+      "amount": 4129.3
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 133,
+      "rate": 181.43,
+      "amount": 24130.19
+    },
+    {
+      "description": "Steel Padlock 50 mm - Retail",
+      "quantity": 86,
+      "rate": 149.17,
+      "amount": 12828.62
+    }
+  ],
+  "taxable_value": 387837.9,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 19391.9,
+  "total": 407229.8,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

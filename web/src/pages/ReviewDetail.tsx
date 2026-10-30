@@ -218,7 +218,7 @@ export function ReviewDetail() {
           field_confidence: invoice?.current_extraction?.field_confidence || {},
           unreadable_fields: [],
         },
-        row_version: invoice.row_version,
+        row_version: invoice?.row_version ?? 1,
       };
       return apiRequest(`/api/v1/invoices/${id}/fields`, {
         method: "PATCH",
@@ -244,7 +244,7 @@ export function ReviewDetail() {
       return apiRequest(`/api/v1/invoices/${id}/approve`, {
         method: "POST",
         body: JSON.stringify({
-          row_version: invoice.row_version,
+          row_version: invoice?.row_version ?? 1,
           override_reason: overrideReason || null,
         }),
       });
@@ -328,10 +328,29 @@ export function ReviewDetail() {
     );
   }
 
-  const pageUrls = invoice?.pages || [];
+  if (!isLoading && !invoice) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-500">
+        <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
+        <p className="text-sm font-semibold">Invoice not found or could not be loaded.</p>
+        <button
+          onClick={() => navigate("/queue")}
+          className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold"
+        >
+          Back to Queue
+        </button>
+      </div>
+    );
+  }
+
+  const rawPages = invoice?.pages || [];
+  const pageUrls = rawPages.map((p: any, idx: number) =>
+    typeof p === "string" ? { page_number: idx + 1, url: p } : p
+  );
   const currentPageImage =
     pageUrls.find((p: any) => p.page_number === activePage)?.url ||
-    pageUrls[0]?.url;
+    pageUrls[0]?.url ||
+    "";
 
   return (
     <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-slate-100">
@@ -448,75 +467,74 @@ export function ReviewDetail() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Pane: Document Viewer with Zoom/Pan/Rotate */}
         <div className="w-1/2 flex flex-col bg-slate-900 border-r border-slate-800 relative">
-          {/* Viewer Controls Floating Toolbar */}
-          <div className="absolute top-4 left-4 z-20 flex items-center space-x-1.5 bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-white shadow-lg">
-            <TransformWrapper
-              initialScale={1}
-              minScale={0.5}
-              maxScale={4}
-              centerOnInit
-            >
-              {({ zoomIn, zoomOut, resetTransform }) => (
-                <div className="flex items-center space-x-2 text-xs">
-                  <button
-                    onClick={() => zoomIn()}
-                    className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
-                    title="Zoom in"
-                  >
-                    <ZoomIn className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => zoomOut()}
-                    className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
-                    title="Zoom out"
-                  >
-                    <ZoomOut className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => resetTransform()}
-                    className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
-                    title="Reset view"
-                  >
-                    <Maximize2 className="h-4 w-4" />
-                  </button>
-                  <div className="h-4 w-px bg-slate-600 mx-1" />
-                  <button
-                    onClick={() => setRotation((r) => (r + 90) % 360)}
-                    className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
-                    title="Rotate 90°"
-                  >
-                    <RotateCw className="h-4 w-4" />
-                  </button>
+          <TransformWrapper
+            initialScale={1}
+            minScale={0.5}
+            maxScale={4}
+            centerOnInit
+          >
+            {({ zoomIn, zoomOut, resetTransform }) => (
+              <>
+                {/* Viewer Controls Floating Toolbar */}
+                <div className="absolute top-4 left-4 z-20 flex items-center space-x-1.5 bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-white shadow-lg">
+                  <div className="flex items-center space-x-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => zoomIn()}
+                      className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
+                      title="Zoom in"
+                    >
+                      <ZoomIn className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => zoomOut()}
+                      className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
+                      title="Zoom out"
+                    >
+                      <ZoomOut className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => resetTransform()}
+                      className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
+                      title="Reset view"
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </button>
+                    <div className="h-4 w-px bg-slate-600 mx-1" />
+                    <button
+                      type="button"
+                      onClick={() => setRotation((r) => (r + 90) % 360)}
+                      className="p-1 hover:bg-slate-700 rounded text-slate-200 hover:text-white"
+                      title="Rotate 90°"
+                    >
+                      <RotateCw className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-              )}
-            </TransformWrapper>
-          </div>
 
-          {/* Interactive Document Pan/Zoom Component */}
-          <div className="flex-1 flex items-center justify-center overflow-hidden">
-            <TransformWrapper
-              initialScale={1}
-              minScale={0.5}
-              maxScale={4}
-              centerOnInit
-            >
-              <TransformComponent
-                wrapperClass="!w-full !h-full"
-                contentClass="!w-full !h-full flex items-center justify-center"
-              >
-                {currentPageImage ? (
-                  <img
-                    src={currentPageImage}
-                    alt={`Invoice page ${activePage}`}
-                    style={{ transform: `rotate(${rotation}deg)` }}
-                    className="max-h-full max-w-full object-contain shadow-2xl transition-transform duration-200 select-none"
-                  />
-                ) : (
-                  <div className="text-slate-500 text-sm">No page image available</div>
-                )}
-              </TransformComponent>
-            </TransformWrapper>
-          </div>
+                {/* Interactive Document Pan/Zoom Component */}
+                <div className="flex-1 flex items-center justify-center overflow-hidden">
+                  <TransformComponent
+                    wrapperClass="!w-full !h-full"
+                    contentClass="!w-full !h-full flex items-center justify-center"
+                  >
+                    {currentPageImage ? (
+                      <img
+                        src={currentPageImage}
+                        alt={`Invoice page ${activePage}`}
+                        style={{ transform: `rotate(${rotation}deg)` }}
+                        className="max-h-full max-w-full object-contain shadow-2xl transition-transform duration-200 select-none"
+                      />
+                    ) : (
+                      <div className="text-slate-500 text-sm">No page image available</div>
+                    )}
+                  </TransformComponent>
+                </div>
+              </>
+            )}
+          </TransformWrapper>
 
           {/* Bottom Page Thumbnail Switcher (R1 multi-page support) */}
           {pageUrls.length > 1 && (

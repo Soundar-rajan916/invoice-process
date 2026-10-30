@@ -23,6 +23,8 @@ target_metadata = Base.metadata
 def get_url() -> str:
     # Use sync or async connection depending on mode
     url = settings.DATABASE_URL
+    if "sqlite" in url:
+        return url
     if "+asyncpg" in url:
         return url
     return url.replace("postgresql://", "postgresql+asyncpg://")

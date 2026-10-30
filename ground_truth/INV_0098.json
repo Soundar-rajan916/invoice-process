@@ -1,0 +1,388 @@
+{
+  "file": "INV_0098.pdf",
+  "layout": "banner",
+  "pages": 2,
+  "invoice_number": "INV-2026-08803",
+  "invoice_date": "2026-01-19",
+  "invoice_date_printed": "19 Jan 2026",
+  "supplier_name": "Andra Group",
+  "supplier_gstin": "19OBCCA2769S6ZB",
+  "line_items": [
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 99,
+      "rate": 221.0,
+      "amount": 21879.0
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 28,
+      "rate": 358.17,
+      "amount": 10028.76
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 17,
+      "rate": 2064.58,
+      "amount": 35097.86
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 36,
+      "rate": 138.53,
+      "amount": 4987.08
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 91,
+      "rate": 160.2,
+      "amount": 14578.2
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 7,
+      "rate": 468.84,
+      "amount": 3281.88
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 58,
+      "rate": 482.89,
+      "amount": 28007.62
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 194,
+      "rate": 196.68,
+      "amount": 38155.92
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 94,
+      "rate": 1666.29,
+      "amount": 156631.26
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 197,
+      "rate": 2405.29,
+      "amount": 473842.13
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 97,
+      "rate": 2375.21,
+      "amount": 230395.37
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 111,
+      "rate": 383.18,
+      "amount": 42532.98
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Premium",
+      "quantity": 58,
+      "rate": 2204.4,
+      "amount": 127855.2
+    },
+    {
+      "description": "Cement 50 kg bag - Bulk",
+      "quantity": 53,
+      "rate": 341.16,
+      "amount": 18081.48
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 138,
+      "rate": 2182.23,
+      "amount": 301147.74
+    },
+    {
+      "description": "Sugar 50 kg bag - Type 1",
+      "quantity": 200,
+      "rate": 2349.62,
+      "amount": 469924.0
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 147,
+      "rate": 231.28,
+      "amount": 33998.16
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Economy",
+      "quantity": 142,
+      "rate": 158.53,
+      "amount": 22511.26
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 5,
+      "rate": 302.09,
+      "amount": 1510.45
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 151,
+      "rate": 2214.71,
+      "amount": 334421.21
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 169,
+      "rate": 914.66,
+      "amount": 154577.54
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Retail",
+      "quantity": 83,
+      "rate": 392.16,
+      "amount": 32549.28
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Grade A",
+      "quantity": 63,
+      "rate": 254.02,
+      "amount": 16003.26
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Premium",
+      "quantity": 189,
+      "rate": 285.71,
+      "amount": 53999.19
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Bulk",
+      "quantity": 133,
+      "rate": 298.98,
+      "amount": 39764.34
+    },
+    {
+      "description": "Sugar 50 kg bag - Grade A",
+      "quantity": 123,
+      "rate": 2346.26,
+      "amount": 288589.98
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Grade B",
+      "quantity": 104,
+      "rate": 187.5,
+      "amount": 19500.0
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Type 1",
+      "quantity": 89,
+      "rate": 1529.13,
+      "amount": 136092.57
+    },
+    {
+      "description": "Extension Board 4-socket - Grade A",
+      "quantity": 180,
+      "rate": 268.94,
+      "amount": 48409.2
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 88,
+      "rate": 225.54,
+      "amount": 19847.52
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Premium",
+      "quantity": 108,
+      "rate": 152.98,
+      "amount": 16521.84
+    },
+    {
+      "description": "Extension Board 4-socket - Economy",
+      "quantity": 1,
+      "rate": 378.81,
+      "amount": 378.81
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 13,
+      "rate": 1433.39,
+      "amount": 18634.07
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Type 1",
+      "quantity": 196,
+      "rate": 223.91,
+      "amount": 43886.36
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Type 2",
+      "quantity": 70,
+      "rate": 1613.95,
+      "amount": 112976.5
+    },
+    {
+      "description": "Extension Board 4-socket - Type 1",
+      "quantity": 97,
+      "rate": 314.36,
+      "amount": 30492.92
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Economy",
+      "quantity": 46,
+      "rate": 1809.56,
+      "amount": 83239.76
+    },
+    {
+      "description": "Plastic Bucket 20 L - Retail",
+      "quantity": 108,
+      "rate": 156.31,
+      "amount": 16881.48
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Economy",
+      "quantity": 196,
+      "rate": 318.65,
+      "amount": 62455.4
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets) - Premium",
+      "quantity": 144,
+      "rate": 307.94,
+      "amount": 44343.36
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Economy",
+      "quantity": 69,
+      "rate": 1572.49,
+      "amount": 108501.81
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 105,
+      "rate": 4098.72,
+      "amount": 430365.6
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Retail",
+      "quantity": 59,
+      "rate": 2072.5,
+      "amount": 122277.5
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 36,
+      "rate": 180.81,
+      "amount": 6509.16
+    },
+    {
+      "description": "Extension Board 4-socket - Grade B",
+      "quantity": 150,
+      "rate": 314.74,
+      "amount": 47211.0
+    },
+    {
+      "description": "Steel Padlock 50 mm - Bulk",
+      "quantity": 135,
+      "rate": 130.59,
+      "amount": 17629.65
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Economy",
+      "quantity": 140,
+      "rate": 198.44,
+      "amount": 27781.6
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Economy",
+      "quantity": 142,
+      "rate": 1174.39,
+      "amount": 166763.38
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Premium",
+      "quantity": 12,
+      "rate": 2022.3,
+      "amount": 24339.6
+    },
+    {
+      "description": "Plastic Bucket 20 L - Type 1",
+      "quantity": 41,
+      "rate": 155.78,
+      "amount": 6386.98
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Premium",
+      "quantity": 137,
+      "rate": 917.13,
+      "amount": 125646.81
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Grade B",
+      "quantity": 49,
+      "rate": 4043.3,
+      "amount": 198121.7
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Retail",
+      "quantity": 172,
+      "rate": 1436.64,
+      "amount": 247102.08
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 144,
+      "rate": 869.74,
+      "amount": 125242.56
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Bulk",
+      "quantity": 177,
+      "rate": 1610.19,
+      "amount": 285003.63
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Type 2",
+      "quantity": 103,
+      "rate": 1872.34,
+      "amount": 192851.02
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Retail",
+      "quantity": 1,
+      "rate": 4006.95,
+      "amount": 4006.95
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Grade B",
+      "quantity": 180,
+      "rate": 289.79,
+      "amount": 52162.2
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Type 2",
+      "quantity": 163,
+      "rate": 261.3,
+      "amount": 42591.9
+    },
+    {
+      "description": "Sugar 50 kg bag - Type 2",
+      "quantity": 180,
+      "rate": 2182.99,
+      "amount": 392938.2
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets) - Economy",
+      "quantity": 94,
+      "rate": 298.25,
+      "amount": 28035.5
+    }
+  ],
+  "taxable_value": 6259407.77,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 751128.93,
+  "total": 7010536.7,
+  "gstin_valid": true,
+  "expected_flags": [
+    "line_amount_mismatch"
+  ],
+  "duplicate_of": null
+}

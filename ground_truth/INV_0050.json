@@ -1,0 +1,68 @@
+{
+  "file": "INV_0050.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "VNA/26-27/0865",
+  "invoice_date": "2026-09-17",
+  "invoice_date_printed": "17-Sep-26",
+  "supplier_name": "Virk, Nagar and Tata",
+  "supplier_gstin": "08VJYFV0268W8ZD",
+  "line_items": [
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 117,
+      "rate": 3212.0,
+      "amount": 375804.0
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 116,
+      "rate": 2467.81,
+      "amount": 286265.96
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 63,
+      "rate": 688.76,
+      "amount": 43391.88
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 28,
+      "rate": 285.73,
+      "amount": 8000.44
+    },
+    {
+      "description": "Sugar 50 kg bag - Grade B",
+      "quantity": 198,
+      "rate": 2125.46,
+      "amount": 420841.08
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 154,
+      "rate": 194.63,
+      "amount": 29973.02
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 71,
+      "rate": 1285.84,
+      "amount": 91294.64
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 133,
+      "rate": 484.89,
+      "amount": 64490.37
+    }
+  ],
+  "taxable_value": 1320061.39,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 369617.19,
+  "total": 1689678.58,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

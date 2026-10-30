@@ -1,0 +1,68 @@
+{
+  "file": "INV_0029.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "SI-969",
+  "invoice_date": "2026-09-28",
+  "invoice_date_printed": "28-Sep-26",
+  "supplier_name": "Sunder, Saini and Lalla",
+  "supplier_gstin": "09SHZFS6682Q9ZI",
+  "line_items": [
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 73,
+      "rate": 2043.17,
+      "amount": 149151.41
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 103,
+      "rate": 285.68,
+      "amount": 29425.04
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 156,
+      "rate": 1824.03,
+      "amount": 284548.68
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 108,
+      "rate": 1585.04,
+      "amount": 171184.32
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Economy",
+      "quantity": 191,
+      "rate": 2186.45,
+      "amount": 417611.95
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 131,
+      "rate": 941.84,
+      "amount": 123381.04
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 180,
+      "rate": 134.32,
+      "amount": 24177.6
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 41,
+      "rate": 178.28,
+      "amount": 7309.48
+    }
+  ],
+  "taxable_value": 1206789.52,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 337901.07,
+  "total": 1544690.59,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

@@ -1,0 +1,56 @@
+{
+  "file": "INV_0019.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "SI-9070",
+  "invoice_date": "2026-01-01",
+  "invoice_date_printed": "2026-01-01",
+  "supplier_name": "Handa PLC",
+  "supplier_gstin": "03WCCFH4501O9ZO",
+  "line_items": [
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 156,
+      "rate": 667.58,
+      "amount": 104142.48
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 18,
+      "rate": 293.64,
+      "amount": 5285.52
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Type 2",
+      "quantity": 159,
+      "rate": 294.06,
+      "amount": 46755.54
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 191,
+      "rate": 1871.3,
+      "amount": 357418.3
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 65,
+      "rate": 2050.62,
+      "amount": 133290.3
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 40,
+      "rate": 470.97,
+      "amount": 18838.8
+    }
+  ],
+  "taxable_value": 665730.94,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 79887.71,
+  "total": 745618.65,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

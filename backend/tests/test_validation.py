@@ -105,6 +105,59 @@ def test_validation_rule_total_mismatch():
     assert "total_mismatch" in codes
 
 
+def test_validation_rule_total_mismatch_one_rupee_difference():
+    # Real case from BAS25094: 9596.88 + 1151.63 = 10748.51, but total on invoice is 10747.51 (diff: 1.00)
+    ext = InvoiceExtraction(
+        invoice_number="BAS25094",
+        invoice_date=date.today(),
+        supplier_name="Bhasin and Sons",
+        supplier_gstin="07UZHCB9097D7ZA",
+        line_items=[
+            LineItem(
+                description="Steel Padlock 50 mm",
+                quantity=Decimal("72.00"),
+                rate=Decimal("133.29"),
+                amount=Decimal("9596.88"),
+            )
+        ],
+        taxable_value=Decimal("9596.88"),
+        igst=Decimal("1151.63"),
+        total=Decimal("10747.51"),
+    )
+    issues = validate_extraction(ext)
+    codes = [i.code for i in issues]
+    assert "total_mismatch" in codes
+    mismatch_issue = next(i for i in issues if i.code == "total_mismatch")
+    assert "diff: ₹1.00" in mismatch_issue.message
+
+
+def test_validation_rule_total_mismatch_one_paise_strict():
+    # Real case from GST3496: 306260.22 + 18375.61 + 18375.61 = 343011.44, but total is 343011.43 (diff: 0.01)
+    ext = InvoiceExtraction(
+        invoice_number="GST3496",
+        invoice_date=date.today(),
+        supplier_name="Acme",
+        supplier_gstin="27AAPFU0939F1ZV",
+        line_items=[
+            LineItem(
+                description="Test Item",
+                quantity=Decimal("1.00"),
+                rate=Decimal("306260.22"),
+                amount=Decimal("306260.22"),
+            )
+        ],
+        taxable_value=Decimal("306260.22"),
+        cgst=Decimal("18375.61"),
+        sgst=Decimal("18375.61"),
+        total=Decimal("343011.43"),  # Expected: 343011.44 (diff: 0.01)
+    )
+    issues = validate_extraction(ext)
+    codes = [i.code for i in issues]
+    assert "total_mismatch" in codes
+    mismatch_issue = next(i for i in issues if i.code == "total_mismatch")
+    assert "diff: ₹0.01" in mismatch_issue.message
+
+
 def test_validation_rule_gstin_checksum():
     ext = InvoiceExtraction(
         invoice_number="INV1",

@@ -1,0 +1,44 @@
+{
+  "file": "INV_0083.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI-5214",
+  "invoice_date": "2025-12-01",
+  "invoice_date_printed": "01/12/2025",
+  "supplier_name": "Bath LLC",
+  "supplier_gstin": "36LUQCB8774U2ZR",
+  "line_items": [
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 127,
+      "rate": 311.81,
+      "amount": 39599.87
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 162,
+      "rate": 494.81,
+      "amount": 80159.22
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 199,
+      "rate": 233.78,
+      "amount": 46522.22
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 50,
+      "rate": 182.96,
+      "amount": 9148.0
+    }
+  ],
+  "taxable_value": 175429.31,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 49120.21,
+  "total": 224549.52,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

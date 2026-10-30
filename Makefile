@@ -1,4 +1,4 @@
-.PHONY: help up down logs migrate seed seed-admin check test eval gen-data lint typecheck frontend-test
+.PHONY: help up down logs migrate seed seed-admin seed-suppliers check test eval gen-data lint typecheck frontend-test
 
 PYTHON := .venv/bin/python
 ifeq ($(OS),Windows_NT)
@@ -32,6 +32,9 @@ migrate:
 
 seed-admin:
 	$(PYTHON) -m backend.app.cli.seed_admin
+
+seed-suppliers:
+	$(PYTHON) -m backend.app.cli.seed_suppliers --manifest manifest.jsonl
 
 gen-data:
 	$(PYTHON) tools/generate_invoices.py --count 100 --out data/synthetic --seed 42 --faulty-ratio 0.10 --duplicates 5 --multipage-ratio 0.15

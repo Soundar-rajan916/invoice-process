@@ -1,0 +1,50 @@
+{
+  "file": "INV_0018.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "NAA26018",
+  "invoice_date": "2026-01-23",
+  "invoice_date_printed": "23-Jan-26",
+  "supplier_name": "Nadkarni, Agate and Raj",
+  "supplier_gstin": "27XLSCN6468S2ZR",
+  "line_items": [
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 34,
+      "rate": 144.33,
+      "amount": 4907.22
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 166,
+      "rate": 2257.12,
+      "amount": 374681.92
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Bulk",
+      "quantity": 81,
+      "rate": 2032.55,
+      "amount": 164636.55
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 70,
+      "rate": 1585.98,
+      "amount": 111018.6
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 153,
+      "rate": 688.23,
+      "amount": 105299.19
+    }
+  ],
+  "taxable_value": 760543.48,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 136897.83,
+  "total": 897441.31,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

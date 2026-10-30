@@ -21,7 +21,15 @@ class StorageService:
 
         self._client: Any = None
         self._s3_available: bool | None = None
-        self._local_fallback_dir = Path("data/storage_fallback")
+        # Support both Docker (/app/data/storage_fallback) and local host dev (./data/storage_fallback)
+        if Path("/app/data/storage_fallback").exists() or Path("/app/data").exists():
+            self._local_fallback_dir = Path("/app/data/storage_fallback")
+        else:
+            self._local_fallback_dir = (
+                Path(__file__).resolve().parent.parent.parent.parent / "data" / "storage_fallback"
+            )
+            if not self._local_fallback_dir.exists():
+                self._local_fallback_dir = Path("data/storage_fallback").resolve()
 
     @property
     def client(self) -> Any:

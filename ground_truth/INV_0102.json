@@ -1,0 +1,52 @@
+{
+  "file": "INV_0102.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "SI-1095",
+  "invoice_date": "2026-06-07",
+  "invoice_date_printed": "07-06-2026",
+  "supplier_name": "Bhatnagar, Yadav and Agarwal",
+  "supplier_gstin": "08KHQCB8878P8ZH",
+  "line_items": [
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 61,
+      "rate": 1341.43,
+      "amount": 81827.23
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 110,
+      "rate": 207.08,
+      "amount": 22778.8
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 143,
+      "rate": 1495.45,
+      "amount": 213849.35
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 190,
+      "rate": 332.15,
+      "amount": 63108.5
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 41,
+      "rate": 1649.04,
+      "amount": 67610.64
+    }
+  ],
+  "taxable_value": 449174.52,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 53900.94,
+  "total": 503075.46,
+  "gstin_valid": true,
+  "expected_flags": [
+    "duplicate"
+  ],
+  "duplicate_of": "INV_0071"
+}

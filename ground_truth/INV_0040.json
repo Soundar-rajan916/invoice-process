@@ -1,0 +1,68 @@
+{
+  "file": "INV_0040.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "BDA/26-27/4201",
+  "invoice_date": "2026-02-02",
+  "invoice_date_printed": "02 Feb 2026",
+  "supplier_name": "Butala, Dutta and Barad",
+  "supplier_gstin": "08USGFB7513Z3ZV",
+  "line_items": [
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 86,
+      "rate": 854.06,
+      "amount": 73449.16
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 75,
+      "rate": 2246.95,
+      "amount": 168521.25
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 112,
+      "rate": 260.5,
+      "amount": 29176.0
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 165,
+      "rate": 169.82,
+      "amount": 28020.3
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 118,
+      "rate": 1931.65,
+      "amount": 227934.7
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 200,
+      "rate": 141.8,
+      "amount": 28360.0
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 156,
+      "rate": 247.69,
+      "amount": 38639.64
+    },
+    {
+      "description": "Sugar 50 kg bag - Type 2",
+      "quantity": 90,
+      "rate": 2279.43,
+      "amount": 205148.7
+    }
+  ],
+  "taxable_value": 799249.75,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 143864.96,
+  "total": 943114.71,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

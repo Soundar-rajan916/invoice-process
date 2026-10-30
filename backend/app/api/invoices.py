@@ -4,7 +4,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import get_db_session
 from app.core.errors import OptimisticLockError, UnresolvedErrorsApprovalError
+import hashlib
+from app.core.logging import logger
+from app.ingestors.upload import convert_heic_to_jpeg, detect_content_type
 from app.core.security import get_current_user, require_reviewer, verify_csrf_header
 from app.core.storage import storage_service
 from app.models.entities import (
@@ -247,6 +250,12 @@ async def update_invoice_fields(
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
 
+    if invoice.status in ("PUSHED", "PUSHING", "REJECTED"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot edit invoice in '{invoice.status}' state",
+        )
+
     # Optimistic locking check
     if invoice.row_version != req.row_version:
         raise OptimisticLockError(
@@ -390,6 +399,12 @@ async def approve_invoice(
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
 
+    if invoice.status != "NEEDS_REVIEW":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot approve invoice in '{invoice.status}' state (only 'NEEDS_REVIEW' can be approved)",
+        )
+
     if invoice.row_version != req.row_version:
         raise OptimisticLockError(
             current_version=invoice.row_version, client_version=req.row_version
@@ -482,6 +497,12 @@ async def reject_invoice(
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
 
+    if invoice.status != "NEEDS_REVIEW":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot reject invoice in '{invoice.status}' state (only 'NEEDS_REVIEW' can be rejected)",
+        )
+
     invoice.status = "REJECTED"
     invoice.status_reason = req.reason
     invoice.row_version += 1
@@ -511,6 +532,12 @@ async def request_resend_invoice(
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
 
+    if invoice.status != "NEEDS_REVIEW":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot request resend for invoice in '{invoice.status}' state (only 'NEEDS_REVIEW' can request resend)",
+        )
+
     invoice.status = "RESEND_REQUESTED"
     invoice.status_reason = req.reason
     invoice.row_version += 1
@@ -525,6 +552,141 @@ async def request_resend_invoice(
     )
     await db.commit()
     return {"message": "Resend requested"}
+
+
+@router.post("/{invoice_id}/upload-replacement")
+async def upload_replacement_invoice_file(
+    invoice_id: uuid.UUID,
+    file: UploadFile = File(...),
+    user: User = Depends(require_reviewer),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, Any]:
+    """Uploads a replacement document fulfilling a RESEND_REQUESTED invoice.
+    - Validates file format and size
+    - Uploads to storage
+    - Creates new SourceFile record
+    - Links invoice to new source_file_id
+    - Resets status to RECEIVED, clears status_reason
+    - Increments row_version
+    - Records resend_fulfilled audit event
+    - Enqueues pipeline reprocessing
+    """
+    invoice = await db.get(Invoice, invoice_id)
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+
+    if invoice.status != "RESEND_REQUESTED":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot upload replacement for invoice in status '{invoice.status}'. Status must be 'RESEND_REQUESTED'.",
+        )
+
+    content = await file.read()
+    max_bytes = settings.MAX_UPLOAD_MB * 1024 * 1024
+    if len(content) > max_bytes:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File exceeds maximum allowed size of {settings.MAX_UPLOAD_MB} MB",
+        )
+
+    real_type = detect_content_type(content, file.content_type or "application/octet-stream")
+    if real_type == "image/heic":
+        content, real_type = convert_heic_to_jpeg(content)
+
+    file_hash = hashlib.sha256(content).hexdigest()
+    storage_key = f"originals/{file_hash[:2]}/{file_hash}"
+    storage_service.upload_bytes(content, storage_key, content_type=real_type)
+
+    stmt = select(SourceFile).where(SourceFile.sha256 == file_hash)
+    existing_file = (await db.execute(stmt)).scalar_one_or_none()
+
+    if existing_file:
+        source_file_record = existing_file
+    else:
+        source_file_record = SourceFile(
+            id=uuid.uuid4(),
+            sha256=file_hash,
+            original_filename=file.filename or "replacement_invoice",
+            content_type=real_type,
+            size_bytes=len(content),
+            storage_key=storage_key,
+            source="resend_upload",
+            uploaded_by=user.id,
+        )
+        db.add(source_file_record)
+        await db.flush()
+
+    old_file_id = str(invoice.source_file_id)
+    invoice.source_file_id = source_file_record.id
+    invoice.status = "RECEIVED"
+    invoice.status_reason = None
+    invoice.row_version += 1
+
+    db.add(
+        ReviewEvent(
+            invoice_id=invoice.id,
+            actor_id=user.id,
+            action="resend_fulfilled",
+            payload={
+                "old_source_file_id": old_file_id,
+                "new_source_file_id": str(source_file_record.id),
+                "filename": file.filename,
+                "size_bytes": len(content),
+            },
+        )
+    )
+    await db.commit()
+
+    # Enqueue pipeline processing
+    try:
+        from app.workers.tasks import process_invoice
+
+        process_invoice.delay(str(invoice.id))
+    except Exception as e:
+        logger.warning("Could not dispatch Celery task for replacement document", error=str(e))
+
+    return {
+        "message": "Replacement document uploaded successfully. Reprocessing started.",
+        "invoice_id": str(invoice.id),
+        "source_file_id": str(source_file_record.id),
+        "filename": file.filename,
+    }
+
+
+@router.post("/{invoice_id}/cancel-resend")
+async def cancel_resend_invoice(
+    invoice_id: uuid.UUID,
+    user: User = Depends(require_reviewer),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, str]:
+    """Cancels a pending RESEND_REQUESTED and reverts invoice back to NEEDS_REVIEW."""
+    invoice = await db.get(Invoice, invoice_id)
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+
+    if invoice.status != "RESEND_REQUESTED":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot cancel resend for invoice in status '{invoice.status}'",
+        )
+
+    previous_reason = invoice.status_reason
+    invoice.status = "NEEDS_REVIEW"
+    invoice.status_reason = None
+    invoice.row_version += 1
+
+    db.add(
+        ReviewEvent(
+            invoice_id=invoice.id,
+            actor_id=user.id,
+            action="cancel_resend",
+            payload={"previous_resend_reason": previous_reason},
+        )
+    )
+    await db.commit()
+    return {"message": "Resend request cancelled. Invoice reverted to NEEDS_REVIEW."}
 
 
 @router.post("/{invoice_id}/confirm-duplicate")

@@ -1,0 +1,34 @@
+{
+  "file": "INV_0038.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI-1606",
+  "invoice_date": "2026-04-10",
+  "invoice_date_printed": "10 Apr 2026",
+  "supplier_name": "Parsa-Baral",
+  "supplier_gstin": "07XQDCP7368X5ZA",
+  "line_items": [
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 162,
+      "rate": 2530.24,
+      "amount": 409898.88
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 44,
+      "rate": 623.17,
+      "amount": 27419.48
+    }
+  ],
+  "taxable_value": 437318.36,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 21865.92,
+  "total": 459184.28,
+  "gstin_valid": false,
+  "expected_flags": [
+    "gstin_checksum"
+  ],
+  "duplicate_of": null
+}

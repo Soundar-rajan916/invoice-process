@@ -1,0 +1,38 @@
+{
+  "file": "INV_0048.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "SI-5780",
+  "invoice_date": "2026-05-30",
+  "invoice_date_printed": "30-05-2026",
+  "supplier_name": "Loke-Raj",
+  "supplier_gstin": "29GFZCL4894D2Z5",
+  "line_items": [
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 21,
+      "rate": 1665.53,
+      "amount": 34976.13
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 166,
+      "rate": 2315.42,
+      "amount": 384359.72
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 82,
+      "rate": 2181.46,
+      "amount": 178879.72
+    }
+  ],
+  "taxable_value": 598215.57,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 71785.87,
+  "total": 670001.44,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

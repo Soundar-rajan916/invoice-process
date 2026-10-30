@@ -1,0 +1,62 @@
+{
+  "file": "INV_0068.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "GST002577",
+  "invoice_date": "2026-05-24",
+  "invoice_date_printed": "24-May-26",
+  "supplier_name": "Raju LLC",
+  "supplier_gstin": "24AECFR9351T6Z3",
+  "line_items": [
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 131,
+      "rate": 363.22,
+      "amount": 47581.82
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 69,
+      "rate": 722.74,
+      "amount": 49869.06
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 168,
+      "rate": 595.14,
+      "amount": 99983.52
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 17,
+      "rate": 431.04,
+      "amount": 7327.68
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 55,
+      "rate": 1697.97,
+      "amount": 93388.35
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 19,
+      "rate": 335.73,
+      "amount": 6378.87
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 198,
+      "rate": 1349.22,
+      "amount": 267145.56
+    }
+  ],
+  "taxable_value": 571674.86,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 28583.74,
+  "total": 600258.6,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

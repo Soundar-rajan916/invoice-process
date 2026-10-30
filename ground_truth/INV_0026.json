@@ -1,0 +1,26 @@
+{
+  "file": "INV_0026.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "ATA/26-27/8160",
+  "invoice_date": "2026-04-06",
+  "invoice_date_printed": "2026-04-06",
+  "supplier_name": "Anand, Tiwari and Reddy",
+  "supplier_gstin": "32UKUFA9451Q3ZG",
+  "line_items": [
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 200,
+      "rate": 437.45,
+      "amount": 87490.0
+    }
+  ],
+  "taxable_value": 87490.0,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 4374.5,
+  "total": 91864.5,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

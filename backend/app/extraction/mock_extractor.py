@@ -17,7 +17,18 @@ class MockExtractor:
     """
 
     def __init__(self, manifest_path: str | None = None) -> None:
-        self.manifest_path = Path(manifest_path or settings.MOCK_MANIFEST_PATH)
+        target = Path(manifest_path or settings.MOCK_MANIFEST_PATH)
+        if not target.exists():
+            candidates = [
+                Path("/app/data/synthetic/manifest.jsonl"),
+                Path(__file__).resolve().parent.parent.parent.parent / "data" / "synthetic" / "manifest.jsonl",
+                Path("data/synthetic/manifest.jsonl").resolve(),
+            ]
+            for c in candidates:
+                if c.exists():
+                    target = c
+                    break
+        self.manifest_path = target
         self._manifest_cache: dict[str, dict[str, Any]] | None = None
 
     def _load_manifest(self) -> dict[str, dict[str, Any]]:

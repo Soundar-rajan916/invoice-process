@@ -1,0 +1,26 @@
+{
+  "file": "INV_0081.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "INV-2026-00803",
+  "invoice_date": "2026-06-28",
+  "invoice_date_printed": "28-06-2026",
+  "supplier_name": "Basak PLC",
+  "supplier_gstin": "27UELFB4955D6ZH",
+  "line_items": [
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 107,
+      "rate": 1022.13,
+      "amount": 109367.91
+    }
+  ],
+  "taxable_value": 109367.91,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 13124.15,
+  "total": 122492.06,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

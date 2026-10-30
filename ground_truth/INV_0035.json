@@ -1,0 +1,68 @@
+{
+  "file": "INV_0035.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "GST008425",
+  "invoice_date": "2026-08-09",
+  "invoice_date_printed": "2026-08-09",
+  "supplier_name": "Pau, Warrior and Samra",
+  "supplier_gstin": "03OHYCP0943X7ZC",
+  "line_items": [
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 108,
+      "rate": 2329.6,
+      "amount": 251596.8
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 180,
+      "rate": 1166.24,
+      "amount": 209923.2
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Grade B",
+      "quantity": 96,
+      "rate": 2394.29,
+      "amount": 229851.84
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 97,
+      "rate": 376.94,
+      "amount": 36563.18
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 80,
+      "rate": 601.38,
+      "amount": 48110.4
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Retail",
+      "quantity": 136,
+      "rate": 2399.31,
+      "amount": 326306.16
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 107,
+      "rate": 380.36,
+      "amount": 40698.52
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 144,
+      "rate": 471.32,
+      "amount": 67870.08
+    }
+  ],
+  "taxable_value": 1210920.18,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 217965.63,
+  "total": 1428885.81,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

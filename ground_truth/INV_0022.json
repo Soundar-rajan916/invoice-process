@@ -1,0 +1,56 @@
+{
+  "file": "INV_0022.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "PL/25-26/8801",
+  "invoice_date": "2025-10-14",
+  "invoice_date_printed": "14-10-2025",
+  "supplier_name": "Parikh LLC",
+  "supplier_gstin": "19BCXFP0944H5ZF",
+  "line_items": [
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 34,
+      "rate": 418.51,
+      "amount": 14229.34
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 190,
+      "rate": 369.09,
+      "amount": 70127.1
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 41,
+      "rate": 1604.11,
+      "amount": 65768.51
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 159,
+      "rate": 489.31,
+      "amount": 77800.29
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 179,
+      "rate": 162.58,
+      "amount": 29101.82
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 37,
+      "rate": 836.89,
+      "amount": 30964.93
+    }
+  ],
+  "taxable_value": 287991.99,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 51838.56,
+  "total": 339830.55,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

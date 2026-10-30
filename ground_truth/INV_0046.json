@@ -1,0 +1,290 @@
+{
+  "file": "INV_0046.pdf",
+  "layout": "classic",
+  "pages": 2,
+  "invoice_number": "GST005476",
+  "invoice_date": "2025-11-23",
+  "invoice_date_printed": "23/11/2025",
+  "supplier_name": "Bava-Shere",
+  "supplier_gstin": "07VKAFB0690M5Z6",
+  "line_items": [
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 182,
+      "rate": 1106.67,
+      "amount": 201413.94
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 82,
+      "rate": 236.51,
+      "amount": 19393.82
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 11,
+      "rate": 234.83,
+      "amount": 2583.13
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 160,
+      "rate": 499.88,
+      "amount": 79980.8
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 153,
+      "rate": 418.51,
+      "amount": 64032.03
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 175,
+      "rate": 2122.82,
+      "amount": 371493.5
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 91,
+      "rate": 429.49,
+      "amount": 39083.59
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 182,
+      "rate": 1637.4,
+      "amount": 298006.8
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Grade A",
+      "quantity": 55,
+      "rate": 1437.09,
+      "amount": 79039.95
+    },
+    {
+      "description": "Cement 50 kg bag - Grade B",
+      "quantity": 184,
+      "rate": 408.53,
+      "amount": 75169.52
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 100,
+      "rate": 872.57,
+      "amount": 87257.0
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 38,
+      "rate": 3500.57,
+      "amount": 133021.66
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Grade A",
+      "quantity": 88,
+      "rate": 1321.23,
+      "amount": 116268.24
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 35,
+      "rate": 2314.67,
+      "amount": 81013.45
+    },
+    {
+      "description": "Cement 50 kg bag - Retail",
+      "quantity": 108,
+      "rate": 391.03,
+      "amount": 42231.24
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 68,
+      "rate": 238.21,
+      "amount": 16198.28
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Retail",
+      "quantity": 105,
+      "rate": 239.83,
+      "amount": 25182.15
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Type 2",
+      "quantity": 53,
+      "rate": 3074.79,
+      "amount": 162963.87
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Type 1",
+      "quantity": 151,
+      "rate": 3479.76,
+      "amount": 525443.76
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Type 1",
+      "quantity": 91,
+      "rate": 193.21,
+      "amount": 17582.11
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 193,
+      "rate": 350.12,
+      "amount": 67573.16
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 105,
+      "rate": 115.22,
+      "amount": 12098.1
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Type 1",
+      "quantity": 77,
+      "rate": 1395.27,
+      "amount": 107435.79
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 143,
+      "rate": 2260.35,
+      "amount": 323230.05
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Bulk",
+      "quantity": 62,
+      "rate": 1450.32,
+      "amount": 89919.84
+    },
+    {
+      "description": "Cement 50 kg bag - Bulk",
+      "quantity": 123,
+      "rate": 330.12,
+      "amount": 40604.76
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 17,
+      "rate": 189.63,
+      "amount": 3223.71
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 76,
+      "rate": 1930.14,
+      "amount": 146690.64
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 15,
+      "rate": 922.95,
+      "amount": 13844.25
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Retail",
+      "quantity": 190,
+      "rate": 1995.49,
+      "amount": 379143.1
+    },
+    {
+      "description": "Ballpoint Pen (box of 50) - Bulk",
+      "quantity": 80,
+      "rate": 369.75,
+      "amount": 29580.0
+    },
+    {
+      "description": "Sugar 50 kg bag - Type 1",
+      "quantity": 62,
+      "rate": 2311.26,
+      "amount": 143298.12
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 57,
+      "rate": 207.72,
+      "amount": 11840.04
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Grade B",
+      "quantity": 110,
+      "rate": 1899.63,
+      "amount": 208959.3
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Type 2",
+      "quantity": 26,
+      "rate": 1510.52,
+      "amount": 39273.52
+    },
+    {
+      "description": "Sugar 50 kg bag - Grade A",
+      "quantity": 139,
+      "rate": 2438.0,
+      "amount": 338882.0
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 30,
+      "rate": 492.65,
+      "amount": 14779.5
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 57,
+      "rate": 303.72,
+      "amount": 17312.04
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 34,
+      "rate": 1891.12,
+      "amount": 64298.08
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Economy",
+      "quantity": 55,
+      "rate": 774.17,
+      "amount": 42579.35
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 46,
+      "rate": 258.78,
+      "amount": 11903.88
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Economy",
+      "quantity": 129,
+      "rate": 1232.2,
+      "amount": 158953.8
+    },
+    {
+      "description": "Cement 50 kg bag - Economy",
+      "quantity": 128,
+      "rate": 397.96,
+      "amount": 50938.88
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Grade A",
+      "quantity": 49,
+      "rate": 1576.15,
+      "amount": 77231.35
+    },
+    {
+      "description": "Detergent Powder 5 kg - Premium",
+      "quantity": 4,
+      "rate": 697.01,
+      "amount": 2788.04
+    }
+  ],
+  "taxable_value": 4833740.14,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 580048.82,
+  "total": 5413788.96,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

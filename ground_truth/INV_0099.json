@@ -1,0 +1,38 @@
+{
+  "file": "INV_0099.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "GST007305",
+  "invoice_date": "2026-04-01",
+  "invoice_date_printed": "01-Apr-26",
+  "supplier_name": "Gara-Sarkar",
+  "supplier_gstin": "37ETDFG2641H6Z9",
+  "line_items": [
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 47,
+      "rate": 280.8,
+      "amount": 13197.6
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 1,
+      "rate": 184.34,
+      "amount": 184.34
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 99,
+      "rate": 335.74,
+      "amount": 33238.26
+    }
+  ],
+  "taxable_value": 46620.2,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 13053.66,
+  "total": 59673.86,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

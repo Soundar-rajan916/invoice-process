@@ -1,0 +1,56 @@
+{
+  "file": "INV_0058.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "SI-7493",
+  "invoice_date": "2026-06-21",
+  "invoice_date_printed": "21-Jun-26",
+  "supplier_name": "Varkey-Char",
+  "supplier_gstin": "24KITCV3387K3ZQ",
+  "line_items": [
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 56,
+      "rate": 257.35,
+      "amount": 14411.6
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 130,
+      "rate": 2152.94,
+      "amount": 279882.2
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 179,
+      "rate": 938.77,
+      "amount": 168039.83
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 101,
+      "rate": 2220.68,
+      "amount": 224288.68
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 3,
+      "rate": 416.9,
+      "amount": 1250.7
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 187,
+      "rate": 412.96,
+      "amount": 77223.52
+    }
+  ],
+  "taxable_value": 765096.53,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 91811.58,
+  "total": 856908.11,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

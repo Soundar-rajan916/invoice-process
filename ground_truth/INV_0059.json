@@ -1,0 +1,56 @@
+{
+  "file": "INV_0059.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "CCA/25-26/1226",
+  "invoice_date": "2025-10-13",
+  "invoice_date_printed": "13 Oct 2025",
+  "supplier_name": "Chakrabarti, Chaudhary and Palla",
+  "supplier_gstin": "19ZQPFC7985Z8ZS",
+  "line_items": [
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 149,
+      "rate": 141.3,
+      "amount": 21053.7
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 152,
+      "rate": 198.97,
+      "amount": 30243.44
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 156,
+      "rate": 519.71,
+      "amount": 81074.76
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 101,
+      "rate": 354.49,
+      "amount": 35803.49
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 88,
+      "rate": 261.8,
+      "amount": 23038.4
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 55,
+      "rate": 2370.19,
+      "amount": 130360.45
+    }
+  ],
+  "taxable_value": 321574.24,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 16078.71,
+  "total": 337652.95,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

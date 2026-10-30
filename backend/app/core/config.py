@@ -67,6 +67,7 @@ class Settings(BaseSettings):
     GROQ_MAX_REQUEST_BYTES: int = Field(default=3500000)
     GROQ_REPAIR_RETRIES: int = Field(default=2)
     GROQ_TIMEOUT_SECONDS: float = Field(default=60.0)
+    GROQ_MAX_TOKENS: int = Field(default=8192)
 
     # Preprocessing & Image Quality Thresholds (R1)
     MAX_IMAGE_LONG_SIDE: int = Field(default=1600)
@@ -78,7 +79,7 @@ class Settings(BaseSettings):
     BUYER_GSTIN: str = Field(default="33AAAAA0000A1Z5")
     BUYER_STATE_CODE: str = Field(default="33")
     AMOUNT_TOLERANCE: Decimal = Field(default=Decimal("0.01"))
-    TOTAL_ROUNDING_TOLERANCE: Decimal = Field(default=Decimal("1.00"))
+    TOTAL_ROUNDING_TOLERANCE: Decimal = Field(default=Decimal("0.00"))
     LOW_CONFIDENCE_THRESHOLD: float = Field(default=0.7)
 
     # Accounting Push API
@@ -87,14 +88,24 @@ class Settings(BaseSettings):
     PUSH_MAX_ATTEMPTS: int = Field(default=3)
 
     # CORS
-    CORS_ORIGINS: list[str] = Field(
+    CORS_ORIGINS: list[str] | str = Field(
         default=["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
     )
 
-    @field_validator("CORS_ORIGINS", mode="before")
+    @field_validator("CORS_ORIGINS", mode="after")
     @classmethod
-    def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
+    def parse_cors_origins(cls, v: list[str] | str) -> list[str]:
         if isinstance(v, str):
+            v = v.strip()
+            if v.startswith("[") and v.endswith("]"):
+                import json
+
+                try:
+                    loaded = json.loads(v)
+                    if isinstance(loaded, list):
+                        return [str(x).strip() for x in loaded if str(x).strip()]
+                except Exception:
+                    pass
             return [x.strip() for x in v.split(",") if x.strip()]
         return v
 

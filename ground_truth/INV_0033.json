@@ -1,0 +1,62 @@
+{
+  "file": "INV_0033.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "INV-2025-03621",
+  "invoice_date": "2025-11-24",
+  "invoice_date_printed": "24-11-2025",
+  "supplier_name": "Sastry LLC",
+  "supplier_gstin": "24DVMCS9114R1ZC",
+  "line_items": [
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 128,
+      "rate": 240.13,
+      "amount": 30736.64
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 151,
+      "rate": 233.93,
+      "amount": 35323.43
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 102,
+      "rate": 522.26,
+      "amount": 53270.52
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 83,
+      "rate": 607.58,
+      "amount": 50429.14
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 77,
+      "rate": 217.45,
+      "amount": 16743.65
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 144,
+      "rate": 90.56,
+      "amount": 13040.64
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 43,
+      "rate": 1760.81,
+      "amount": 75714.83
+    }
+  ],
+  "taxable_value": 275258.85,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 33031.06,
+  "total": 308289.91,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

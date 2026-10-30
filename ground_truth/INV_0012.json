@@ -1,0 +1,44 @@
+{
+  "file": "INV_0012.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "INV-2026-09350",
+  "invoice_date": "2026-06-07",
+  "invoice_date_printed": "07-Jun-26",
+  "supplier_name": "Gopal Group",
+  "supplier_gstin": "19VGVCG9609M6ZG",
+  "line_items": [
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 109,
+      "rate": 453.06,
+      "amount": 49383.54
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 81,
+      "rate": 1371.74,
+      "amount": 111110.94
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 7,
+      "rate": 2376.1,
+      "amount": 16632.7
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 71,
+      "rate": 181.34,
+      "amount": 12875.14
+    }
+  ],
+  "taxable_value": 190002.32,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 53200.65,
+  "total": 243202.97,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

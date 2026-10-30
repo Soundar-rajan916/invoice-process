@@ -1,0 +1,46 @@
+{
+  "file": "INV_0077.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "SI-9295",
+  "invoice_date": "2025-10-31",
+  "invoice_date_printed": "31-Oct-25",
+  "supplier_name": "Naidu, Devan and Rana",
+  "supplier_gstin": "07HPJFN6314L7ZS",
+  "line_items": [
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 47,
+      "rate": 2062.04,
+      "amount": 96915.88
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 163,
+      "rate": 389.0,
+      "amount": 63407.0
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 11,
+      "rate": 207.64,
+      "amount": 2284.04
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 4,
+      "rate": 690.15,
+      "amount": 2760.6
+    }
+  ],
+  "taxable_value": 165367.52,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 8268.38,
+  "total": 174407.9,
+  "gstin_valid": true,
+  "expected_flags": [
+    "total_mismatch"
+  ],
+  "duplicate_of": null
+}

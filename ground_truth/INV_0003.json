@@ -1,0 +1,416 @@
+{
+  "file": "INV_0003.pdf",
+  "layout": "banner",
+  "pages": 3,
+  "invoice_number": "GST004992",
+  "invoice_date": "2025-12-30",
+  "invoice_date_printed": "30-12-2025",
+  "supplier_name": "Rama-Ganguly",
+  "supplier_gstin": "07NPBFR8727T2Z2",
+  "line_items": [
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 192,
+      "rate": 2001.45,
+      "amount": 384278.4
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 33,
+      "rate": 126.32,
+      "amount": 4168.56
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 152,
+      "rate": 205.3,
+      "amount": 31205.6
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 182,
+      "rate": 640.98,
+      "amount": 116658.36
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 44,
+      "rate": 1053.94,
+      "amount": 46373.36
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 143,
+      "rate": 235.33,
+      "amount": 33652.19
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 175,
+      "rate": 3643.63,
+      "amount": 637635.25
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 138,
+      "rate": 1770.6,
+      "amount": 244342.8
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 55,
+      "rate": 1972.99,
+      "amount": 108514.45
+    },
+    {
+      "description": "Steel Padlock 50 mm - Retail",
+      "quantity": 17,
+      "rate": 93.33,
+      "amount": 1586.61
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 200,
+      "rate": 2480.37,
+      "amount": 496074.0
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 80,
+      "rate": 566.61,
+      "amount": 45328.8
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 51,
+      "rate": 634.76,
+      "amount": 32372.76
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 99,
+      "rate": 1113.47,
+      "amount": 110233.53
+    },
+    {
+      "description": "Detergent Powder 5 kg - Type 1",
+      "quantity": 68,
+      "rate": 509.04,
+      "amount": 34614.72
+    },
+    {
+      "description": "Sugar 50 kg bag - Retail",
+      "quantity": 139,
+      "rate": 2422.56,
+      "amount": 336735.84
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 144,
+      "rate": 197.99,
+      "amount": 28510.56
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 162,
+      "rate": 293.15,
+      "amount": 47490.3
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 90,
+      "rate": 1888.4,
+      "amount": 169956.0
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 137,
+      "rate": 280.28,
+      "amount": 38398.36
+    },
+    {
+      "description": "Tea Powder 1 kg pack - Bulk",
+      "quantity": 100,
+      "rate": 351.23,
+      "amount": 35123.0
+    },
+    {
+      "description": "Extension Board 4-socket - Retail",
+      "quantity": 185,
+      "rate": 362.49,
+      "amount": 67060.65
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Bulk",
+      "quantity": 19,
+      "rate": 2372.08,
+      "amount": 45069.52
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Retail",
+      "quantity": 145,
+      "rate": 1067.57,
+      "amount": 154797.65
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Bulk",
+      "quantity": 188,
+      "rate": 1235.31,
+      "amount": 232238.28
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Type 2",
+      "quantity": 144,
+      "rate": 769.78,
+      "amount": 110848.32
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Premium",
+      "quantity": 11,
+      "rate": 1902.69,
+      "amount": 20929.59
+    },
+    {
+      "description": "Detergent Powder 5 kg - Premium",
+      "quantity": 81,
+      "rate": 669.44,
+      "amount": 54224.64
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Type 1",
+      "quantity": 147,
+      "rate": 168.28,
+      "amount": 24737.16
+    },
+    {
+      "description": "Sugar 50 kg bag - Grade B",
+      "quantity": 185,
+      "rate": 2224.05,
+      "amount": 411449.25
+    },
+    {
+      "description": "Detergent Powder 5 kg - Grade A",
+      "quantity": 118,
+      "rate": 481.64,
+      "amount": 56833.52
+    },
+    {
+      "description": "Tea Powder 1 kg pack - Retail",
+      "quantity": 55,
+      "rate": 403.19,
+      "amount": 22175.45
+    },
+    {
+      "description": "Detergent Powder 5 kg - Economy",
+      "quantity": 157,
+      "rate": 539.47,
+      "amount": 84696.79
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Grade B",
+      "quantity": 13,
+      "rate": 2037.32,
+      "amount": 26485.16
+    },
+    {
+      "description": "Steel Padlock 50 mm - Economy",
+      "quantity": 197,
+      "rate": 175.61,
+      "amount": 34595.17
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Premium",
+      "quantity": 192,
+      "rate": 3798.8,
+      "amount": 729369.6
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Premium",
+      "quantity": 4,
+      "rate": 132.01,
+      "amount": 528.04
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Retail",
+      "quantity": 117,
+      "rate": 192.9,
+      "amount": 22569.3
+    },
+    {
+      "description": "Extension Board 4-socket - Premium",
+      "quantity": 187,
+      "rate": 262.12,
+      "amount": 49016.44
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Grade A",
+      "quantity": 27,
+      "rate": 1953.77,
+      "amount": 52751.79
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Premium",
+      "quantity": 172,
+      "rate": 911.16,
+      "amount": 156719.52
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 119,
+      "rate": 2015.23,
+      "amount": 239812.37
+    },
+    {
+      "description": "Extension Board 4-socket - Grade B",
+      "quantity": 24,
+      "rate": 438.21,
+      "amount": 10517.04
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 161,
+      "rate": 150.47,
+      "amount": 24225.67
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 23,
+      "rate": 1624.57,
+      "amount": 37365.11
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Premium",
+      "quantity": 83,
+      "rate": 2152.52,
+      "amount": 178659.16
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Retail",
+      "quantity": 37,
+      "rate": 2057.85,
+      "amount": 76140.45
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Type 1",
+      "quantity": 19,
+      "rate": 239.41,
+      "amount": 4548.79
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 109,
+      "rate": 473.98,
+      "amount": 51663.82
+    },
+    {
+      "description": "Tea Powder 1 kg pack - Grade A",
+      "quantity": 5,
+      "rate": 393.34,
+      "amount": 1966.7
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Grade A",
+      "quantity": 156,
+      "rate": 879.7,
+      "amount": 137233.2
+    },
+    {
+      "description": "Sugar 50 kg bag - Premium",
+      "quantity": 65,
+      "rate": 2419.34,
+      "amount": 157257.1
+    },
+    {
+      "description": "Steel Padlock 50 mm - Type 1",
+      "quantity": 124,
+      "rate": 163.56,
+      "amount": 20281.44
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Type 1",
+      "quantity": 59,
+      "rate": 1908.64,
+      "amount": 112609.76
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 189,
+      "rate": 232.03,
+      "amount": 43853.67
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Bulk",
+      "quantity": 142,
+      "rate": 2237.62,
+      "amount": 317742.04
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12) - Premium",
+      "quantity": 76,
+      "rate": 569.05,
+      "amount": 43247.8
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 83,
+      "rate": 187.7,
+      "amount": 15579.1
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Grade A",
+      "quantity": 171,
+      "rate": 1909.37,
+      "amount": 326502.27
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Grade B",
+      "quantity": 136,
+      "rate": 189.42,
+      "amount": 25761.12
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Grade A",
+      "quantity": 50,
+      "rate": 174.16,
+      "amount": 8708.0
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Type 2",
+      "quantity": 135,
+      "rate": 149.21,
+      "amount": 20143.35
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Economy",
+      "quantity": 83,
+      "rate": 3350.51,
+      "amount": 278092.33
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 60,
+      "rate": 384.94,
+      "amount": 23096.4
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Retail",
+      "quantity": 52,
+      "rate": 1273.2,
+      "amount": 66206.4
+    },
+    {
+      "description": "Tea Powder 1 kg pack - Premium",
+      "quantity": 70,
+      "rate": 433.19,
+      "amount": 30323.3
+    }
+  ],
+  "taxable_value": 7591885.68,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 911026.28,
+  "total": 8502911.96,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

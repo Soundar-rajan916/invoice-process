@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 import uuid
 
-from sqlalchemy import select, update
+from sqlalchemy import case, delete, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,6 +20,7 @@ from app.models.entities import (
     ReviewEvent,
     SourceFile,
     Supplier,
+    User,
     ValidationIssue,
 )
 from app.services.dedup import check_duplicates, get_financial_year, normalize_invoice_number
@@ -219,52 +221,123 @@ async def process_invoice_pipeline(session: AsyncSession, invoice_id: uuid.UUID)
         )
 
         # Update invoice business key columns
+        raw_gstin = extraction_res.extraction.supplier_gstin
+        clean_gstin = raw_gstin.strip() if raw_gstin else None
         invoice.current_extraction_id = ext_row.id
         invoice.extraction_path = extraction_res.extraction_path
-        invoice.supplier_gstin = extraction_res.extraction.supplier_gstin
-        invoice.normalized_invoice_number = norm_inv_num
-        invoice.financial_year = fin_year
+        invoice.supplier_gstin = clean_gstin[:64] if clean_gstin else None
+        invoice.normalized_invoice_number = norm_inv_num[:100] if norm_inv_num else None
+        invoice.financial_year = fin_year[:10] if fin_year else None
         if dup_of_id:
             invoice.dup_of_id = dup_of_id
 
-        # 9. Persist Validation Issues
-        for issue in val_issues:
-            v_row = ValidationIssue(
-                invoice_id=invoice.id,
-                extraction_id=ext_row.id,
-                code=issue.code,
-                field=issue.field,
-                severity=issue.severity,
-                message=issue.message,
+        # Check if this invoice fulfills an existing RESEND_REQUESTED invoice
+        if clean_gstin and norm_inv_num and fin_year and not dup_of_id:
+            resend_stmt = select(Invoice).where(
+                Invoice.id != invoice.id,
+                Invoice.supplier_gstin == clean_gstin[:64],
+                Invoice.normalized_invoice_number == norm_inv_num[:100],
+                Invoice.financial_year == fin_year[:10],
+                Invoice.status == "RESEND_REQUESTED",
             )
-            session.add(v_row)
-
-        for d_issue in dup_issues:
-            d_row = ValidationIssue(
-                invoice_id=invoice.id,
-                extraction_id=ext_row.id,
-                code=d_issue["code"],
-                field=d_issue["field"],
-                severity=d_issue["severity"],
-                message=d_issue["message"],
-            )
-            session.add(d_row)
-
-        # 10. Transition to NEEDS_REVIEW (R2 - All invoices pass through human review)
-        invoice.status = "NEEDS_REVIEW"
-        session.add(
-            ReviewEvent(
-                invoice_id=invoice.id,
-                action="status_change",
-                payload={
-                    "from_status": "PROCESSING",
-                    "to_status": "NEEDS_REVIEW",
-                    "issues_count": len(val_issues) + len(dup_issues),
-                },
-            )
-        )
+            resend_match = (await session.execute(resend_stmt)).scalars().first()
+            if resend_match:
+                resend_match.status = "REJECTED_DUPLICATE"
+                resend_match.dup_of_id = invoice.id
+                resend_match.status_reason = f"Superseded by replacement invoice {invoice.id}"
+                resend_match.row_version += 1
+                session.add(
+                    ReviewEvent(
+                        invoice_id=resend_match.id,
+                        action="resend_fulfilled",
+                        payload={
+                            "replacement_invoice_id": str(invoice.id),
+                            "reason": "Replacement invoice uploaded and processed successfully",
+                        },
+                    )
+                )
+                session.add(
+                    ReviewEvent(
+                        invoice_id=invoice.id,
+                        action="resend_fulfilled",
+                        payload={
+                            "previous_invoice_id": str(resend_match.id),
+                            "previous_resend_reason": resend_match.status_reason,
+                        },
+                    )
+                )
 
         try:
+            # 9. Clear stale validation issues and persist fresh issues
+            await session.execute(
+                delete(ValidationIssue).where(ValidationIssue.invoice_id == invoice.id)
+            )
+            for issue in val_issues:
+                v_row = ValidationIssue(
+                    invoice_id=invoice.id,
+                    extraction_id=ext_row.id,
+                    code=issue.code,
+                    field=issue.field,
+                    severity=issue.severity,
+                    message=issue.message,
+                )
+                session.add(v_row)
+
+            for d_issue in dup_issues:
+                d_row = ValidationIssue(
+                    invoice_id=invoice.id,
+                    extraction_id=ext_row.id,
+                    code=d_issue["code"],
+                    field=d_issue["field"],
+                    severity=d_issue["severity"],
+                    message=d_issue["message"],
+                )
+                session.add(d_row)
+
+            # 10. Straight-Through Processing (STP): Auto-approve and push clean invoices
+            is_clean = len(val_issues) == 0 and len(dup_issues) == 0 and not dup_of_id
+
+            if is_clean:
+                admin_stmt = (
+                    select(User.id)
+                    .where(User.is_active.is_(True))
+                    .order_by(case((User.role == "admin", 0), else_=1))
+                    .limit(1)
+                )
+                admin_id = (await session.execute(admin_stmt)).scalars().first()
+
+                invoice.status = "APPROVED"
+                invoice.approved_by = admin_id
+                invoice.approved_at = datetime.now(UTC)
+                invoice.approved_extraction_id = ext_row.id
+                invoice.row_version += 1
+                session.add(
+                    ReviewEvent(
+                        invoice_id=invoice.id,
+                        actor_id=admin_id,
+                        action="auto_approve",
+                        payload={
+                            "from_status": "PROCESSING",
+                            "to_status": "APPROVED",
+                            "approved_extraction_id": str(ext_row.id),
+                            "reason": "Straight-Through Processing: 0 validation issues and no duplicates.",
+                        },
+                    )
+                )
+            else:
+                invoice.status = "NEEDS_REVIEW"
+                session.add(
+                    ReviewEvent(
+                        invoice_id=invoice.id,
+                        action="status_change",
+                        payload={
+                            "from_status": "PROCESSING",
+                            "to_status": "NEEDS_REVIEW",
+                            "issues_count": len(val_issues) + len(dup_issues),
+                        },
+                    )
+                )
+
             await session.commit()
         except IntegrityError:
             # Handle concurrent race on duplicate business key (R3 concurrency race)
@@ -273,10 +346,24 @@ async def process_invoice_pipeline(session: AsyncSession, invoice_id: uuid.UUID)
                 "IntegrityError on business key unique index; marking duplicate",
                 invoice_id=str(invoice_id),
             )
+            norm_gstin = extraction_res.extraction.supplier_gstin
+            orig_stmt = select(Invoice.id).where(
+                Invoice.id != invoice_id,
+                Invoice.supplier_gstin == norm_gstin,
+                Invoice.normalized_invoice_number == norm_inv_num,
+                Invoice.financial_year == fin_year,
+                Invoice.dup_of_id.is_(None),
+            )
+            existing_id = (await session.execute(orig_stmt)).scalars().first()
+
             dup_invoice = await session.get(Invoice, invoice_id)
             if dup_invoice:
                 dup_invoice.status = "NEEDS_REVIEW"
-                dup_invoice.dup_of_id = dup_of_id or uuid.uuid4()
+                dup_invoice.dup_of_id = existing_id
+                dup_invoice.supplier_gstin = norm_gstin
+                dup_invoice.normalized_invoice_number = norm_inv_num
+                dup_invoice.financial_year = fin_year
+                dup_invoice.current_extraction_id = ext_row.id
                 session.add(
                     ValidationIssue(
                         invoice_id=dup_invoice.id,
@@ -290,20 +377,42 @@ async def process_invoice_pipeline(session: AsyncSession, invoice_id: uuid.UUID)
                 await session.commit()
                 return dup_invoice
 
+        # 11. If auto-approved, push directly to accounting system
+        if is_clean and invoice.status == "APPROVED":
+            try:
+                from app.services.push import push_invoice
+
+                pushed_inv = await push_invoice(session, invoice.id)
+                if pushed_inv:
+                    invoice = pushed_inv
+            except Exception as push_err:
+                logger.exception(
+                    "Auto-push to accounting failed",
+                    invoice_id=str(invoice.id),
+                    error=str(push_err),
+                )
+
         return invoice
 
     except Exception as e:
         logger.exception(
-            "Pipeline failed while processing invoice", invoice_id=str(invoice.id), error=str(e)
+            "Pipeline failed while processing invoice", invoice_id=str(invoice_id), error=str(e)
         )
-        invoice.status = "FAILED"
-        invoice.status_reason = f"Processing failed: {str(e)}"
-        session.add(
-            ReviewEvent(
-                invoice_id=invoice.id,
-                action="status_change",
-                payload={"from_status": "PROCESSING", "to_status": "FAILED", "error": str(e)},
-            )
-        )
-        await session.commit()
+        try:
+            await session.rollback()
+            failed_inv = await session.get(Invoice, invoice_id)
+            if failed_inv:
+                failed_inv.status = "FAILED"
+                failed_inv.status_reason = f"Processing failed: {str(e)}"
+                session.add(
+                    ReviewEvent(
+                        invoice_id=failed_inv.id,
+                        action="status_change",
+                        payload={"from_status": "PROCESSING", "to_status": "FAILED", "error": str(e)},
+                    )
+                )
+                await session.commit()
+                return failed_inv
+        except Exception as rollback_err:
+            logger.error("Failed to persist FAILED status after pipeline exception", error=str(rollback_err))
         return invoice

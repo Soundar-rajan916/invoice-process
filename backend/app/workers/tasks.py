@@ -2,14 +2,22 @@ import asyncio
 import uuid
 from typing import Any
 
-from celery import shared_task
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
 
-from app.core.database import async_session_maker
+from app.core.config import settings
 from app.core.logging import logger
 from app.services.pipeline import process_invoice_pipeline
+from app.workers.celery_app import celery_app
 
 
-@shared_task(
+def _get_worker_session():
+    task_engine = create_async_engine(settings.DATABASE_URL, poolclass=NullPool)
+    maker = async_sessionmaker(task_engine, class_=AsyncSession, expire_on_commit=False)
+    return maker, task_engine
+
+
+@celery_app.task(
     bind=True,
     name="app.workers.tasks.process_invoice",
     max_retries=3,
@@ -23,9 +31,13 @@ def process_invoice(self: Any, invoice_id_str: str) -> dict[str, str]:
     invoice_id = uuid.UUID(invoice_id_str)
 
     async def _run() -> str:
-        async with async_session_maker() as session:
-            inv = await process_invoice_pipeline(session, invoice_id)
-            return inv.status if inv else "SKIPPED"
+        maker, task_engine = _get_worker_session()
+        try:
+            async with maker() as session:
+                inv = await process_invoice_pipeline(session, invoice_id)
+                return inv.status if inv else "SKIPPED"
+        finally:
+            await task_engine.dispose()
 
     try:
         status = asyncio.run(_run())
@@ -38,20 +50,24 @@ def process_invoice(self: Any, invoice_id_str: str) -> dict[str, str]:
         if self.request.retries >= self.max_retries:
             # Mark FAILED on exhausted retries
             async def _mark_failed() -> None:
-                async with async_session_maker() as session:
-                    from app.models.entities import Invoice
+                maker, task_engine = _get_worker_session()
+                try:
+                    async with maker() as session:
+                        from app.models.entities import Invoice
 
-                    inv = await session.get(Invoice, invoice_id)
-                    if inv:
-                        inv.status = "FAILED"
-                        inv.status_reason = f"Exhausted worker retries: {err_msg}"
-                        await session.commit()
+                        inv = await session.get(Invoice, invoice_id)
+                        if inv:
+                            inv.status = "FAILED"
+                            inv.status_reason = f"Exhausted worker retries: {err_msg}"
+                            await session.commit()
+                finally:
+                    await task_engine.dispose()
 
             asyncio.run(_mark_failed())
         raise self.retry(exc=exc) from exc
 
 
-@shared_task(
+@celery_app.task(
     bind=True,
     name="app.workers.tasks.push_invoice_task",
     max_retries=3,
@@ -69,9 +85,13 @@ def push_invoice_task(self: Any, invoice_id_str: str) -> dict[str, str]:
     invoice_id = uuid.UUID(invoice_id_str)
 
     async def _run() -> str:
-        async with async_session_maker() as session:
-            inv = await push_invoice(session, invoice_id)
-            return inv.status if inv else "SKIPPED"
+        maker, task_engine = _get_worker_session()
+        try:
+            async with maker() as session:
+                inv = await push_invoice(session, invoice_id)
+                return inv.status if inv else "SKIPPED"
+        finally:
+            await task_engine.dispose()
 
     try:
         status = asyncio.run(_run())

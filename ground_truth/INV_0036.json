@@ -1,0 +1,44 @@
+{
+  "file": "INV_0036.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "CP26036",
+  "invoice_date": "2026-04-18",
+  "invoice_date_printed": "18 Apr 2026",
+  "supplier_name": "Chada PLC",
+  "supplier_gstin": "32NKNFC2164H1ZP",
+  "line_items": [
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 145,
+      "rate": 389.04,
+      "amount": 56410.8
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 111,
+      "rate": 1126.03,
+      "amount": 124989.33
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 173,
+      "rate": 217.88,
+      "amount": 37693.24
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 151,
+      "rate": 392.38,
+      "amount": 59249.38
+    }
+  ],
+  "taxable_value": 278342.75,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 50101.7,
+  "total": 328444.45,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

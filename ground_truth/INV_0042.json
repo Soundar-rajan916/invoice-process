@@ -1,0 +1,56 @@
+{
+  "file": "INV_0042.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "NL25042",
+  "invoice_date": "2025-10-05",
+  "invoice_date_printed": "05-10-2025",
+  "supplier_name": "Nori Ltd",
+  "supplier_gstin": "27JRICN6346G5ZW",
+  "line_items": [
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 73,
+      "rate": 1410.34,
+      "amount": 102954.82
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 152,
+      "rate": 2204.25,
+      "amount": 335046.0
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 115,
+      "rate": 2121.17,
+      "amount": 243934.55
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 44,
+      "rate": 666.17,
+      "amount": 29311.48
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 107,
+      "rate": 179.0,
+      "amount": 19153.0
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 129,
+      "rate": 91.44,
+      "amount": 11795.76
+    }
+  ],
+  "taxable_value": 742195.61,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 37109.78,
+  "total": 779305.39,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

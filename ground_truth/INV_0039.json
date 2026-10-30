@@ -1,0 +1,38 @@
+{
+  "file": "INV_0039.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "SI-5645",
+  "invoice_date": "2026-01-02",
+  "invoice_date_printed": "02 Jan 2026",
+  "supplier_name": "Sarraf, Kadakia and Nadkarni",
+  "supplier_gstin": "36WWBCS2803U9ZT",
+  "line_items": [
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 198,
+      "rate": 2207.71,
+      "amount": 437126.58
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 87,
+      "rate": 174.96,
+      "amount": 15221.52
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 121,
+      "rate": 2446.62,
+      "amount": 296041.02
+    }
+  ],
+  "taxable_value": 748389.12,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 134710.04,
+  "total": 883099.16,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

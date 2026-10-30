@@ -1,0 +1,44 @@
+{
+  "file": "INV_0044.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "MP26044",
+  "invoice_date": "2026-02-10",
+  "invoice_date_printed": "10 Feb 2026",
+  "supplier_name": "Misra PLC",
+  "supplier_gstin": "27MRSCM0065B4Z7",
+  "line_items": [
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 174,
+      "rate": 3149.76,
+      "amount": 548058.24
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 164,
+      "rate": 1226.08,
+      "amount": 201077.12
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 36,
+      "rate": 430.11,
+      "amount": 15483.96
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 64,
+      "rate": 200.29,
+      "amount": 12818.56
+    }
+  ],
+  "taxable_value": 777437.88,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 38871.89,
+  "total": 816309.77,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

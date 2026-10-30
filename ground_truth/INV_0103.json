@@ -1,0 +1,34 @@
+{
+  "file": "INV_0103.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "ZVA26015",
+  "invoice_date": "2026-08-22",
+  "invoice_date_printed": "22-08-2026",
+  "supplier_name": "Zacharia, Verma and Padmanabhan",
+  "supplier_gstin": "07GCHCZ6828S2ZW",
+  "line_items": [
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 43,
+      "rate": 379.37,
+      "amount": 16312.91
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 96,
+      "rate": 178.73,
+      "amount": 17158.08
+    }
+  ],
+  "taxable_value": 33470.99,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 6024.78,
+  "total": 39495.77,
+  "gstin_valid": true,
+  "expected_flags": [
+    "duplicate"
+  ],
+  "duplicate_of": "INV_0015"
+}

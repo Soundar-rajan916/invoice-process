@@ -1,0 +1,44 @@
+{
+  "file": "INV_0002.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "DTA/26-27/3534",
+  "invoice_date": "2026-08-05",
+  "invoice_date_printed": "05 Aug 2026",
+  "supplier_name": "Dara, Tella and Nagar",
+  "supplier_gstin": "37YVKFD1350T9ZT",
+  "line_items": [
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 184,
+      "rate": 208.43,
+      "amount": 38351.12
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 10,
+      "rate": 142.32,
+      "amount": 1423.2
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 87,
+      "rate": 510.76,
+      "amount": 44436.12
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 196,
+      "rate": 2012.07,
+      "amount": 394365.72
+    }
+  ],
+  "taxable_value": 478576.16,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 57429.14,
+  "total": 536005.3,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

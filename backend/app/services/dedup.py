@@ -68,7 +68,7 @@ async def check_duplicates(
             Invoice.normalized_invoice_number == normalized_inv_num,
             Invoice.financial_year == financial_year,
             Invoice.dup_of_id.is_(None),
-            ~Invoice.status.in_(["REJECTED", "REJECTED_DUPLICATE"]),
+            ~Invoice.status.in_(["REJECTED", "REJECTED_DUPLICATE", "RESEND_REQUESTED"]),
         )
         .order_by(Invoice.created_at.asc())
     )
@@ -100,7 +100,7 @@ async def check_duplicates(
             Invoice.id != invoice_id,
             Invoice.supplier_gstin == supplier_gstin,
             Invoice.dup_of_id.is_(None),
-            ~Invoice.status.in_(["REJECTED", "REJECTED_DUPLICATE"]),
+            ~Invoice.status.in_(["REJECTED", "REJECTED_DUPLICATE", "RESEND_REQUESTED"]),
         )
         candidates = (await session.execute(fuzzy_stmt)).scalars().all()
         from app.models.entities import Extraction

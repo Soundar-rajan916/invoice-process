@@ -1,0 +1,26 @@
+{
+  "file": "INV_0027.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "INV-2026-05285",
+  "invoice_date": "2026-06-15",
+  "invoice_date_printed": "2026-06-15",
+  "supplier_name": "Ravel, Dubey and Anne",
+  "supplier_gstin": "37ZGECR0559P3ZQ",
+  "line_items": [
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 43,
+      "rate": 494.6,
+      "amount": 21267.8
+    }
+  ],
+  "taxable_value": 21267.8,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 2552.14,
+  "total": 23819.94,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

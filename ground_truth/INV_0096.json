@@ -1,0 +1,50 @@
+{
+  "file": "INV_0096.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "SI-432",
+  "invoice_date": "2026-05-22",
+  "invoice_date_printed": "22/05/2026",
+  "supplier_name": "Kashyap, Deshmukh and Borra",
+  "supplier_gstin": "24SSNCK2896J4ZC",
+  "line_items": [
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 79,
+      "rate": 2055.9,
+      "amount": 162416.1
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 83,
+      "rate": 2224.38,
+      "amount": 184623.54
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 157,
+      "rate": 282.17,
+      "amount": 44300.69
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 115,
+      "rate": 614.26,
+      "amount": 70639.9
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 176,
+      "rate": 185.95,
+      "amount": 32727.2
+    }
+  ],
+  "taxable_value": 494707.43,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 89047.34,
+  "total": 583754.77,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

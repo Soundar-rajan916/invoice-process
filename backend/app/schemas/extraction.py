@@ -4,7 +4,7 @@ from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
-from pydantic import BaseModel, Field, field_serializer, field_validator
+from pydantic import BaseModel, Field, field_serializer, field_validator, model_validator
 
 
 def format_money(val: Decimal | None) -> str | None:
@@ -50,6 +50,8 @@ class InvoiceExtraction(BaseModel):
     invoice_date: date | None = None
     supplier_name: str | None = None
     supplier_gstin: str | None = None
+    buyer_name: str | None = None
+    buyer_gstin: str | None = None
     line_items: list[LineItem] = Field(default_factory=list)
     taxable_value: Decimal | None = None
     cgst: Decimal | None = None
@@ -58,6 +60,30 @@ class InvoiceExtraction(BaseModel):
     total: Decimal | None = None
     field_confidence: dict[str, float] = Field(default_factory=dict)
     unreadable_fields: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_aliases(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        
+        # Normalize supplier / seller aliases
+        if not data.get("supplier_name"):
+            data["supplier_name"] = data.get("seller_name") or data.get("vendor_name") or data.get("issuer_name")
+        if not data.get("supplier_gstin"):
+            data["supplier_gstin"] = data.get("seller_gstin") or data.get("vendor_gstin") or data.get("issuer_gstin")
+            
+        # Normalize buyer / customer aliases
+        if not data.get("buyer_name"):
+            data["buyer_name"] = data.get("customer_name") or data.get("recipient_name") or data.get("billed_to_name")
+        if not data.get("buyer_gstin"):
+            data["buyer_gstin"] = data.get("customer_gstin") or data.get("recipient_gstin") or data.get("billed_to_gstin")
+            
+        # Normalize invoice number aliases
+        if not data.get("invoice_number"):
+            data["invoice_number"] = data.get("invoice_no") or data.get("bill_no") or data.get("bill_number")
+            
+        return data
 
     @field_validator("taxable_value", "cgst", "sgst", "igst", "total", mode="before")
     @classmethod

@@ -1,0 +1,62 @@
+{
+  "file": "INV_0028.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "SI-2877",
+  "invoice_date": "2026-06-10",
+  "invoice_date_printed": "10 Jun 2026",
+  "supplier_name": "Nori, Kant and Chahal",
+  "supplier_gstin": "03IBKFN6207V4ZA",
+  "line_items": [
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 24,
+      "rate": 173.41,
+      "amount": 4161.84
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 138,
+      "rate": 869.03,
+      "amount": 119926.14
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 1,
+      "rate": 1203.49,
+      "amount": 1203.49
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 135,
+      "rate": 294.89,
+      "amount": 39810.15
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 34,
+      "rate": 345.5,
+      "amount": 11747.0
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 34,
+      "rate": 187.41,
+      "amount": 6371.94
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Bulk",
+      "quantity": 99,
+      "rate": 1058.43,
+      "amount": 104784.57
+    }
+  ],
+  "taxable_value": 288005.13,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 51840.92,
+  "total": 339846.05,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

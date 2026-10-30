@@ -1,0 +1,352 @@
+{
+  "file": "INV_0069.pdf",
+  "layout": "compact",
+  "pages": 2,
+  "invoice_number": "S/26-27/1005",
+  "invoice_date": "2026-07-14",
+  "invoice_date_printed": "14 Jul 2026",
+  "supplier_name": "Sen-Balan",
+  "supplier_gstin": "37ECPFS1980D7ZF",
+  "line_items": [
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 190,
+      "rate": 213.09,
+      "amount": 40487.1
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 122,
+      "rate": 2121.14,
+      "amount": 258779.08
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 167,
+      "rate": 200.31,
+      "amount": 33451.77
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 49,
+      "rate": 2109.74,
+      "amount": 103377.26
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Premium",
+      "quantity": 16,
+      "rate": 132.87,
+      "amount": 2125.92
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Bulk",
+      "quantity": 119,
+      "rate": 134.68,
+      "amount": 16026.92
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 34,
+      "rate": 887.47,
+      "amount": 30173.98
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 37,
+      "rate": 3145.93,
+      "amount": 116399.41
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 50,
+      "rate": 243.45,
+      "amount": 12172.5
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 107,
+      "rate": 583.02,
+      "amount": 62383.14
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 128,
+      "rate": 261.69,
+      "amount": 33496.32
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Premium",
+      "quantity": 4,
+      "rate": 2009.4,
+      "amount": 8037.6
+    },
+    {
+      "description": "Ballpoint Pen (box of 50) - Retail",
+      "quantity": 120,
+      "rate": 255.19,
+      "amount": 30622.8
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 40,
+      "rate": 2162.63,
+      "amount": 86505.2
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 52,
+      "rate": 2201.79,
+      "amount": 114493.08
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 97,
+      "rate": 2276.14,
+      "amount": 220785.58
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Type 1",
+      "quantity": 158,
+      "rate": 1897.35,
+      "amount": 299781.3
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 181,
+      "rate": 513.8,
+      "amount": 92997.8
+    },
+    {
+      "description": "Detergent Powder 5 kg - Type 2",
+      "quantity": 128,
+      "rate": 610.8,
+      "amount": 78182.4
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 116,
+      "rate": 167.25,
+      "amount": 19401.0
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 12,
+      "rate": 432.98,
+      "amount": 5195.76
+    },
+    {
+      "description": "Detergent Powder 5 kg - Type 1",
+      "quantity": 63,
+      "rate": 658.9,
+      "amount": 41510.7
+    },
+    {
+      "description": "Ballpoint Pen (box of 50) - Economy",
+      "quantity": 103,
+      "rate": 249.29,
+      "amount": 25676.87
+    },
+    {
+      "description": "Steel Padlock 50 mm - Type 2",
+      "quantity": 3,
+      "rate": 120.22,
+      "amount": 360.66
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 65,
+      "rate": 222.5,
+      "amount": 14462.5
+    },
+    {
+      "description": "Detergent Powder 5 kg - Bulk",
+      "quantity": 178,
+      "rate": 627.63,
+      "amount": 111718.14
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 83,
+      "rate": 198.47,
+      "amount": 16473.01
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Type 1",
+      "quantity": 41,
+      "rate": 3615.33,
+      "amount": 148228.53
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Type 2",
+      "quantity": 165,
+      "rate": 1982.21,
+      "amount": 327064.65
+    },
+    {
+      "description": "Detergent Powder 5 kg - Grade B",
+      "quantity": 197,
+      "rate": 615.61,
+      "amount": 121275.17
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 110,
+      "rate": 233.61,
+      "amount": 25697.1
+    },
+    {
+      "description": "Steel Padlock 50 mm - Economy",
+      "quantity": 71,
+      "rate": 116.04,
+      "amount": 8238.84
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 146,
+      "rate": 481.89,
+      "amount": 70355.94
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12) - Bulk",
+      "quantity": 35,
+      "rate": 573.05,
+      "amount": 20056.75
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Retail",
+      "quantity": 92,
+      "rate": 1905.8,
+      "amount": 175333.6
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 61,
+      "rate": 309.85,
+      "amount": 18900.85
+    },
+    {
+      "description": "Sugar 50 kg bag - Premium",
+      "quantity": 157,
+      "rate": 2243.1,
+      "amount": 352166.7
+    },
+    {
+      "description": "Sugar 50 kg bag - Retail",
+      "quantity": 167,
+      "rate": 2399.28,
+      "amount": 400679.76
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Type 2",
+      "quantity": 42,
+      "rate": 1839.66,
+      "amount": 77265.72
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Type 1",
+      "quantity": 78,
+      "rate": 247.05,
+      "amount": 19269.9
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Bulk",
+      "quantity": 190,
+      "rate": 996.16,
+      "amount": 189270.4
+    },
+    {
+      "description": "Tea Powder 1 kg pack - Grade B",
+      "quantity": 170,
+      "rate": 574.92,
+      "amount": 97736.4
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Grade A",
+      "quantity": 10,
+      "rate": 1824.13,
+      "amount": 18241.3
+    },
+    {
+      "description": "Extension Board 4-socket - Type 1",
+      "quantity": 32,
+      "rate": 474.41,
+      "amount": 15181.12
+    },
+    {
+      "description": "Plastic Bucket 20 L - Retail",
+      "quantity": 142,
+      "rate": 248.64,
+      "amount": 35306.88
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 135,
+      "rate": 1865.53,
+      "amount": 251846.55
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets) - Retail",
+      "quantity": 197,
+      "rate": 229.93,
+      "amount": 45296.21
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Type 2",
+      "quantity": 139,
+      "rate": 186.01,
+      "amount": 25855.39
+    },
+    {
+      "description": "Sugar 50 kg bag - Bulk",
+      "quantity": 119,
+      "rate": 2234.46,
+      "amount": 265900.74
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 62,
+      "rate": 698.76,
+      "amount": 43323.12
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Retail",
+      "quantity": 194,
+      "rate": 1763.73,
+      "amount": 342163.62
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Bulk",
+      "quantity": 168,
+      "rate": 2516.96,
+      "amount": 422849.28
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Premium",
+      "quantity": 192,
+      "rate": 235.21,
+      "amount": 45160.32
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Economy",
+      "quantity": 25,
+      "rate": 3949.25,
+      "amount": 98731.25
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Grade B",
+      "quantity": 118,
+      "rate": 871.76,
+      "amount": 102867.68
+    }
+  ],
+  "taxable_value": 5639341.57,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 281967.08,
+  "total": 5921308.65,
+  "gstin_valid": false,
+  "expected_flags": [
+    "gstin_checksum"
+  ],
+  "duplicate_of": null
+}

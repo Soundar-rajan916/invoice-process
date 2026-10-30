@@ -1,0 +1,68 @@
+{
+  "file": "INV_0084.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "AP/26-27/3146",
+  "invoice_date": "2026-01-07",
+  "invoice_date_printed": "2026-01-07",
+  "supplier_name": "Anne PLC",
+  "supplier_gstin": "24WIDCA9662X2ZK",
+  "line_items": [
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 198,
+      "rate": 2123.53,
+      "amount": 420458.94
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 186,
+      "rate": 755.38,
+      "amount": 140500.68
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 155,
+      "rate": 370.6,
+      "amount": 57443.0
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 75,
+      "rate": 216.44,
+      "amount": 16233.0
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 143,
+      "rate": 3314.54,
+      "amount": 473979.22
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 108,
+      "rate": 304.92,
+      "amount": 32931.36
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 158,
+      "rate": 2061.38,
+      "amount": 325698.04
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Type 2",
+      "quantity": 43,
+      "rate": 918.07,
+      "amount": 39477.01
+    }
+  ],
+  "taxable_value": 1506721.25,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 180806.55,
+  "total": 1687527.8,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

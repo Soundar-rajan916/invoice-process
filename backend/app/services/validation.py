@@ -194,13 +194,14 @@ def validate_extraction(
     calculated_total = base_taxable + cgst + sgst + igst
 
     if extraction.total is not None:
-        if abs(calculated_total - extraction.total) > total_tol:
+        diff = calculated_total - extraction.total
+        if abs(diff) > total_tol:
             issues.append(
                 ValidationIssueDto(
                     "total_mismatch",
                     "total",
                     "error",
-                    f"Taxable ({base_taxable:.2f}) + CGST ({cgst:.2f}) + SGST ({sgst:.2f}) + IGST ({igst:.2f}) = {calculated_total:.2f}, but extracted total is {extraction.total:.2f}",
+                    f"Taxable ({base_taxable:.2f}) + CGST ({cgst:.2f}) + SGST ({sgst:.2f}) + IGST ({igst:.2f}) = {calculated_total:.2f}, but extracted total is {extraction.total:.2f} (diff: ₹{abs(diff):.2f})",
                 )
             )
 

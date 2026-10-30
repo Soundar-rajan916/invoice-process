@@ -1,0 +1,32 @@
+{
+  "file": "INV_0062.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "INV-2026-03690",
+  "invoice_date": "2026-05-14",
+  "invoice_date_printed": "14 May 2026",
+  "supplier_name": "Sarna Group",
+  "supplier_gstin": "36QQCCS3296C3Z0",
+  "line_items": [
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 155,
+      "rate": 1635.0,
+      "amount": 253425.0
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 4,
+      "rate": 2350.76,
+      "amount": 9403.04
+    }
+  ],
+  "taxable_value": 262828.04,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 31539.36,
+  "total": 294367.4,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

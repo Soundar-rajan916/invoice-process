@@ -1,0 +1,64 @@
+{
+  "file": "INV_0074.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "TL25074",
+  "invoice_date": "2025-12-13",
+  "invoice_date_printed": "13/12/2025",
+  "supplier_name": "Tank Ltd",
+  "supplier_gstin": "19UAIFT1139A6ZR",
+  "line_items": [
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 175,
+      "rate": 2022.78,
+      "amount": 353986.5
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 146,
+      "rate": 1031.94,
+      "amount": 150663.24
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 78,
+      "rate": 304.13,
+      "amount": 24138.14
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 136,
+      "rate": 148.46,
+      "amount": 20190.56
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 189,
+      "rate": 404.21,
+      "amount": 76395.69
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 112,
+      "rate": 3409.32,
+      "amount": 381843.84
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 183,
+      "rate": 2234.46,
+      "amount": 408906.18
+    }
+  ],
+  "taxable_value": 1415708.15,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 169884.98,
+  "total": 1585593.13,
+  "gstin_valid": true,
+  "expected_flags": [
+    "line_amount_mismatch"
+  ],
+  "duplicate_of": null
+}

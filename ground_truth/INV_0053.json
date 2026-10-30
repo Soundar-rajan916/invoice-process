@@ -1,0 +1,50 @@
+{
+  "file": "INV_0053.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI-5904",
+  "invoice_date": "2026-02-13",
+  "invoice_date_printed": "13 Feb 2026",
+  "supplier_name": "Arya Ltd",
+  "supplier_gstin": "07BDFFA7579D1Z6",
+  "line_items": [
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 179,
+      "rate": 156.74,
+      "amount": 28056.46
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 134,
+      "rate": 209.45,
+      "amount": 28066.3
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 90,
+      "rate": 2414.48,
+      "amount": 217303.2
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 24,
+      "rate": 2225.14,
+      "amount": 53403.36
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 165,
+      "rate": 388.7,
+      "amount": 64135.5
+    }
+  ],
+  "taxable_value": 390964.82,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 70373.67,
+  "total": 461338.49,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

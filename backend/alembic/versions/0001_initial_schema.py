@@ -20,10 +20,15 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    is_sqlite = bind.dialect.name == "sqlite"
+    UUID_TYPE = sa.String(36) if is_sqlite else postgresql.UUID(as_uuid=True)
+    JSON_TYPE = sa.JSON() if is_sqlite else postgresql.JSONB(astext_type=sa.Text())
+
     # 1. users
     op.create_table(
         "users",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("id", UUID_TYPE, primary_key=True),
         sa.Column("email", sa.String(255), nullable=False, unique=True),
         sa.Column("password_hash", sa.String(255), nullable=False),
         sa.Column("role", sa.String(50), nullable=False, server_default="reviewer"),
@@ -36,7 +41,7 @@ def upgrade() -> None:
     # 2. suppliers
     op.create_table(
         "suppliers",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("id", UUID_TYPE, primary_key=True),
         sa.Column("gstin", sa.String(15), nullable=False, unique=True),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("state_code", sa.String(2), nullable=False),
@@ -49,7 +54,7 @@ def upgrade() -> None:
     # 3. source_files
     op.create_table(
         "source_files",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("id", UUID_TYPE, primary_key=True),
         sa.Column("sha256", sa.String(64), nullable=False, unique=True),
         sa.Column("original_filename", sa.String(255), nullable=False),
         sa.Column("content_type", sa.String(100), nullable=False),
@@ -58,7 +63,7 @@ def upgrade() -> None:
         sa.Column("source", sa.String(50), nullable=False, server_default="upload"),
         sa.Column("received_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column(
-            "uploaded_by", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id"), nullable=True
+            "uploaded_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True
         ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
@@ -68,19 +73,19 @@ def upgrade() -> None:
     # 4. extractions (pre-created so invoices can FK to it)
     op.create_table(
         "extractions",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("invoice_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("id", UUID_TYPE, primary_key=True),
+        sa.Column("invoice_id", UUID_TYPE, nullable=False),
         sa.Column("version", sa.Integer(), nullable=False, server_default="1"),
         sa.Column("kind", sa.String(30), nullable=False),
-        sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("confidences", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("data", JSON_TYPE, nullable=False),
+        sa.Column("confidences", JSON_TYPE, nullable=False),
         sa.Column("model_id", sa.String(100), nullable=True),
         sa.Column("prompt_version", sa.String(50), nullable=True),
-        sa.Column("raw_response", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-        sa.Column("token_usage", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column("raw_response", JSON_TYPE, nullable=True),
+        sa.Column("token_usage", JSON_TYPE, nullable=True),
         sa.Column("latency_ms", sa.Integer(), nullable=True),
         sa.Column(
-            "created_by", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id"), nullable=True
+            "created_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True
         ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
@@ -89,10 +94,10 @@ def upgrade() -> None:
     # 5. invoices
     op.create_table(
         "invoices",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("id", UUID_TYPE, primary_key=True),
         sa.Column(
             "source_file_id",
-            postgresql.UUID(as_uuid=True),
+            UUID_TYPE,
             sa.ForeignKey("source_files.id"),
             nullable=False,
         ),
@@ -102,25 +107,25 @@ def upgrade() -> None:
         sa.Column("extraction_path", sa.String(20), nullable=True),
         sa.Column(
             "current_extraction_id",
-            postgresql.UUID(as_uuid=True),
+            UUID_TYPE,
             sa.ForeignKey("extractions.id"),
             nullable=True,
         ),
         sa.Column(
             "approved_extraction_id",
-            postgresql.UUID(as_uuid=True),
+            UUID_TYPE,
             sa.ForeignKey("extractions.id"),
             nullable=True,
         ),
         sa.Column(
-            "approved_by", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id"), nullable=True
+            "approved_by", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True
         ),
         sa.Column("approved_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("supplier_gstin", sa.String(15), nullable=True),
         sa.Column("normalized_invoice_number", sa.String(100), nullable=True),
         sa.Column("financial_year", sa.String(10), nullable=True),
         sa.Column(
-            "dup_of_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("invoices.id"), nullable=True
+            "dup_of_id", UUID_TYPE, sa.ForeignKey("invoices.id"), nullable=True
         ),
         sa.Column("dup_overridden", sa.Boolean(), nullable=False, server_default=sa.false()),
         sa.Column("dup_override_reason", sa.Text(), nullable=True),
@@ -143,39 +148,48 @@ def upgrade() -> None:
     op.create_index("ix_invoices_financial_year", "invoices", ["financial_year"])
 
     # R3 Partial unique index on business key
-    op.create_index(
-        "idx_invoices_business_key_unique",
-        "invoices",
-        ["supplier_gstin", "normalized_invoice_number", "financial_year"],
-        unique=True,
-        postgresql_where=sa.text(
-            "dup_of_id IS NULL AND status NOT IN ('REJECTED', 'REJECTED_DUPLICATE')"
-        ),
-    )
+    if is_sqlite:
+        op.create_index(
+            "idx_invoices_business_key_unique",
+            "invoices",
+            ["supplier_gstin", "normalized_invoice_number", "financial_year"],
+            unique=False,
+        )
+    else:
+        op.create_index(
+            "idx_invoices_business_key_unique",
+            "invoices",
+            ["supplier_gstin", "normalized_invoice_number", "financial_year"],
+            unique=True,
+            postgresql_where=sa.text(
+                "dup_of_id IS NULL AND status NOT IN ('REJECTED', 'REJECTED_DUPLICATE')"
+            ),
+        )
 
     # Now add foreign key from extractions to invoices
-    op.create_foreign_key(
-        "fk_extractions_invoice_id",
-        "extractions",
-        "invoices",
-        ["invoice_id"],
-        ["id"],
-    )
+    if not is_sqlite:
+        op.create_foreign_key(
+            "fk_extractions_invoice_id",
+            "extractions",
+            "invoices",
+            ["invoice_id"],
+            ["id"],
+        )
     op.create_index("ix_extractions_invoice_id", "extractions", ["invoice_id"])
 
     # 6. validation_issues
     op.create_table(
         "validation_issues",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("id", UUID_TYPE, primary_key=True),
         sa.Column(
             "invoice_id",
-            postgresql.UUID(as_uuid=True),
+            UUID_TYPE,
             sa.ForeignKey("invoices.id"),
             nullable=False,
         ),
         sa.Column(
             "extraction_id",
-            postgresql.UUID(as_uuid=True),
+            UUID_TYPE,
             sa.ForeignKey("extractions.id"),
             nullable=True,
         ),
@@ -192,26 +206,27 @@ def upgrade() -> None:
     # 7. review_events (audit trail)
     op.create_table(
         "review_events",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("id", UUID_TYPE, primary_key=True),
         sa.Column(
             "invoice_id",
-            postgresql.UUID(as_uuid=True),
+            UUID_TYPE,
             sa.ForeignKey("invoices.id"),
             nullable=False,
         ),
         sa.Column(
-            "actor_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id"), nullable=True
+            "actor_id", UUID_TYPE, sa.ForeignKey("users.id"), nullable=True
         ),
         sa.Column("action", sa.String(50), nullable=False),
-        sa.Column("payload", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("payload", JSON_TYPE, nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
     )
     op.create_index("ix_review_events_invoice_id", "review_events", ["invoice_id"])
 
     # Append-only trigger for review_events (Postgres specific)
-    bind = op.get_bind()
-    if bind.dialect.name == "postgresql":
+    # Split into two separate op.execute() calls — asyncpg cannot prepare
+    # a statement that contains multiple SQL commands in one string.
+    if not is_sqlite:
         op.execute(
             """
             CREATE OR REPLACE FUNCTION block_review_events_mutation()
@@ -219,28 +234,31 @@ def upgrade() -> None:
             BEGIN
                 RAISE EXCEPTION 'review_events is append-only: updates and deletes are prohibited.';
             END;
-            $$ LANGUAGE plpgsql;
-
+            $$ LANGUAGE plpgsql
+            """
+        )
+        op.execute(
+            """
             CREATE TRIGGER trg_review_events_append_only
             BEFORE UPDATE OR DELETE ON review_events
             FOR EACH ROW
-            EXECUTE FUNCTION block_review_events_mutation();
+            EXECUTE FUNCTION block_review_events_mutation()
             """
         )
 
     # 8. push_attempts
     op.create_table(
         "push_attempts",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("id", UUID_TYPE, primary_key=True),
         sa.Column(
             "invoice_id",
-            postgresql.UUID(as_uuid=True),
+            UUID_TYPE,
             sa.ForeignKey("invoices.id"),
             nullable=False,
         ),
         sa.Column("attempt_no", sa.Integer(), nullable=False),
         sa.Column("http_status", sa.Integer(), nullable=True),
-        sa.Column("response", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column("response", JSON_TYPE, nullable=True),
         sa.Column("error", sa.Text(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),

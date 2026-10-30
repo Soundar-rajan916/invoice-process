@@ -1,0 +1,32 @@
+{
+  "file": "INV_0076.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "GST005378",
+  "invoice_date": "2025-11-06",
+  "invoice_date_printed": "06 Nov 2025",
+  "supplier_name": "Keer and Sons",
+  "supplier_gstin": "37AUVFK8029B2ZV",
+  "line_items": [
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 80,
+      "rate": 3939.72,
+      "amount": 315177.6
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 190,
+      "rate": 284.46,
+      "amount": 54047.4
+    }
+  ],
+  "taxable_value": 369225.0,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 18461.25,
+  "total": 387686.25,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

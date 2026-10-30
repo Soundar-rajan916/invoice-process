@@ -1,0 +1,56 @@
+{
+  "file": "INV_0021.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "SI-3110",
+  "invoice_date": "2026-06-25",
+  "invoice_date_printed": "25 Jun 2026",
+  "supplier_name": "Thaman Group",
+  "supplier_gstin": "33TDXCT4960V9Z2",
+  "line_items": [
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 177,
+      "rate": 2023.06,
+      "amount": 358081.62
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 16,
+      "rate": 242.35,
+      "amount": 3877.6
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Type 1",
+      "quantity": 22,
+      "rate": 234.98,
+      "amount": 5169.56
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 25,
+      "rate": 1352.7,
+      "amount": 33817.5
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 161,
+      "rate": 2527.75,
+      "amount": 406967.75
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 98,
+      "rate": 3446.33,
+      "amount": 337740.34
+    }
+  ],
+  "taxable_value": 1145654.37,
+  "cgst": 68739.26,
+  "sgst": 68739.26,
+  "igst": 0.0,
+  "total": 1283132.89,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

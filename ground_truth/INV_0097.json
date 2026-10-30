@@ -1,0 +1,56 @@
+{
+  "file": "INV_0097.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "SG/25-26/5549",
+  "invoice_date": "2025-11-26",
+  "invoice_date_printed": "26/11/2025",
+  "supplier_name": "Sridhar Group",
+  "supplier_gstin": "32RYUFS5207J9ZV",
+  "line_items": [
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 157,
+      "rate": 910.05,
+      "amount": 142877.85
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 150,
+      "rate": 456.55,
+      "amount": 68482.5
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 57,
+      "rate": 2574.1,
+      "amount": 146723.7
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 146,
+      "rate": 1353.32,
+      "amount": 197584.72
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 29,
+      "rate": 1785.0,
+      "amount": 51765.0
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 3,
+      "rate": 180.47,
+      "amount": 541.41
+    }
+  ],
+  "taxable_value": 607975.18,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 109435.53,
+  "total": 717410.71,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

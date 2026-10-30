@@ -1,0 +1,40 @@
+{
+  "file": "INV_0045.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "INV-2026-09223",
+  "invoice_date": "2026-02-22",
+  "invoice_date_printed": "22-Feb-26",
+  "supplier_name": "Nayar-Palan",
+  "supplier_gstin": "09OZOFN9989R6ZM",
+  "line_items": [
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 174,
+      "rate": 196.8,
+      "amount": 34390.2
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 41,
+      "rate": 1501.43,
+      "amount": 61558.63
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 192,
+      "rate": 2061.21,
+      "amount": 395752.32
+    }
+  ],
+  "taxable_value": 491554.15,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 88479.75,
+  "total": 580033.9,
+  "gstin_valid": true,
+  "expected_flags": [
+    "line_amount_mismatch"
+  ],
+  "duplicate_of": null
+}

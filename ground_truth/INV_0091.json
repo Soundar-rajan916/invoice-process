@@ -1,0 +1,206 @@
+{
+  "file": "INV_0091.pdf",
+  "layout": "banner",
+  "pages": 2,
+  "invoice_number": "NP26091",
+  "invoice_date": "2026-06-19",
+  "invoice_date_printed": "19-06-2026",
+  "supplier_name": "Nadkarni PLC",
+  "supplier_gstin": "29OCBCN0547G4ZZ",
+  "line_items": [
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 190,
+      "rate": 1953.32,
+      "amount": 371130.8
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 103,
+      "rate": 446.35,
+      "amount": 45974.05
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 115,
+      "rate": 331.99,
+      "amount": 38178.85
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 99,
+      "rate": 4167.67,
+      "amount": 412599.33
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 133,
+      "rate": 248.04,
+      "amount": 32989.32
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 134,
+      "rate": 1282.49,
+      "amount": 171853.66
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 16,
+      "rate": 1928.18,
+      "amount": 30850.88
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets) - Grade A",
+      "quantity": 97,
+      "rate": 228.69,
+      "amount": 22182.93
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 109,
+      "rate": 285.79,
+      "amount": 31151.11
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 167,
+      "rate": 154.09,
+      "amount": 25733.03
+    },
+    {
+      "description": "Plastic Bucket 20 L - Grade B",
+      "quantity": 59,
+      "rate": 251.67,
+      "amount": 14848.53
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 191,
+      "rate": 710.27,
+      "amount": 135661.57
+    },
+    {
+      "description": "Plastic Bucket 20 L - Type 1",
+      "quantity": 168,
+      "rate": 165.4,
+      "amount": 27787.2
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Type 1",
+      "quantity": 101,
+      "rate": 1872.78,
+      "amount": 189150.78
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 46,
+      "rate": 1549.47,
+      "amount": 71275.62
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 8,
+      "rate": 625.1,
+      "amount": 5000.8
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 175,
+      "rate": 200.17,
+      "amount": 35029.75
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 139,
+      "rate": 410.28,
+      "amount": 57028.92
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Type 2",
+      "quantity": 171,
+      "rate": 256.76,
+      "amount": 43905.96
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Economy",
+      "quantity": 127,
+      "rate": 459.4,
+      "amount": 58343.8
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Grade A",
+      "quantity": 187,
+      "rate": 221.41,
+      "amount": 41403.67
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 106,
+      "rate": 2146.24,
+      "amount": 227501.44
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Bulk",
+      "quantity": 168,
+      "rate": 481.7,
+      "amount": 80925.6
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Retail",
+      "quantity": 65,
+      "rate": 242.47,
+      "amount": 15760.55
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 63,
+      "rate": 126.6,
+      "amount": 7975.8
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30) - Bulk",
+      "quantity": 3,
+      "rate": 176.25,
+      "amount": 528.75
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Premium",
+      "quantity": 192,
+      "rate": 668.7,
+      "amount": 128390.4
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Type 1",
+      "quantity": 110,
+      "rate": 3802.06,
+      "amount": 418226.6
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Grade A",
+      "quantity": 187,
+      "rate": 2040.29,
+      "amount": 381534.23
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Type 2",
+      "quantity": 61,
+      "rate": 2023.68,
+      "amount": 123444.48
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets) - Retail",
+      "quantity": 61,
+      "rate": 237.82,
+      "amount": 14507.02
+    }
+  ],
+  "taxable_value": 3260875.43,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 163043.77,
+  "total": 3423919.2,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

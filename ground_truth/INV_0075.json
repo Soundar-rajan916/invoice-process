@@ -1,0 +1,68 @@
+{
+  "file": "INV_0075.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "GKA26075",
+  "invoice_date": "2026-01-22",
+  "invoice_date_printed": "22 Jan 2026",
+  "supplier_name": "Garg, Khanna and Salvi",
+  "supplier_gstin": "37MTSCG6134Z9ZK",
+  "line_items": [
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 189,
+      "rate": 236.3,
+      "amount": 44660.7
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 199,
+      "rate": 1114.34,
+      "amount": 221753.66
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 65,
+      "rate": 2436.08,
+      "amount": 158345.2
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 192,
+      "rate": 545.68,
+      "amount": 104770.56
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 132,
+      "rate": 189.76,
+      "amount": 25048.32
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Type 2",
+      "quantity": 125,
+      "rate": 2022.72,
+      "amount": 252840.0
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 26,
+      "rate": 2268.01,
+      "amount": 58968.26
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Type 2",
+      "quantity": 187,
+      "rate": 1383.6,
+      "amount": 258733.2
+    }
+  ],
+  "taxable_value": 1125119.9,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 56256.0,
+  "total": 1181375.9,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

@@ -1,0 +1,26 @@
+{
+  "file": "INV_0041.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "S26041",
+  "invoice_date": "2026-02-10",
+  "invoice_date_printed": "10 Feb 2026",
+  "supplier_name": "Sood-Vohra",
+  "supplier_gstin": "19KLDCS8678L9ZA",
+  "line_items": [
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 3,
+      "rate": 1219.34,
+      "amount": 3658.02
+    }
+  ],
+  "taxable_value": 3658.02,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 182.9,
+  "total": 3840.92,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

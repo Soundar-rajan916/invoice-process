@@ -1,0 +1,40 @@
+{
+  "file": "INV_0032.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "INV-2025-00174",
+  "invoice_date": "2025-11-15",
+  "invoice_date_printed": "15-11-2025",
+  "supplier_name": "Chadha, Kari and Edwin",
+  "supplier_gstin": "07WQKCC3962I9ZN",
+  "line_items": [
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 91,
+      "rate": 267.88,
+      "amount": 24377.08
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 143,
+      "rate": 350.35,
+      "amount": 50100.05
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 78,
+      "rate": 2577.05,
+      "amount": 201377.9
+    }
+  ],
+  "taxable_value": 275487.03,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 49587.67,
+  "total": 325074.7,
+  "gstin_valid": true,
+  "expected_flags": [
+    "line_amount_mismatch"
+  ],
+  "duplicate_of": null
+}

@@ -1,0 +1,68 @@
+{
+  "file": "INV_0016.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "SI-5464",
+  "invoice_date": "2026-03-30",
+  "invoice_date_printed": "2026-03-30",
+  "supplier_name": "Buch Inc",
+  "supplier_gstin": "27ZUICB9215W8ZO",
+  "line_items": [
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 27,
+      "rate": 1968.77,
+      "amount": 53156.79
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 175,
+      "rate": 160.34,
+      "amount": 28059.5
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 47,
+      "rate": 2041.1,
+      "amount": 95931.7
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 28,
+      "rate": 304.53,
+      "amount": 8526.84
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 127,
+      "rate": 2368.93,
+      "amount": 300854.11
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 137,
+      "rate": 865.59,
+      "amount": 118585.83
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 139,
+      "rate": 232.92,
+      "amount": 32375.88
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Grade A",
+      "quantity": 166,
+      "rate": 1924.12,
+      "amount": 319403.92
+    }
+  ],
+  "taxable_value": 956894.57,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 267930.48,
+  "total": 1224825.05,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

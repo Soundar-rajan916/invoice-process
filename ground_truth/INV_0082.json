@@ -1,0 +1,224 @@
+{
+  "file": "INV_0082.pdf",
+  "layout": "classic",
+  "pages": 2,
+  "invoice_number": "SBA26082",
+  "invoice_date": "2026-03-14",
+  "invoice_date_printed": "14-03-2026",
+  "supplier_name": "Saha, Bali and Rattan",
+  "supplier_gstin": "07HKFCS8874Z1Z0",
+  "line_items": [
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 92,
+      "rate": 2126.48,
+      "amount": 195636.16
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 188,
+      "rate": 2544.87,
+      "amount": 478435.56
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 11,
+      "rate": 1029.43,
+      "amount": 11323.73
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Grade A",
+      "quantity": 200,
+      "rate": 1626.54,
+      "amount": 325308.0
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 46,
+      "rate": 1336.32,
+      "amount": 61470.72
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Grade A",
+      "quantity": 27,
+      "rate": 1107.43,
+      "amount": 29900.61
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 28,
+      "rate": 435.82,
+      "amount": 12202.96
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 68,
+      "rate": 732.65,
+      "amount": 49820.2
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 49,
+      "rate": 185.8,
+      "amount": 9104.2
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 33,
+      "rate": 1917.91,
+      "amount": 63291.03
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Retail",
+      "quantity": 3,
+      "rate": 2147.76,
+      "amount": 6443.28
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 36,
+      "rate": 2468.48,
+      "amount": 88865.28
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 168,
+      "rate": 151.05,
+      "amount": 25376.4
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 61,
+      "rate": 309.06,
+      "amount": 18852.66
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Type 2",
+      "quantity": 54,
+      "rate": 1526.78,
+      "amount": 82446.12
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Type 1",
+      "quantity": 17,
+      "rate": 188.84,
+      "amount": 3210.28
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 8,
+      "rate": 679.18,
+      "amount": 5433.44
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 70,
+      "rate": 536.86,
+      "amount": 37580.2
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 23,
+      "rate": 429.99,
+      "amount": 9889.77
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 69,
+      "rate": 1449.11,
+      "amount": 99988.59
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Type 2",
+      "quantity": 30,
+      "rate": 259.54,
+      "amount": 7786.2
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 115,
+      "rate": 164.51,
+      "amount": 18918.65
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 175,
+      "rate": 282.94,
+      "amount": 49514.5
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Economy",
+      "quantity": 74,
+      "rate": 2219.1,
+      "amount": 164213.4
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 156,
+      "rate": 1672.45,
+      "amount": 260902.2
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 142,
+      "rate": 1842.71,
+      "amount": 261664.82
+    },
+    {
+      "description": "Sugar 50 kg bag - Bulk",
+      "quantity": 60,
+      "rate": 2191.97,
+      "amount": 131518.2
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 8,
+      "rate": 189.22,
+      "amount": 1513.76
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Grade B",
+      "quantity": 53,
+      "rate": 145.78,
+      "amount": 7726.34
+    },
+    {
+      "description": "Cement 50 kg bag - Grade A",
+      "quantity": 31,
+      "rate": 431.92,
+      "amount": 13389.52
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Economy",
+      "quantity": 105,
+      "rate": 2296.01,
+      "amount": 241081.05
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Type 2",
+      "quantity": 91,
+      "rate": 2151.48,
+      "amount": 195784.68
+    },
+    {
+      "description": "Ballpoint Pen (box of 50) - Grade A",
+      "quantity": 177,
+      "rate": 296.09,
+      "amount": 52407.93
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Type 2",
+      "quantity": 134,
+      "rate": 150.34,
+      "amount": 20145.56
+    }
+  ],
+  "taxable_value": 3041146.0,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 152057.3,
+  "total": 3193203.3,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

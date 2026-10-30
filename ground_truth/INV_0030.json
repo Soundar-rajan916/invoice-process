@@ -1,0 +1,338 @@
+{
+  "file": "INV_0030.pdf",
+  "layout": "banner",
+  "pages": 2,
+  "invoice_number": "INV-2026-03486",
+  "invoice_date": "2026-07-25",
+  "invoice_date_printed": "25 Jul 2026",
+  "supplier_name": "Talwar-Chacko",
+  "supplier_gstin": "27HOXCT2160L7ZI",
+  "line_items": [
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 155,
+      "rate": 2023.04,
+      "amount": 313571.2
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 176,
+      "rate": 444.72,
+      "amount": 78270.72
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 170,
+      "rate": 179.27,
+      "amount": 30475.9
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 158,
+      "rate": 2325.02,
+      "amount": 367353.16
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 116,
+      "rate": 502.92,
+      "amount": 58338.72
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Type 2",
+      "quantity": 147,
+      "rate": 474.17,
+      "amount": 69702.99
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Economy",
+      "quantity": 122,
+      "rate": 2389.11,
+      "amount": 291471.42
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 36,
+      "rate": 234.49,
+      "amount": 8441.64
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Economy",
+      "quantity": 117,
+      "rate": 243.42,
+      "amount": 28480.14
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 100,
+      "rate": 514.24,
+      "amount": 51424.0
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 125,
+      "rate": 142.3,
+      "amount": 17787.5
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 117,
+      "rate": 154.31,
+      "amount": 18054.27
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 179,
+      "rate": 2009.17,
+      "amount": 359641.43
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 41,
+      "rate": 398.92,
+      "amount": 16355.72
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Grade A",
+      "quantity": 150,
+      "rate": 243.48,
+      "amount": 36522.0
+    },
+    {
+      "description": "Detergent Powder 5 kg - Grade B",
+      "quantity": 11,
+      "rate": 570.05,
+      "amount": 6270.55
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 189,
+      "rate": 2133.92,
+      "amount": 403310.88
+    },
+    {
+      "description": "Cement 50 kg bag - Bulk",
+      "quantity": 19,
+      "rate": 421.41,
+      "amount": 8006.79
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Grade A",
+      "quantity": 115,
+      "rate": 2170.74,
+      "amount": 249635.1
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Grade B",
+      "quantity": 164,
+      "rate": 201.21,
+      "amount": 32998.44
+    },
+    {
+      "description": "Detergent Powder 5 kg - Retail",
+      "quantity": 181,
+      "rate": 510.41,
+      "amount": 92384.21
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 48,
+      "rate": 230.54,
+      "amount": 11065.92
+    },
+    {
+      "description": "Detergent Powder 5 kg - Economy",
+      "quantity": 25,
+      "rate": 484.05,
+      "amount": 12101.25
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Bulk",
+      "quantity": 50,
+      "rate": 1833.29,
+      "amount": 91664.5
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 170,
+      "rate": 336.12,
+      "amount": 57140.4
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 74,
+      "rate": 480.86,
+      "amount": 35583.64
+    },
+    {
+      "description": "Cement 50 kg bag - Grade A",
+      "quantity": 116,
+      "rate": 341.54,
+      "amount": 39618.64
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 145,
+      "rate": 2248.43,
+      "amount": 326022.35
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Type 2",
+      "quantity": 92,
+      "rate": 1915.18,
+      "amount": 176196.56
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Premium",
+      "quantity": 88,
+      "rate": 212.94,
+      "amount": 18738.72
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 73,
+      "rate": 274.5,
+      "amount": 20038.5
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Grade A",
+      "quantity": 174,
+      "rate": 205.22,
+      "amount": 35708.28
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 200,
+      "rate": 1460.01,
+      "amount": 292002.0
+    },
+    {
+      "description": "Cement 50 kg bag - Retail",
+      "quantity": 38,
+      "rate": 416.18,
+      "amount": 15814.84
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12) - Bulk",
+      "quantity": 9,
+      "rate": 611.44,
+      "amount": 5502.96
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 173,
+      "rate": 325.68,
+      "amount": 56342.64
+    },
+    {
+      "description": "Detergent Powder 5 kg - Bulk",
+      "quantity": 42,
+      "rate": 469.97,
+      "amount": 19738.74
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 118,
+      "rate": 1111.05,
+      "amount": 131103.9
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 81,
+      "rate": 839.45,
+      "amount": 67995.45
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Bulk",
+      "quantity": 142,
+      "rate": 136.52,
+      "amount": 19385.84
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 88,
+      "rate": 3114.44,
+      "amount": 274070.72
+    },
+    {
+      "description": "Detergent Powder 5 kg - Grade A",
+      "quantity": 73,
+      "rate": 495.7,
+      "amount": 36186.1
+    },
+    {
+      "description": "Detergent Powder 5 kg - Type 2",
+      "quantity": 89,
+      "rate": 571.69,
+      "amount": 50880.41
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Premium",
+      "quantity": 181,
+      "rate": 1943.2,
+      "amount": 351719.2
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Grade B",
+      "quantity": 67,
+      "rate": 187.7,
+      "amount": 12575.9
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 69,
+      "rate": 2233.39,
+      "amount": 154103.91
+    },
+    {
+      "description": "Extension Board 4-socket - Grade A",
+      "quantity": 145,
+      "rate": 462.42,
+      "amount": 67050.9
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Type 1",
+      "quantity": 110,
+      "rate": 137.09,
+      "amount": 15079.9
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Bulk",
+      "quantity": 144,
+      "rate": 207.13,
+      "amount": 29826.72
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Type 2",
+      "quantity": 118,
+      "rate": 257.65,
+      "amount": 30402.7
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Type 2",
+      "quantity": 188,
+      "rate": 2038.59,
+      "amount": 383254.92
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 175,
+      "rate": 709.89,
+      "amount": 124230.75
+    },
+    {
+      "description": "Tea Powder 1 kg pack - Type 2",
+      "quantity": 43,
+      "rate": 357.33,
+      "amount": 15365.19
+    }
+  ],
+  "taxable_value": 5515009.23,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 661801.11,
+  "total": 6176810.34,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

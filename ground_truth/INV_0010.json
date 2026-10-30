@@ -1,0 +1,50 @@
+{
+  "file": "INV_0010.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "GZA/26-27/6110",
+  "invoice_date": "2026-05-10",
+  "invoice_date_printed": "2026-05-10",
+  "supplier_name": "Garg, Zachariah and Mander",
+  "supplier_gstin": "36RQYCG6556M2Z4",
+  "line_items": [
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 152,
+      "rate": 198.99,
+      "amount": 30246.48
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Premium",
+      "quantity": 44,
+      "rate": 219.55,
+      "amount": 9660.2
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 108,
+      "rate": 581.55,
+      "amount": 62807.4
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 13,
+      "rate": 2206.35,
+      "amount": 28682.55
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 182,
+      "rate": 1569.15,
+      "amount": 285585.3
+    }
+  ],
+  "taxable_value": 416981.93,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 116754.94,
+  "total": 533736.87,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

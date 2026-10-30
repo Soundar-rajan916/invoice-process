@@ -98,7 +98,7 @@ class Invoice(Base, TimestampMixin):
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Business-key columns
-    supplier_gstin: Mapped[str | None] = mapped_column(String(15), index=True, nullable=True)
+    supplier_gstin: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)
     normalized_invoice_number: Mapped[str | None] = mapped_column(
         String(100), index=True, nullable=True
     )
@@ -137,11 +137,11 @@ class Invoice(Base, TimestampMixin):
             unique=True,
             postgresql_where=(
                 (Column("dup_of_id").is_(None))
-                & (~Column("status").in_(["REJECTED", "REJECTED_DUPLICATE"]))
+                & (~Column("status").in_(["REJECTED", "REJECTED_DUPLICATE", "RESEND_REQUESTED"]))
             ),
             sqlite_where=(
                 (Column("dup_of_id").is_(None))
-                & (~Column("status").in_(["REJECTED", "REJECTED_DUPLICATE"]))
+                & (~Column("status").in_(["REJECTED", "REJECTED_DUPLICATE", "RESEND_REQUESTED"]))
             ),
         ),
     )

@@ -1,0 +1,32 @@
+{
+  "file": "INV_0087.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "INV-2026-06281",
+  "invoice_date": "2026-04-30",
+  "invoice_date_printed": "30/04/2026",
+  "supplier_name": "Pillai Group",
+  "supplier_gstin": "24KCWCP1883K7Z5",
+  "line_items": [
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 139,
+      "rate": 211.19,
+      "amount": 29355.41
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 153,
+      "rate": 1000.95,
+      "amount": 153145.35
+    }
+  ],
+  "taxable_value": 182500.76,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 51100.21,
+  "total": 233600.97,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

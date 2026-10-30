@@ -1,0 +1,38 @@
+{
+  "file": "INV_0007.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "GST002188",
+  "invoice_date": "2026-08-10",
+  "invoice_date_printed": "10/08/2026",
+  "supplier_name": "Sarin, Rattan and Morar",
+  "supplier_gstin": "33UKBCS8042E6ZE",
+  "line_items": [
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 150,
+      "rate": 1559.61,
+      "amount": 233941.5
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 194,
+      "rate": 503.91,
+      "amount": 97758.54
+    },
+    {
+      "description": "Tea Powder 1 kg pack - Retail",
+      "quantity": 28,
+      "rate": 352.51,
+      "amount": 9870.28
+    }
+  ],
+  "taxable_value": 341570.32,
+  "cgst": 8539.26,
+  "sgst": 8539.26,
+  "igst": 0.0,
+  "total": 358648.84,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

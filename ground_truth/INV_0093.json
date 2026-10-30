@@ -1,0 +1,62 @@
+{
+  "file": "INV_0093.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "BP26093",
+  "invoice_date": "2026-10-19",
+  "invoice_date_printed": "19 Oct 2026",
+  "supplier_name": "Bhardwaj PLC",
+  "supplier_gstin": "33NJRFB3360R6ZW",
+  "line_items": [
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 97,
+      "rate": 261.58,
+      "amount": 25373.26
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 191,
+      "rate": 330.52,
+      "amount": 63129.32
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 40,
+      "rate": 711.35,
+      "amount": 28454.0
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 183,
+      "rate": 302.42,
+      "amount": 55342.86
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 53,
+      "rate": 2285.39,
+      "amount": 121125.67
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Type 1",
+      "quantity": 163,
+      "rate": 2397.69,
+      "amount": 390823.47
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 130,
+      "rate": 585.89,
+      "amount": 76165.7
+    }
+  ],
+  "taxable_value": 760414.28,
+  "cgst": 106458.0,
+  "sgst": 106458.0,
+  "igst": 0.0,
+  "total": 973330.28,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

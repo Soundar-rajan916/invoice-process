@@ -1,0 +1,44 @@
+{
+  "file": "INV_0008.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI-2669",
+  "invoice_date": "2025-10-29",
+  "invoice_date_printed": "2025-10-29",
+  "supplier_name": "Contractor, Balay and Bhatia",
+  "supplier_gstin": "32AFQCC3694V7Z4",
+  "line_items": [
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 113,
+      "rate": 176.03,
+      "amount": 19891.39
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 137,
+      "rate": 313.48,
+      "amount": 42946.76
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 198,
+      "rate": 126.31,
+      "amount": 25009.38
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 159,
+      "rate": 2293.34,
+      "amount": 364641.06
+    }
+  ],
+  "taxable_value": 452488.59,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 22624.43,
+  "total": 475113.02,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

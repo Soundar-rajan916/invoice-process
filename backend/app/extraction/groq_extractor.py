@@ -19,19 +19,38 @@ from app.extraction.base import ExtractionResult, PageInput
 from app.extraction.preprocess import downscale_and_compress
 from app.schemas.extraction import InvoiceExtraction
 
-PROMPT_VERSION = "2026-10-28.v1"
+PROMPT_VERSION = "2026-10-28.v2"
 
 EXTRACTION_SYSTEM_PROMPT = """You are a precise invoice extraction engine for Indian GST invoices.
 Rules:
 1. Read ONLY what is printed on the invoice. Never calculate, infer, or guess any values.
 2. Return null for any field that is missing, cut off, or illegible.
-3. Copy invoice numbers and GSTINs EXACTLY as printed, preserving hyphens, slashes, and original punctuation.
-4. Format all dates as YYYY-MM-DD. Note that Indian invoices use day-first format (DD/MM/YYYY or DD-MM-YYYY). For example, '03/04/2026' is 2026-04-03.
-5. Format all numbers as plain decimals without currency symbols (₹, Rs) or thousands separators. Normalize Indian digit grouping (e.g., '1,23,456.50' -> '123456.50').
-6. Extract line items in exact printed order. Include description, quantity, rate, and amount per line item.
-7. Provide a field_confidence map (values 0.0 to 1.0) for every top-level field as an indicator of legibility.
-8. List any uncertain, faded, or unreadable fields in unreadable_fields.
-9. You MUST output valid JSON conforming exactly to the requested schema.
+3. ENTITIES:
+   - SUPPLIER (Seller / Vendor): The entity issuing the invoice (top header / letterhead). Use exact keys "supplier_name" and "supplier_gstin".
+   - BUYER (Customer / Recipient): The entity under 'Bill To', 'Billed To', 'Buyer', 'Consignee'. Use exact keys "buyer_name" and "buyer_gstin".
+4. Copy invoice numbers and GSTINs EXACTLY as printed, preserving hyphens, slashes, and original punctuation.
+5. Format all dates as YYYY-MM-DD. Note that Indian invoices use day-first format (DD/MM/YYYY or DD-MM-YYYY).
+6. Format all numbers as plain decimals without currency symbols (₹, Rs) or thousands separators. Normalize Indian digit grouping (e.g., '1,23,456.50' -> '123456.50').
+7. Extract line items in exact printed order. Include description, quantity, rate, and amount per line item.
+8. Provide a field_confidence map (values 0.0 to 1.0) for every top-level field as an indicator of legibility.
+9. List any uncertain, faded, or unreadable fields in unreadable_fields.
+10. You MUST output a JSON object using EXACTLY these keys:
+{
+  "invoice_number": "string or null",
+  "invoice_date": "YYYY-MM-DD or null",
+  "supplier_name": "string or null",
+  "supplier_gstin": "15-char string or null",
+  "buyer_name": "string or null",
+  "buyer_gstin": "15-char string or null",
+  "line_items": [{"description": "string", "quantity": 1.0, "rate": 1.0, "amount": 1.0}],
+  "taxable_value": 0.0,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 0.0,
+  "total": 0.0,
+  "field_confidence": {},
+  "unreadable_fields": []
+}
 """
 
 
@@ -46,6 +65,7 @@ class GroqExtractor:
         self.max_bytes = settings.GROQ_MAX_REQUEST_BYTES
         self.repair_retries = settings.GROQ_REPAIR_RETRIES
         self.timeout = settings.GROQ_TIMEOUT_SECONDS
+        self.max_tokens = settings.GROQ_MAX_TOKENS
 
         if GroqExtractor._semaphore is None:
             GroqExtractor._semaphore = asyncio.Semaphore(settings.GROQ_MAX_CONCURRENCY)
@@ -276,7 +296,13 @@ class GroqExtractor:
                     response = await self._execute_request_with_backoff(
                         client, model, current_messages
                     )
-                    raw_content = response.choices[0].message.content or "{}"
+                    choice = response.choices[0]
+                    if choice.finish_reason == "length":
+                        logger.warning(
+                            "Groq completion truncated due to token limit (finish_reason=length)",
+                            completion_tokens=getattr(response.usage, "completion_tokens", None),
+                        )
+                    raw_content = choice.message.content or "{}"
                     raw_json = json.loads(raw_content)
 
                     # Validate with Pydantic
@@ -350,6 +376,7 @@ class GroqExtractor:
                         model=model,
                         messages=messages,
                         temperature=0.0,
+                        max_tokens=self.max_tokens,
                         response_format={"type": "json_object"},
                     ),
                     timeout=self.timeout,

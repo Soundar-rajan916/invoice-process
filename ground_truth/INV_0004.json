@@ -1,0 +1,68 @@
+{
+  "file": "INV_0004.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI26004",
+  "invoice_date": "2026-02-23",
+  "invoice_date_printed": "23 Feb 2026",
+  "supplier_name": "Sankar Inc",
+  "supplier_gstin": "24WNJFS8482M1Z3",
+  "line_items": [
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 156,
+      "rate": 206.26,
+      "amount": 32176.56
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 51,
+      "rate": 161.18,
+      "amount": 8220.18
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 100,
+      "rate": 163.39,
+      "amount": 16339.0
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 72,
+      "rate": 570.12,
+      "amount": 41048.64
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 70,
+      "rate": 2135.99,
+      "amount": 149519.3
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 3,
+      "rate": 2254.59,
+      "amount": 6763.77
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Retail",
+      "quantity": 130,
+      "rate": 205.34,
+      "amount": 26694.2
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 92,
+      "rate": 1668.49,
+      "amount": 153501.08
+    }
+  ],
+  "taxable_value": 434262.73,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 78167.29,
+  "total": 512430.02,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

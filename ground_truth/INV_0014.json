@@ -1,0 +1,40 @@
+{
+  "file": "INV_0014.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI-9574",
+  "invoice_date": "2025-12-03",
+  "invoice_date_printed": "2025-12-03",
+  "supplier_name": "Sunder and Sons",
+  "supplier_gstin": "29FZRFS2245F2ZB",
+  "line_items": [
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 91,
+      "rate": 247.01,
+      "amount": 22477.91
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 148,
+      "rate": 2216.38,
+      "amount": 328315.24
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 23,
+      "rate": 470.83,
+      "amount": 10829.09
+    }
+  ],
+  "taxable_value": 361331.24,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 101172.75,
+  "total": 462503.99,
+  "gstin_valid": true,
+  "expected_flags": [
+    "line_amount_mismatch"
+  ],
+  "duplicate_of": null
+}

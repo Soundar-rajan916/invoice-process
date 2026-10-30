@@ -1,0 +1,296 @@
+{
+  "file": "INV_0085.pdf",
+  "layout": "compact",
+  "pages": 2,
+  "invoice_number": "INV-2025-03485",
+  "invoice_date": "2025-10-03",
+  "invoice_date_printed": "03-10-2025",
+  "supplier_name": "Khosla and Sons",
+  "supplier_gstin": "19DZDCK0166P1ZM",
+  "line_items": [
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 47,
+      "rate": 413.74,
+      "amount": 19445.78
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 81,
+      "rate": 2298.49,
+      "amount": 186177.69
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 58,
+      "rate": 147.68,
+      "amount": 8565.44
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 5,
+      "rate": 2029.93,
+      "amount": 10149.65
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Economy",
+      "quantity": 44,
+      "rate": 2011.03,
+      "amount": 88485.32
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 182,
+      "rate": 2043.75,
+      "amount": 371962.5
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 152,
+      "rate": 918.98,
+      "amount": 139684.96
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Bulk",
+      "quantity": 131,
+      "rate": 785.41,
+      "amount": 102888.71
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Type 1",
+      "quantity": 102,
+      "rate": 1949.18,
+      "amount": 198816.36
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 142,
+      "rate": 2034.84,
+      "amount": 288947.28
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Bulk",
+      "quantity": 6,
+      "rate": 168.81,
+      "amount": 1012.86
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 127,
+      "rate": 1012.02,
+      "amount": 128526.54
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Grade A",
+      "quantity": 27,
+      "rate": 911.05,
+      "amount": 24598.35
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 74,
+      "rate": 2032.83,
+      "amount": 150429.42
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 134,
+      "rate": 251.75,
+      "amount": 33734.5
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Economy",
+      "quantity": 69,
+      "rate": 661.13,
+      "amount": 45617.97
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Type 1",
+      "quantity": 196,
+      "rate": 168.3,
+      "amount": 32986.8
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Type 2",
+      "quantity": 112,
+      "rate": 1967.08,
+      "amount": 220312.96
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Premium",
+      "quantity": 151,
+      "rate": 186.3,
+      "amount": 28131.3
+    },
+    {
+      "description": "Plastic Bucket 20 L - Bulk",
+      "quantity": 117,
+      "rate": 187.54,
+      "amount": 21942.18
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Type 1",
+      "quantity": 69,
+      "rate": 742.49,
+      "amount": 51231.81
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 188,
+      "rate": 236.41,
+      "amount": 44445.08
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 14,
+      "rate": 364.14,
+      "amount": 5097.96
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 184,
+      "rate": 2259.29,
+      "amount": 415709.36
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 24,
+      "rate": 582.1,
+      "amount": 13970.4
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Type 2",
+      "quantity": 68,
+      "rate": 2507.26,
+      "amount": 170493.68
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Premium",
+      "quantity": 70,
+      "rate": 682.23,
+      "amount": 47756.1
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Retail",
+      "quantity": 104,
+      "rate": 1780.01,
+      "amount": 185121.04
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Grade B",
+      "quantity": 148,
+      "rate": 2048.25,
+      "amount": 303141.0
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Type 2",
+      "quantity": 189,
+      "rate": 691.31,
+      "amount": 130657.59
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 45,
+      "rate": 4147.68,
+      "amount": 186645.6
+    },
+    {
+      "description": "Plastic Bucket 20 L - Type 2",
+      "quantity": 19,
+      "rate": 257.87,
+      "amount": 4899.53
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 4,
+      "rate": 356.86,
+      "amount": 1427.44
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Grade B",
+      "quantity": 116,
+      "rate": 482.71,
+      "amount": 55994.36
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Type 1",
+      "quantity": 163,
+      "rate": 277.68,
+      "amount": 45261.84
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Retail",
+      "quantity": 3,
+      "rate": 1652.76,
+      "amount": 4958.28
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Retail",
+      "quantity": 62,
+      "rate": 2253.2,
+      "amount": 139698.4
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Bulk",
+      "quantity": 134,
+      "rate": 477.91,
+      "amount": 64039.94
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 26,
+      "rate": 1389.02,
+      "amount": 36114.52
+    },
+    {
+      "description": "Ballpoint Pen (box of 50) - Economy",
+      "quantity": 154,
+      "rate": 247.58,
+      "amount": 38127.32
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 105,
+      "rate": 1661.67,
+      "amount": 174475.35
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 74,
+      "rate": 233.27,
+      "amount": 17261.98
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Premium",
+      "quantity": 53,
+      "rate": 2048.41,
+      "amount": 108565.73
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Grade A",
+      "quantity": 163,
+      "rate": 242.08,
+      "amount": 39459.04
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 61,
+      "rate": 644.95,
+      "amount": 39341.95
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Bulk",
+      "quantity": 156,
+      "rate": 1854.43,
+      "amount": 289291.08
+    }
+  ],
+  "taxable_value": 4715602.95,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 1320368.83,
+  "total": 6035971.78,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

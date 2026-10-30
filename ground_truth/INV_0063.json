@@ -1,0 +1,68 @@
+{
+  "file": "INV_0063.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "GST003228",
+  "invoice_date": "2026-03-16",
+  "invoice_date_printed": "16-Mar-26",
+  "supplier_name": "Kala-Gupta",
+  "supplier_gstin": "08JHDFK7691O4ZT",
+  "line_items": [
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 168,
+      "rate": 1458.27,
+      "amount": 244989.36
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 8,
+      "rate": 793.46,
+      "amount": 6347.68
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 169,
+      "rate": 2358.77,
+      "amount": 398632.13
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 158,
+      "rate": 323.97,
+      "amount": 51187.26
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 197,
+      "rate": 2359.65,
+      "amount": 464851.05
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 27,
+      "rate": 275.13,
+      "amount": 7428.51
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 175,
+      "rate": 788.18,
+      "amount": 137931.5
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 175,
+      "rate": 210.64,
+      "amount": 36862.0
+    }
+  ],
+  "taxable_value": 1348229.49,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 377504.26,
+  "total": 1725733.75,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

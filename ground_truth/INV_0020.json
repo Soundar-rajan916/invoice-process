@@ -1,0 +1,32 @@
+{
+  "file": "INV_0020.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "INV-2026-07685",
+  "invoice_date": "2026-10-14",
+  "invoice_date_printed": "14 Oct 2026",
+  "supplier_name": "Modi Ltd",
+  "supplier_gstin": "29OTACM1372J8ZQ",
+  "line_items": [
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 171,
+      "rate": 477.87,
+      "amount": 81715.77
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 66,
+      "rate": 263.52,
+      "amount": 17392.32
+    }
+  ],
+  "taxable_value": 99108.09,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 11892.97,
+  "total": 111001.06,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

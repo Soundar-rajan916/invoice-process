@@ -1,0 +1,38 @@
+{
+  "file": "INV_0025.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "S/25-26/3074",
+  "invoice_date": "2025-09-29",
+  "invoice_date_printed": "29-Sep-25",
+  "supplier_name": "Sharaf-Madan",
+  "supplier_gstin": "33JTDCS1154X1ZG",
+  "line_items": [
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 118,
+      "rate": 627.96,
+      "amount": 74099.28
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 73,
+      "rate": 1998.69,
+      "amount": 145904.37
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 20,
+      "rate": 165.56,
+      "amount": 3311.2
+    }
+  ],
+  "taxable_value": 223314.85,
+  "cgst": 31264.08,
+  "sgst": 31264.08,
+  "igst": 0.0,
+  "total": 285843.01,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

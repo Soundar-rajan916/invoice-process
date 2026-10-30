@@ -1,0 +1,50 @@
+{
+  "file": "INV_0005.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "N/25-26/1078",
+  "invoice_date": "2025-09-25",
+  "invoice_date_printed": "2025-09-25",
+  "supplier_name": "Nayak-Korpal",
+  "supplier_gstin": "03LEVFN8964C9Z4",
+  "line_items": [
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 76,
+      "rate": 267.72,
+      "amount": 20346.72
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 165,
+      "rate": 434.54,
+      "amount": 71699.1
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 61,
+      "rate": 246.67,
+      "amount": 15046.87
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 98,
+      "rate": 419.74,
+      "amount": 41134.52
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 20,
+      "rate": 2140.84,
+      "amount": 42816.8
+    }
+  ],
+  "taxable_value": 191044.01,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 53492.32,
+  "total": 244536.33,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

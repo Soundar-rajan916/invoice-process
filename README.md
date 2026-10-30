@@ -25,7 +25,13 @@ Edit `.env` and set your `GROQ_API_KEY` (and optionally configure `GROQ_TEXT_MOD
 
 ### Step 2: Start Services
 ```bash
+# On Linux / macOS / Git Bash:
 make up
+
+# On Windows PowerShell:
+.\run.ps1 up
+# Or directly:
+docker compose up -d
 ```
 This launches:
 - **PostgreSQL 16**: `localhost:5432`

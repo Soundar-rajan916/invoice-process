@@ -88,11 +88,59 @@ class UploadIngestor:
         existing_file = (await self.session.execute(stmt)).scalar_one_or_none()
 
         if existing_file:
-            # Existing file: do not create new invoice. Write duplicate_file_skipped audit event
             inv_stmt = select(Invoice).where(Invoice.source_file_id == existing_file.id)
             existing_invoice = (await self.session.execute(inv_stmt)).scalars().first()
             inv_id = existing_invoice.id if existing_invoice else existing_file.id
 
+            # If the invoice was waiting for a resend, fulfill the request and re-process!
+            if existing_invoice and existing_invoice.status == "RESEND_REQUESTED":
+                existing_invoice.status = "RECEIVED"
+                existing_invoice.status_reason = None
+                existing_invoice.row_version += 1
+
+                event = ReviewEvent(
+                    invoice_id=existing_invoice.id,
+                    actor_id=raw.uploaded_by,
+                    action="resend_fulfilled",
+                    payload={
+                        "sha256": file_hash,
+                        "filename": raw.filename,
+                        "source": "inbox_upload",
+                        "reason": "Re-uploaded file fulfills resend request",
+                    },
+                )
+                self.session.add(event)
+                await self.session.commit()
+
+                if settings.ENVIRONMENT != "test":
+                    try:
+                        from app.workers.tasks import process_invoice
+
+                        process_invoice.delay(str(existing_invoice.id))
+                    except Exception as e:
+                        logger.warning(
+                            "Could not dispatch Celery task for re-uploaded resend", error=str(e)
+                        )
+                else:
+                    from app.services.pipeline import process_invoice_pipeline
+
+                    await process_invoice_pipeline(self.session, existing_invoice.id)
+
+                logger.info(
+                    "Resend request fulfilled by re-uploaded file",
+                    invoice_id=str(existing_invoice.id),
+                    filename=raw.filename,
+                )
+                return IngestResult(
+                    source_file_id=existing_file.id,
+                    invoice_id=existing_invoice.id,
+                    sha256=file_hash,
+                    is_duplicate=False,
+                    status="RECEIVED",
+                    message="Replacement file accepted. Re-processing invoice pipeline...",
+                )
+
+            # Existing file: do not create new invoice. Write duplicate_file_skipped audit event
             event = ReviewEvent(
                 invoice_id=inv_id,
                 actor_id=raw.uploaded_by,

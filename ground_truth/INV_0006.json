@@ -1,0 +1,326 @@
+{
+  "file": "INV_0006.pdf",
+  "layout": "banner",
+  "pages": 2,
+  "invoice_number": "INV-2025-04079",
+  "invoice_date": "2025-11-12",
+  "invoice_date_printed": "12-Nov-25",
+  "supplier_name": "Jayaraman-Vyas",
+  "supplier_gstin": "09ECTFJ4188U5ZK",
+  "line_items": [
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 103,
+      "rate": 1856.75,
+      "amount": 191245.25
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 43,
+      "rate": 345.96,
+      "amount": 14876.28
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 118,
+      "rate": 134.26,
+      "amount": 15842.68
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 180,
+      "rate": 615.73,
+      "amount": 110831.4
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Grade A",
+      "quantity": 64,
+      "rate": 1629.63,
+      "amount": 104296.32
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 145,
+      "rate": 350.07,
+      "amount": 50760.15
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 108,
+      "rate": 163.87,
+      "amount": 17697.96
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 129,
+      "rate": 192.16,
+      "amount": 24788.64
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 114,
+      "rate": 2143.18,
+      "amount": 244322.52
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 146,
+      "rate": 3684.45,
+      "amount": 537929.7
+    },
+    {
+      "description": "Extension Board 4-socket - Grade A",
+      "quantity": 173,
+      "rate": 425.51,
+      "amount": 73613.23
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Bulk",
+      "quantity": 101,
+      "rate": 1718.86,
+      "amount": 173604.86
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 75,
+      "rate": 150.42,
+      "amount": 11281.5
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 174,
+      "rate": 1347.91,
+      "amount": 234536.34
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Retail",
+      "quantity": 58,
+      "rate": 181.17,
+      "amount": 10507.86
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 105,
+      "rate": 152.84,
+      "amount": 16048.2
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Bulk",
+      "quantity": 54,
+      "rate": 262.14,
+      "amount": 14155.56
+    },
+    {
+      "description": "Cement 50 kg bag - Type 1",
+      "quantity": 144,
+      "rate": 331.7,
+      "amount": 47764.8
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 161,
+      "rate": 248.97,
+      "amount": 40084.17
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 178,
+      "rate": 2143.26,
+      "amount": 381500.28
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Type 2",
+      "quantity": 10,
+      "rate": 2191.7,
+      "amount": 21917.0
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 53,
+      "rate": 2498.74,
+      "amount": 132433.22
+    },
+    {
+      "description": "Extension Board 4-socket - Retail",
+      "quantity": 94,
+      "rate": 261.56,
+      "amount": 24586.64
+    },
+    {
+      "description": "Extension Board 4-socket - Premium",
+      "quantity": 106,
+      "rate": 260.32,
+      "amount": 27593.92
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Premium",
+      "quantity": 57,
+      "rate": 137.15,
+      "amount": 7817.55
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 133,
+      "rate": 2354.33,
+      "amount": 313125.89
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Premium",
+      "quantity": 87,
+      "rate": 154.39,
+      "amount": 13431.93
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Type 2",
+      "quantity": 104,
+      "rate": 2505.25,
+      "amount": 260546.0
+    },
+    {
+      "description": "Plastic Bucket 20 L - Bulk",
+      "quantity": 193,
+      "rate": 199.6,
+      "amount": 38522.8
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 117,
+      "rate": 262.04,
+      "amount": 30658.68
+    },
+    {
+      "description": "Plastic Bucket 20 L - Retail",
+      "quantity": 108,
+      "rate": 183.33,
+      "amount": 19799.64
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 25,
+      "rate": 929.65,
+      "amount": 23241.25
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12) - Grade A",
+      "quantity": 76,
+      "rate": 536.27,
+      "amount": 40756.52
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Type 1",
+      "quantity": 61,
+      "rate": 303.94,
+      "amount": 18540.34
+    },
+    {
+      "description": "Plastic Bucket 20 L - Type 2",
+      "quantity": 88,
+      "rate": 187.87,
+      "amount": 16532.56
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Bulk",
+      "quantity": 30,
+      "rate": 1270.42,
+      "amount": 38112.6
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 167,
+      "rate": 301.06,
+      "amount": 50277.02
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Grade B",
+      "quantity": 64,
+      "rate": 1856.02,
+      "amount": 118785.28
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 38,
+      "rate": 515.41,
+      "amount": 19585.58
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 177,
+      "rate": 267.8,
+      "amount": 47400.6
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 133,
+      "rate": 537.48,
+      "amount": 71484.84
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Economy",
+      "quantity": 28,
+      "rate": 1810.18,
+      "amount": 50685.04
+    },
+    {
+      "description": "Cement 50 kg bag - Type 2",
+      "quantity": 108,
+      "rate": 425.49,
+      "amount": 45952.92
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Grade A",
+      "quantity": 104,
+      "rate": 3591.78,
+      "amount": 373545.12
+    },
+    {
+      "description": "Ballpoint Pen (box of 50) - Grade B",
+      "quantity": 31,
+      "rate": 312.61,
+      "amount": 9690.91
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Type 2",
+      "quantity": 63,
+      "rate": 1545.99,
+      "amount": 97397.37
+    },
+    {
+      "description": "Ballpoint Pen (box of 50) - Type 2",
+      "quantity": 124,
+      "rate": 263.91,
+      "amount": 32724.84
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Premium",
+      "quantity": 101,
+      "rate": 2106.93,
+      "amount": 212799.93
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Type 1",
+      "quantity": 107,
+      "rate": 1613.63,
+      "amount": 172658.41
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 178,
+      "rate": 1558.72,
+      "amount": 277452.16
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Type 1",
+      "quantity": 36,
+      "rate": 271.61,
+      "amount": 9777.96
+    }
+  ],
+  "taxable_value": 4933522.22,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 1381386.22,
+  "total": 6314908.44,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

@@ -1,0 +1,364 @@
+{
+  "file": "INV_0051.pdf",
+  "layout": "compact",
+  "pages": 2,
+  "invoice_number": "P26051",
+  "invoice_date": "2026-07-29",
+  "invoice_date_printed": "29-Jul-26",
+  "supplier_name": "Pandit-Barad",
+  "supplier_gstin": "08CFOFP8899M1ZJ",
+  "line_items": [
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 125,
+      "rate": 411.38,
+      "amount": 51422.5
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 173,
+      "rate": 1490.38,
+      "amount": 257835.74
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Grade A",
+      "quantity": 67,
+      "rate": 486.92,
+      "amount": 32623.64
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 25,
+      "rate": 131.59,
+      "amount": 3289.75
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Premium",
+      "quantity": 72,
+      "rate": 453.32,
+      "amount": 32639.04
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Type 2",
+      "quantity": 187,
+      "rate": 133.6,
+      "amount": 24983.2
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 158,
+      "rate": 321.26,
+      "amount": 50759.08
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Retail",
+      "quantity": 186,
+      "rate": 1653.75,
+      "amount": 307597.5
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 67,
+      "rate": 802.39,
+      "amount": 53760.13
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 170,
+      "rate": 1954.18,
+      "amount": 332210.6
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 112,
+      "rate": 150.08,
+      "amount": 16808.96
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Bulk",
+      "quantity": 103,
+      "rate": 955.2,
+      "amount": 98385.6
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Grade A",
+      "quantity": 28,
+      "rate": 967.11,
+      "amount": 27079.08
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 157,
+      "rate": 881.17,
+      "amount": 138343.69
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 160,
+      "rate": 1439.21,
+      "amount": 230273.6
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 116,
+      "rate": 2132.32,
+      "amount": 247349.12
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Grade B",
+      "quantity": 1,
+      "rate": 759.16,
+      "amount": 759.16
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Grade B",
+      "quantity": 73,
+      "rate": 2409.87,
+      "amount": 175920.51
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 26,
+      "rate": 147.56,
+      "amount": 3836.56
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 101,
+      "rate": 206.02,
+      "amount": 20808.02
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 109,
+      "rate": 1698.24,
+      "amount": 185108.16
+    },
+    {
+      "description": "Extension Board 4-socket - Retail",
+      "quantity": 23,
+      "rate": 387.1,
+      "amount": 8903.3
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 77,
+      "rate": 224.11,
+      "amount": 17256.47
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Retail",
+      "quantity": 163,
+      "rate": 155.55,
+      "amount": 25354.65
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Economy",
+      "quantity": 54,
+      "rate": 1633.19,
+      "amount": 88192.26
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 157,
+      "rate": 403.73,
+      "amount": 63385.61
+    },
+    {
+      "description": "Cement 50 kg bag - Economy",
+      "quantity": 66,
+      "rate": 405.13,
+      "amount": 26738.58
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Type 1",
+      "quantity": 124,
+      "rate": 1379.11,
+      "amount": 171009.64
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 69,
+      "rate": 678.78,
+      "amount": 46835.82
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Type 2",
+      "quantity": 73,
+      "rate": 698.88,
+      "amount": 51018.24
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Grade B",
+      "quantity": 165,
+      "rate": 2082.21,
+      "amount": 343564.65
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 67,
+      "rate": 2220.6,
+      "amount": 148780.2
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Economy",
+      "quantity": 105,
+      "rate": 855.54,
+      "amount": 89831.7
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 108,
+      "rate": 250.24,
+      "amount": 27025.92
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Grade B",
+      "quantity": 181,
+      "rate": 460.5,
+      "amount": 83350.5
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Retail",
+      "quantity": 164,
+      "rate": 251.71,
+      "amount": 41280.44
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Type 2",
+      "quantity": 102,
+      "rate": 866.68,
+      "amount": 88401.36
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 61,
+      "rate": 3445.57,
+      "amount": 210179.77
+    },
+    {
+      "description": "Plastic Bucket 20 L - Grade B",
+      "quantity": 63,
+      "rate": 185.49,
+      "amount": 11685.87
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Premium",
+      "quantity": 170,
+      "rate": 826.55,
+      "amount": 140513.5
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Economy",
+      "quantity": 185,
+      "rate": 830.5,
+      "amount": 153642.5
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Retail",
+      "quantity": 17,
+      "rate": 2388.53,
+      "amount": 40605.01
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Type 1",
+      "quantity": 101,
+      "rate": 1467.33,
+      "amount": 148200.33
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Type 1",
+      "quantity": 94,
+      "rate": 664.53,
+      "amount": 62465.82
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 93,
+      "rate": 253.32,
+      "amount": 23558.76
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Retail",
+      "quantity": 200,
+      "rate": 658.58,
+      "amount": 131716.0
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets) - Economy",
+      "quantity": 82,
+      "rate": 328.28,
+      "amount": 26918.96
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Grade A",
+      "quantity": 198,
+      "rate": 827.54,
+      "amount": 163852.92
+    },
+    {
+      "description": "Sugar 50 kg bag - Type 2",
+      "quantity": 79,
+      "rate": 2139.27,
+      "amount": 169002.33
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Economy",
+      "quantity": 37,
+      "rate": 2118.82,
+      "amount": 78396.34
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Premium",
+      "quantity": 164,
+      "rate": 283.58,
+      "amount": 46507.12
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m - Type 1",
+      "quantity": 1,
+      "rate": 1710.46,
+      "amount": 1710.46
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Bulk",
+      "quantity": 74,
+      "rate": 1148.97,
+      "amount": 85023.78
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 26,
+      "rate": 1998.06,
+      "amount": 51949.56
+    },
+    {
+      "description": "Cement 50 kg bag - Grade A",
+      "quantity": 110,
+      "rate": 439.42,
+      "amount": 48779.2
+    },
+    {
+      "description": "LED Bulb 9W (box of 10) - Bulk",
+      "quantity": 3,
+      "rate": 665.03,
+      "amount": 1995.09
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Premium",
+      "quantity": 177,
+      "rate": 2033.66,
+      "amount": 359957.82
+    }
+  ],
+  "taxable_value": 5568941.12,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 1002409.4,
+  "total": 6571350.52,
+  "gstin_valid": true,
+  "expected_flags": [
+    "line_amount_mismatch"
+  ],
+  "duplicate_of": null
+}

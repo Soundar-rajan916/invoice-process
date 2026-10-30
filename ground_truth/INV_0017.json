@@ -1,0 +1,28 @@
+{
+  "file": "INV_0017.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "GBA26017",
+  "invoice_date": "2026-03-22",
+  "invoice_date_printed": "22-03-2026",
+  "supplier_name": "Ganesh, Bala and Badal",
+  "supplier_gstin": "36APBFG8467C5ZG",
+  "line_items": [
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 32,
+      "rate": 369.01,
+      "amount": 12074.32
+    }
+  ],
+  "taxable_value": 11808.32,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 1417.0,
+  "total": 13225.32,
+  "gstin_valid": true,
+  "expected_flags": [
+    "line_amount_mismatch"
+  ],
+  "duplicate_of": null
+}

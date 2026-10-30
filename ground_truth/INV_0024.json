@@ -1,0 +1,50 @@
+{
+  "file": "INV_0024.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "BI25024",
+  "invoice_date": "2025-10-11",
+  "invoice_date_printed": "2025-10-11",
+  "supplier_name": "Behl Inc",
+  "supplier_gstin": "09CTDCB7719C8ZG",
+  "line_items": [
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 59,
+      "rate": 1592.27,
+      "amount": 93943.93
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 31,
+      "rate": 2225.51,
+      "amount": 68990.81
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 52,
+      "rate": 356.97,
+      "amount": 18562.44
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 21,
+      "rate": 231.81,
+      "amount": 4868.01
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 197,
+      "rate": 388.23,
+      "amount": 76481.31
+    }
+  ],
+  "taxable_value": 262846.5,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 31541.58,
+  "total": 294388.08,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

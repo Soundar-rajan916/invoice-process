@@ -1,0 +1,56 @@
+{
+  "file": "INV_0013.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "INV-2026-03086",
+  "invoice_date": "2026-05-27",
+  "invoice_date_printed": "27 May 2026",
+  "supplier_name": "Palan-Barman",
+  "supplier_gstin": "27KTTFP8482F3Z3",
+  "line_items": [
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 128,
+      "rate": 2158.07,
+      "amount": 276232.96
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 77,
+      "rate": 1532.94,
+      "amount": 118036.38
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 57,
+      "rate": 410.84,
+      "amount": 23417.88
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 106,
+      "rate": 555.22,
+      "amount": 58853.32
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 15,
+      "rate": 1958.34,
+      "amount": 29375.1
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Type 2",
+      "quantity": 5,
+      "rate": 424.28,
+      "amount": 2121.4
+    }
+  ],
+  "taxable_value": 508037.04,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 91446.67,
+  "total": 599483.71,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

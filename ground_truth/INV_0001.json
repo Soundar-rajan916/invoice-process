@@ -1,0 +1,254 @@
+{
+  "file": "INV_0001.pdf",
+  "layout": "banner",
+  "pages": 2,
+  "invoice_number": "GST009474",
+  "invoice_date": "2025-12-06",
+  "invoice_date_printed": "06-Dec-25",
+  "supplier_name": "Dixit-Vala",
+  "supplier_gstin": "33KSDCD5556D5ZJ",
+  "line_items": [
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 146,
+      "rate": 2087.0,
+      "amount": 304702.0
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 62,
+      "rate": 309.59,
+      "amount": 19194.58
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 17,
+      "rate": 2091.6,
+      "amount": 35557.2
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 182,
+      "rate": 421.98,
+      "amount": 76800.36
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 188,
+      "rate": 514.14,
+      "amount": 96658.32
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 166,
+      "rate": 519.98,
+      "amount": 86316.68
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 82,
+      "rate": 1023.61,
+      "amount": 83936.02
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 97,
+      "rate": 194.33,
+      "amount": 18850.01
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Grade B",
+      "quantity": 9,
+      "rate": 716.26,
+      "amount": 6446.34
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 185,
+      "rate": 134.95,
+      "amount": 24965.75
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 45,
+      "rate": 4117.48,
+      "amount": 185286.6
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 177,
+      "rate": 381.65,
+      "amount": 67552.05
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Bulk",
+      "quantity": 189,
+      "rate": 183.61,
+      "amount": 34702.29
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Type 1",
+      "quantity": 87,
+      "rate": 174.75,
+      "amount": 15203.25
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 20,
+      "rate": 223.62,
+      "amount": 4472.4
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 152,
+      "rate": 1679.05,
+      "amount": 255215.6
+    },
+    {
+      "description": "Cement 50 kg bag - Grade A",
+      "quantity": 113,
+      "rate": 371.78,
+      "amount": 42011.14
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Type 1",
+      "quantity": 29,
+      "rate": 847.3,
+      "amount": 24571.7
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 143,
+      "rate": 104.55,
+      "amount": 14950.65
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Grade A",
+      "quantity": 131,
+      "rate": 198.86,
+      "amount": 26050.66
+    },
+    {
+      "description": "Basmati Rice 25 kg bag - Bulk",
+      "quantity": 28,
+      "rate": 1842.6,
+      "amount": 51592.8
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12) - Type 2",
+      "quantity": 18,
+      "rate": 540.92,
+      "amount": 9736.56
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Bulk",
+      "quantity": 127,
+      "rate": 202.95,
+      "amount": 25774.65
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 182,
+      "rate": 1901.64,
+      "amount": 346098.48
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12) - Grade A",
+      "quantity": 126,
+      "rate": 589.86,
+      "amount": 74322.36
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 63,
+      "rate": 265.0,
+      "amount": 16695.0
+    },
+    {
+      "description": "LED Bulb 9W (box of 10)",
+      "quantity": 186,
+      "rate": 736.26,
+      "amount": 136944.36
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 196,
+      "rate": 157.78,
+      "amount": 30924.88
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Type 2",
+      "quantity": 75,
+      "rate": 3446.57,
+      "amount": 258492.75
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 191,
+      "rate": 1461.63,
+      "amount": 279171.33
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Premium",
+      "quantity": 69,
+      "rate": 129.46,
+      "amount": 8932.74
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 103,
+      "rate": 509.55,
+      "amount": 52483.65
+    },
+    {
+      "description": "Detergent Powder 5 kg - Premium",
+      "quantity": 186,
+      "rate": 512.07,
+      "amount": 95245.02
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Type 2",
+      "quantity": 19,
+      "rate": 712.13,
+      "amount": 13530.47
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Retail",
+      "quantity": 177,
+      "rate": 136.86,
+      "amount": 24224.22
+    },
+    {
+      "description": "Extension Board 4-socket - Type 2",
+      "quantity": 143,
+      "rate": 436.96,
+      "amount": 62485.28
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Bulk",
+      "quantity": 49,
+      "rate": 1638.71,
+      "amount": 80296.79
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12) - Bulk",
+      "quantity": 144,
+      "rate": 611.21,
+      "amount": 88014.24
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Economy",
+      "quantity": 5,
+      "rate": 167.37,
+      "amount": 836.85
+    }
+  ],
+  "taxable_value": 3079246.03,
+  "cgst": 184754.76,
+  "sgst": 184754.76,
+  "igst": 0.0,
+  "total": 3448755.55,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

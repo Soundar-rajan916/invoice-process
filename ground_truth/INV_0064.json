@@ -1,0 +1,52 @@
+{
+  "file": "INV_0064.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "ML/26-27/6693",
+  "invoice_date": "2026-04-30",
+  "invoice_date_printed": "30-04-2026",
+  "supplier_name": "Mallick LLC",
+  "supplier_gstin": "36SSNCM8086O1ZW",
+  "line_items": [
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 38,
+      "rate": 3800.73,
+      "amount": 144645.74
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 176,
+      "rate": 213.21,
+      "amount": 37524.96
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 43,
+      "rate": 1139.33,
+      "amount": 48991.19
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Economy",
+      "quantity": 113,
+      "rate": 1645.52,
+      "amount": 185943.76
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L - Grade A",
+      "quantity": 16,
+      "rate": 1537.74,
+      "amount": 24603.84
+    }
+  ],
+  "taxable_value": 441491.49,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 52978.98,
+  "total": 494470.47,
+  "gstin_valid": true,
+  "expected_flags": [
+    "line_amount_mismatch"
+  ],
+  "duplicate_of": null
+}

@@ -1,0 +1,40 @@
+{
+  "file": "INV_0104.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "GST004906",
+  "invoice_date": "2026-04-22",
+  "invoice_date_printed": "22 Apr 2026",
+  "supplier_name": "Ranganathan-Morar",
+  "supplier_gstin": "19YIACR2961P3ZM",
+  "line_items": [
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 65,
+      "rate": 362.0,
+      "amount": 23530.0
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 31,
+      "rate": 237.7,
+      "amount": 7368.7
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 150,
+      "rate": 242.24,
+      "amount": 36336.0
+    }
+  ],
+  "taxable_value": 67234.7,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 12102.25,
+  "total": 79336.95,
+  "gstin_valid": true,
+  "expected_flags": [
+    "duplicate"
+  ],
+  "duplicate_of": "INV_0070"
+}

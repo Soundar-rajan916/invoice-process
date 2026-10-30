@@ -1,0 +1,62 @@
+{
+  "file": "INV_0078.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "INV-2026-06218",
+  "invoice_date": "2026-07-20",
+  "invoice_date_printed": "20-07-2026",
+  "supplier_name": "Hayer-Ram",
+  "supplier_gstin": "24ZYLCH1830V6ZS",
+  "line_items": [
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 54,
+      "rate": 190.34,
+      "amount": 10278.36
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 93,
+      "rate": 1876.08,
+      "amount": 174475.44
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 191,
+      "rate": 2290.92,
+      "amount": 437565.72
+    },
+    {
+      "description": "Engine Oil 20W-40, 4 L",
+      "quantity": 64,
+      "rate": 1436.3,
+      "amount": 91923.2
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 113,
+      "rate": 2000.55,
+      "amount": 226062.15
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 118,
+      "rate": 459.82,
+      "amount": 54258.76
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 142,
+      "rate": 303.11,
+      "amount": 43041.62
+    }
+  ],
+  "taxable_value": 1037605.25,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 186768.95,
+  "total": 1224374.2,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

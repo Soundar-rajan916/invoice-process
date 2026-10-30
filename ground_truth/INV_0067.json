@@ -1,0 +1,284 @@
+{
+  "file": "INV_0067.pdf",
+  "layout": "classic",
+  "pages": 2,
+  "invoice_number": "SI-6673",
+  "invoice_date": "2026-08-10",
+  "invoice_date_printed": "2026-08-10",
+  "supplier_name": "Srinivasan, Chaudry and Gole",
+  "supplier_gstin": "08BQLCS0395I8ZT",
+  "line_items": [
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 46,
+      "rate": 278.14,
+      "amount": 12794.44
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36)",
+      "quantity": 123,
+      "rate": 1939.99,
+      "amount": 238618.77
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 140,
+      "rate": 198.05,
+      "amount": 27727.0
+    },
+    {
+      "description": "Extension Board 4-socket - Bulk",
+      "quantity": 125,
+      "rate": 436.22,
+      "amount": 54527.5
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 12,
+      "rate": 225.29,
+      "amount": 2703.48
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 186,
+      "rate": 3655.65,
+      "amount": 679950.9
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 187,
+      "rate": 1572.67,
+      "amount": 294089.29
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 150,
+      "rate": 656.87,
+      "amount": 98530.5
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m",
+      "quantity": 97,
+      "rate": 243.8,
+      "amount": 23648.6
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 116,
+      "rate": 890.36,
+      "amount": 103281.76
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Type 1",
+      "quantity": 123,
+      "rate": 279.56,
+      "amount": 34385.88
+    },
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 54,
+      "rate": 2172.96,
+      "amount": 117339.84
+    },
+    {
+      "description": "Extension Board 4-socket - Premium",
+      "quantity": 102,
+      "rate": 408.0,
+      "amount": 41616.0
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 74,
+      "rate": 151.26,
+      "amount": 11193.24
+    },
+    {
+      "description": "Extension Board 4-socket - Retail",
+      "quantity": 32,
+      "rate": 396.35,
+      "amount": 12683.2
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Bulk",
+      "quantity": 2,
+      "rate": 277.31,
+      "amount": 554.62
+    },
+    {
+      "description": "Sugar 50 kg bag - Economy",
+      "quantity": 10,
+      "rate": 2186.41,
+      "amount": 21864.1
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 30,
+      "rate": 1981.73,
+      "amount": 59451.9
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 109,
+      "rate": 454.89,
+      "amount": 49583.01
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Grade B",
+      "quantity": 63,
+      "rate": 1414.07,
+      "amount": 89086.41
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 30,
+      "rate": 189.03,
+      "amount": 5670.9
+    },
+    {
+      "description": "Hand Sanitizer 500 ml - Grade B",
+      "quantity": 166,
+      "rate": 196.99,
+      "amount": 32700.34
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 47,
+      "rate": 218.02,
+      "amount": 10246.94
+    },
+    {
+      "description": "Bath Soap 100 g (carton of 48) - Economy",
+      "quantity": 2,
+      "rate": 1134.6,
+      "amount": 2269.2
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Premium",
+      "quantity": 50,
+      "rate": 479.7,
+      "amount": 23985.0
+    },
+    {
+      "description": "Toothpaste 150 g (carton of 36) - Premium",
+      "quantity": 22,
+      "rate": 2438.39,
+      "amount": 53644.58
+    },
+    {
+      "description": "Detergent Powder 5 kg - Type 2",
+      "quantity": 7,
+      "rate": 460.16,
+      "amount": 3221.12
+    },
+    {
+      "description": "Toor Dal 30 kg bag - Type 1",
+      "quantity": 107,
+      "rate": 3185.2,
+      "amount": 340816.4
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12) - Economy",
+      "quantity": 50,
+      "rate": 142.82,
+      "amount": 7141.0
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Premium",
+      "quantity": 77,
+      "rate": 312.19,
+      "amount": 24038.63
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 17,
+      "rate": 219.4,
+      "amount": 3729.8
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets)",
+      "quantity": 25,
+      "rate": 273.93,
+      "amount": 6848.25
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20)",
+      "quantity": 125,
+      "rate": 2069.63,
+      "amount": 258703.75
+    },
+    {
+      "description": "Cotton Gloves (dozen) - Economy",
+      "quantity": 18,
+      "rate": 218.7,
+      "amount": 3936.6
+    },
+    {
+      "description": "Sunflower Oil 15 L tin - Retail",
+      "quantity": 18,
+      "rate": 2070.33,
+      "amount": 37265.94
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton) - Grade B",
+      "quantity": 196,
+      "rate": 1040.8,
+      "amount": 203996.8
+    },
+    {
+      "description": "Turmeric Powder 500 g (carton of 20) - Grade B",
+      "quantity": 128,
+      "rate": 2101.98,
+      "amount": 269053.44
+    },
+    {
+      "description": "PVC Pipe 1 inch, 3 m - Retail",
+      "quantity": 5,
+      "rate": 212.81,
+      "amount": 1064.05
+    },
+    {
+      "description": "Ballpoint Pen (box of 50) - Economy",
+      "quantity": 79,
+      "rate": 372.13,
+      "amount": 29398.27
+    },
+    {
+      "description": "A4 Copier Paper (500 sheets) - Bulk",
+      "quantity": 187,
+      "rate": 292.19,
+      "amount": 54639.53
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 73,
+      "rate": 478.24,
+      "amount": 34911.52
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Type 2",
+      "quantity": 102,
+      "rate": 381.44,
+      "amount": 38906.88
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg - Type 1",
+      "quantity": 163,
+      "rate": 445.59,
+      "amount": 72631.17
+    },
+    {
+      "description": "Garbage Bags 30 L (pack of 30)",
+      "quantity": 35,
+      "rate": 175.02,
+      "amount": 6125.7
+    }
+  ],
+  "taxable_value": 3498576.25,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 979601.35,
+  "total": 4478177.6,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

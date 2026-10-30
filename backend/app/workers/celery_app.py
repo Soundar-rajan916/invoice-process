@@ -10,6 +10,7 @@ celery_app = Celery(
     backend=settings.REDIS_URL,
     include=["app.workers.tasks"],
 )
+celery_app.set_default()
 
 celery_app.conf.update(
     task_acks_late=True,

@@ -1,0 +1,26 @@
+{
+  "file": "INV_0065.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "GST001919",
+  "invoice_date": "2026-08-09",
+  "invoice_date_printed": "09 Aug 2026",
+  "supplier_name": "Bhagat Inc",
+  "supplier_gstin": "33NKWCB3312O3ZC",
+  "line_items": [
+    {
+      "description": "Bath Soap 100 g (carton of 48)",
+      "quantity": 155,
+      "rate": 1334.63,
+      "amount": 206867.65
+    }
+  ],
+  "taxable_value": 206867.65,
+  "cgst": 12412.06,
+  "sgst": 12412.06,
+  "igst": 0.0,
+  "total": 231691.77,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

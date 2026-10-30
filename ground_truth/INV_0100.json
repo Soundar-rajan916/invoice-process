@@ -1,0 +1,50 @@
+{
+  "file": "INV_0100.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "R/25-26/0703",
+  "invoice_date": "2025-09-27",
+  "invoice_date_printed": "27/09/2025",
+  "supplier_name": "Ramaswamy-Datta",
+  "supplier_gstin": "09TRNCR0754C4ZS",
+  "line_items": [
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 105,
+      "rate": 737.44,
+      "amount": 77431.2
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 17,
+      "rate": 1771.1,
+      "amount": 30108.7
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 96,
+      "rate": 460.89,
+      "amount": 44245.44
+    },
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 80,
+      "rate": 181.63,
+      "amount": 14530.4
+    },
+    {
+      "description": "Extension Board 4-socket",
+      "quantity": 11,
+      "rate": 390.16,
+      "amount": 4291.76
+    }
+  ],
+  "taxable_value": 170607.5,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 20472.9,
+  "total": 191080.4,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

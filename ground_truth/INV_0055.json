@@ -1,0 +1,38 @@
+{
+  "file": "INV_0055.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI-6322",
+  "invoice_date": "2026-08-27",
+  "invoice_date_printed": "27-Aug-26",
+  "supplier_name": "Tailor Group",
+  "supplier_gstin": "24ZNZFT8210G7Z8",
+  "line_items": [
+    {
+      "description": "Sugar 50 kg bag",
+      "quantity": 122,
+      "rate": 2395.21,
+      "amount": 292215.62
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 38,
+      "rate": 615.9,
+      "amount": 23404.2
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 86,
+      "rate": 2066.06,
+      "amount": 177681.16
+    }
+  ],
+  "taxable_value": 493300.98,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 88794.18,
+  "total": 582095.16,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

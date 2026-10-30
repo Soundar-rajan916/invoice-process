@@ -1,0 +1,62 @@
+{
+  "file": "INV_0037.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "SI-151",
+  "invoice_date": "2026-06-20",
+  "invoice_date_printed": "20 Jun 2026",
+  "supplier_name": "Mallick, Chakraborty and Parikh",
+  "supplier_gstin": "29RJFFM4546G8ZX",
+  "line_items": [
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 177,
+      "rate": 3417.14,
+      "amount": 604833.78
+    },
+    {
+      "description": "Glucose Biscuits 800 g (carton)",
+      "quantity": 79,
+      "rate": 806.3,
+      "amount": 63697.7
+    },
+    {
+      "description": "Sunflower Oil 15 L tin",
+      "quantity": 5,
+      "rate": 2249.42,
+      "amount": 11247.1
+    },
+    {
+      "description": "Tea Powder 1 kg pack",
+      "quantity": 80,
+      "rate": 503.52,
+      "amount": 40281.6
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 56,
+      "rate": 338.59,
+      "amount": 18961.04
+    },
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 177,
+      "rate": 520.99,
+      "amount": 92215.23
+    },
+    {
+      "description": "Plastic Bucket 20 L",
+      "quantity": 188,
+      "rate": 219.18,
+      "amount": 41205.84
+    }
+  ],
+  "taxable_value": 872442.29,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 43622.11,
+  "total": 916064.4,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

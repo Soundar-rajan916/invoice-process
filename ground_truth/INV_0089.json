@@ -1,0 +1,62 @@
+{
+  "file": "INV_0089.pdf",
+  "layout": "classic",
+  "pages": 1,
+  "invoice_number": "RG/26-27/5686",
+  "invoice_date": "2026-05-24",
+  "invoice_date_printed": "24 May 2026",
+  "supplier_name": "Rattan Group",
+  "supplier_gstin": "32KMLFR3909D7ZA",
+  "line_items": [
+    {
+      "description": "Mineral Water 1 L (case of 12)",
+      "quantity": 49,
+      "rate": 179.74,
+      "amount": 8807.26
+    },
+    {
+      "description": "Detergent Powder 5 kg",
+      "quantity": 178,
+      "rate": 666.95,
+      "amount": 118717.1
+    },
+    {
+      "description": "Wheat Flour (Atta) 10 kg",
+      "quantity": 106,
+      "rate": 449.18,
+      "amount": 47613.08
+    },
+    {
+      "description": "Cotton Gloves (dozen)",
+      "quantity": 116,
+      "rate": 200.88,
+      "amount": 23302.08
+    },
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 199,
+      "rate": 131.23,
+      "amount": 26114.77
+    },
+    {
+      "description": "Hand Sanitizer 500 ml",
+      "quantity": 37,
+      "rate": 138.64,
+      "amount": 5129.68
+    },
+    {
+      "description": "Basmati Rice 25 kg bag",
+      "quantity": 71,
+      "rate": 2169.09,
+      "amount": 154005.39
+    }
+  ],
+  "taxable_value": 383689.36,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 46042.72,
+  "total": 429732.08,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

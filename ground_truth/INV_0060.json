@@ -1,0 +1,38 @@
+{
+  "file": "INV_0060.pdf",
+  "layout": "banner",
+  "pages": 1,
+  "invoice_number": "HJA/25-26/4153",
+  "invoice_date": "2025-10-13",
+  "invoice_date_printed": "13-10-2025",
+  "supplier_name": "Halder, Jain and Dua",
+  "supplier_gstin": "37WTHFH9101N1ZD",
+  "line_items": [
+    {
+      "description": "Steel Padlock 50 mm",
+      "quantity": 80,
+      "rate": 129.15,
+      "amount": 10332.0
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 144,
+      "rate": 1815.49,
+      "amount": 261430.56
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 194,
+      "rate": 302.25,
+      "amount": 58636.5
+    }
+  ],
+  "taxable_value": 330399.06,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 39647.89,
+  "total": 370046.95,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}

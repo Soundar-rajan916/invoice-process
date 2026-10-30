@@ -1,0 +1,50 @@
+{
+  "file": "INV_0072.pdf",
+  "layout": "compact",
+  "pages": 1,
+  "invoice_number": "GST006861",
+  "invoice_date": "2025-11-01",
+  "invoice_date_printed": "01 Nov 2025",
+  "supplier_name": "Chhabra-Bhardwaj",
+  "supplier_gstin": "24XEIFC7752N7ZZ",
+  "line_items": [
+    {
+      "description": "Notebook 200 pages (pack of 12)",
+      "quantity": 63,
+      "rate": 604.91,
+      "amount": 38109.33
+    },
+    {
+      "description": "Ballpoint Pen (box of 50)",
+      "quantity": 86,
+      "rate": 237.76,
+      "amount": 20447.36
+    },
+    {
+      "description": "Cement 50 kg bag",
+      "quantity": 34,
+      "rate": 392.79,
+      "amount": 13354.86
+    },
+    {
+      "description": "Toor Dal 30 kg bag",
+      "quantity": 89,
+      "rate": 4077.7,
+      "amount": 362915.3
+    },
+    {
+      "description": "Copper Wire 1.5 sq mm, 90 m",
+      "quantity": 44,
+      "rate": 2029.04,
+      "amount": 89277.76
+    }
+  ],
+  "taxable_value": 524104.61,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 62892.55,
+  "total": 586997.16,
+  "gstin_valid": true,
+  "expected_flags": [],
+  "duplicate_of": null
+}
