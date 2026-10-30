@@ -69,10 +69,19 @@ class Settings(BaseSettings):
     GROQ_TIMEOUT_SECONDS: float = Field(default=60.0)
     GROQ_MAX_TOKENS: int = Field(default=8192)
 
+    # Safety Net & Second Opinion (R2)
+    SECOND_OPINION_ENABLED: bool = Field(default=False)
+    GROQ_SECOND_MODEL: str = Field(default="llama-3.2-90b-vision-preview")
+    NATIVE_PDF_EXTRACTOR_URL: str = Field(default="")
+    NATIVE_PDF_EXTRACTOR_KEY: str = Field(default="")
+
     # Preprocessing & Image Quality Thresholds (R1)
     MAX_IMAGE_LONG_SIDE: int = Field(default=1600)
     MIN_TEXT_CHARS: int = Field(default=80)
     BLUR_REJECT_THRESHOLD: float = Field(default=50.0)
+    PREPROCESS_MIN_BRIGHTNESS: float = Field(default=30.0)
+    PREPROCESS_MAX_BRIGHTNESS: float = Field(default=240.0)
+    PREPROCESS_MIN_CONTRAST: float = Field(default=15.0)
     MAX_UPLOAD_MB: int = Field(default=20)
 
     # Business Validation Constants (R2, R3)
@@ -81,6 +90,53 @@ class Settings(BaseSettings):
     AMOUNT_TOLERANCE: Decimal = Field(default=Decimal("0.01"))
     TOTAL_ROUNDING_TOLERANCE: Decimal = Field(default=Decimal("0.00"))
     LOW_CONFIDENCE_THRESHOLD: float = Field(default=0.7)
+
+    # Email Intake Configuration (4.1)
+    EMAIL_INTAKE_ENABLED: bool = Field(default=False)
+    EMAIL_IMAP_HOST: str = Field(default="imap.example.com")
+    EMAIL_IMAP_PORT: int = Field(default=993)
+    EMAIL_IMAP_USER: str = Field(default="")
+    EMAIL_IMAP_PASSWORD: str = Field(default="")
+    EMAIL_FOLDER: str = Field(default="INBOX")
+    EMAIL_PROCESSED_FOLDER: str = Field(default="Processed")
+    EMAIL_FAILED_FOLDER: str = Field(default="Failed")
+    EMAIL_POLL_INTERVAL_SECONDS: int = Field(default=60)
+    EMAIL_MIN_ATTACHMENT_BYTES: int = Field(default=5000)
+    EMAIL_MIN_IMAGE_PIXELS: int = Field(default=100)
+    EMAIL_MAX_ATTACHMENT_BYTES: int = Field(default=20 * 1024 * 1024)
+    EMAIL_MAX_ATTACHMENTS_PER_MESSAGE: int = Field(default=10)
+    EMAIL_MAX_PDF_PAGES: int = Field(default=50)
+    EMAIL_ALLOWED_SENDER_DOMAINS: list[str] | str = Field(default=[])
+
+    # Outbox & Notifications (4.3)
+    EMAIL_SMTP_HOST: str = Field(default="smtp.example.com")
+    EMAIL_SMTP_PORT: int = Field(default=587)
+    EMAIL_SMTP_USER: str = Field(default="")
+    EMAIL_SMTP_PASSWORD: str = Field(default="")
+    EMAIL_FROM_ADDRESS: str = Field(default="invoices@invoiceflow.local")
+    RESEND_MAX_PER_SENDER_PER_DAY: int = Field(default=5)
+
+    # WhatsApp Intake Configuration (4.2)
+    WHATSAPP_PHONE_NUMBER_ID: str = Field(default="100000000000001")
+    WHATSAPP_API_TOKEN: str = Field(default="")
+    WHATSAPP_APP_SECRET: str = Field(default="dev-whatsapp-app-secret")
+    WHATSAPP_VERIFY_TOKEN: str = Field(default="invoiceflow-verify-token")
+    WHATSAPP_GROUP_WINDOW_SECONDS: int = Field(default=90)
+    WHATSAPP_RESEND_TEMPLATE: str = Field(default="invoice_resend_request")
+
+    # Antivirus (4.5)
+    ANTIVIRUS_ENABLED: bool = Field(default=False)
+    CLAMAV_HOST: str = Field(default="clamav")
+    CLAMAV_PORT: int = Field(default=3310)
+
+    # Phase 5 Fallback & Resiliency
+    FALLBACK_LLM_BASE_URL: str = Field(default="")
+    FALLBACK_LLM_API_KEY: str = Field(default="")
+    FALLBACK_LLM_MODEL: str = Field(default="")
+    REVIEW_CLAIM_TIMEOUT_MINUTES: int = Field(default=5)
+
+    # Shadow Mode (6.5)
+    SHADOW_MODE: bool = Field(default=False)
 
     # Accounting Push API
     ACCOUNTING_API_URL: str = Field(default="http://localhost:8001")
@@ -109,11 +165,21 @@ class Settings(BaseSettings):
             return [x.strip() for x in v.split(",") if x.strip()]
         return v
 
+    @field_validator("EMAIL_ALLOWED_SENDER_DOMAINS", mode="after")
+    @classmethod
+    def parse_allowed_domains(cls, v: list[str] | str) -> list[str]:
+        if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                return []
+            return [x.strip().lower() for x in v.split(",") if x.strip()]
+        return [str(x).strip().lower() for x in v if str(x).strip()]
+
     @field_validator("EXTRACTOR")
     @classmethod
     def validate_extractor(cls, v: str) -> str:
         if v not in ("groq", "mock"):
-            raise ValueError(f"EXTRACTOR must be 'groq' or 'mock', got '{v}'")
+            raise ValueError(f"Invalid EXTRACTOR: {v}. Must be 'groq' or 'mock'")
         return v
 
 

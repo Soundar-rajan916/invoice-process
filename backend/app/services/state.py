@@ -10,8 +10,9 @@ from app.models.entities import Invoice, ReviewEvent
 
 # Explicit allowed transitions table
 ALLOWED_TRANSITIONS: dict[str, set[str]] = {
-    "RECEIVED": {"PROCESSING"},
-    "PROCESSING": {"NEEDS_REVIEW", "RESEND_REQUESTED", "FAILED"},
+    "RECEIVED": {"PROCESSING", "WAITING_PROVIDER"},
+    "WAITING_PROVIDER": {"PROCESSING"},
+    "PROCESSING": {"NEEDS_REVIEW", "RESEND_REQUESTED", "FAILED", "WAITING_PROVIDER"},
     "NEEDS_REVIEW": {
         "APPROVED",
         "REJECTED",

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Decimal from "decimal.js";
 import { apiRequest, ConflictError } from "@/lib/api";
+import { maskSender } from "@/lib/mask";
 import { StatusPill } from "@/components/StatusPill";
 import { AuditTrailFlowchart } from "@/components/AuditTrailFlowchart";
 import { DocumentViewer } from "@/components/DocumentViewer";
@@ -24,6 +25,10 @@ import {
   RefreshCw,
   FileUp,
   RotateCcw,
+  Split,
+  Mail,
+  MessageSquare,
+  Upload,
   CheckCircle2,
   XCircle,
   Loader2,
@@ -125,6 +130,25 @@ export function ReviewDetail() {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "line_items",
+  });
+
+
+  // Split Pages Mutation (R1 multi-page grouped documents)
+  const splitPagesMutation = useMutation({
+    mutationFn: () => {
+      return apiRequest(`/api/v1/invoices/${id}/split-pages`, {
+        method: "POST",
+      });
+    },
+    onSuccess: (data: any) => {
+      alert(data.message || "Invoice split successfully");
+      queryClient.invalidateQueries({ queryKey: ["invoice-detail", id] });
+      queryClient.invalidateQueries({ queryKey: ["invoices-queue"] });
+      navigate("/queue");
+    },
+    onError: (err: any) => {
+      alert(err.message || "Failed to split pages");
+    },
   });
 
   // Populate form with fetched invoice extractions (supporting both current_extraction and direct fields)
@@ -474,9 +498,24 @@ export function ReviewDetail() {
               </h2>
               <StatusPill status={invoice?.status || ""} />
             </div>
-            <p className="text-xs text-findeck-muted font-mono mt-0.5">
-              ID: {id} • Version: {invoice?.row_version}
-            </p>
+            
+            <div className="flex items-center space-x-2 mt-1">
+              <span className="text-[11px] text-findeck-muted font-mono">
+                ID: {id} • Version: {invoice?.row_version}
+              </span>
+              {invoice?.channel && (
+                <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent-soft text-accent-strong">
+                  {invoice.channel === "email" ? <Mail className="h-3 w-3" /> : invoice.channel === "whatsapp" ? <MessageSquare className="h-3 w-3" /> : <Upload className="h-3 w-3" />}
+                  <span className="capitalize">{invoice.channel}</span>
+                  {invoice.sender && <span>: {maskSender(invoice.sender, invoice.channel)}</span>}
+                </span>
+              )}
+              {invoice?.original_filename && (
+                <span className="text-[11px] text-findeck-muted font-mono truncate max-w-[200px]" title={invoice.original_filename}>
+                  • {invoice.original_filename}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -500,6 +539,18 @@ export function ReviewDetail() {
             <History className="h-3.5 w-3.5" />
             <span>Audit Trail</span>
           </button>
+
+          {invoice?.page_count > 1 && (
+            <button
+              onClick={() => splitPagesMutation.mutate()}
+              disabled={splitPagesMutation.isPending}
+              className="inline-flex items-center space-x-1 px-3 py-1.5 border border-findeck-border bg-white rounded-btn text-xs font-semibold text-findeck-text hover:bg-findeck-app transition-colors cursor-pointer"
+              title="Split multi-page invoice into individual invoices"
+            >
+              <Split className="h-3.5 w-3.5" />
+              <span>Split Pages</span>
+            </button>
+          )}
 
           {invoice?.status === "RESEND_REQUESTED" ? (
             <div

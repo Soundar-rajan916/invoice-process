@@ -57,3 +57,28 @@ This document records all domain, technical, and operational assumptions made du
 3. **Storage Retention:**
    - Original files in MinIO are immutable (`originals/{sha256[:2]}/{sha256}`).
    - Audit logs in PostgreSQL are append-only; an explicit database trigger prevents `UPDATE` or `DELETE` operations on `review_events`.
+
+
+---
+
+## 4. Phase 4 Assumptions (Real Intake & Extraction Safety)
+
+1. **Email Poller (R1, R3):**
+   - Inbound email polling uses IMAP over TLS with idempotent tracking on `Message-ID` in the `inbound_messages` table. Re-polling a folder never creates duplicate records or reprocesses attachments.
+   - Attachments with inline disposition and size < `EMAIL_MIN_ATTACHMENT_BYTES` (5 KB), or dimensions < `EMAIL_MIN_IMAGE_PIXELS` (100 px), or matching `LOGO_PATTERN` (`image001.png`, `logo`, `signature`) are classified as non-invoice artifacts and ignored.
+   - Corrupt or password-encrypted PDFs immediately transition to `RESEND_REQUESTED` without crashing the poller, and generate an outbound resend notification.
+   - Successfully processed emails are moved to the `Processed` folder (or `Failed` on unrecoverable error).
+
+2. **WhatsApp Intake (R1, R3):**
+   - WhatsApp Cloud API webhooks verify the `X-Hub-Signature-256` HMAC header using constant-time comparison against `WHATSAPP_APP_SECRET`. Non-matching signatures are rejected with HTTP 401 before payload inspection.
+   - Multiple photos sent within `WHATSAPP_GROUP_WINDOW_SECONDS` (90 s) from the same sender phone number are aggregated into a single multi-page invoice.
+   - Reviewers can split grouped photo invoices via `POST /api/v1/invoices/{id}/split-pages`.
+
+3. **Transactional Outbox & Resend Safety (R2):**
+   - Outbound notifications for resend requests are inserted atomically in `outbound_messages` within the same database transaction as the status transition.
+   - Notification text templates (`backend/app/templates/`) include only rejection reasons, guidance on photo quality/encryption, and support contact details. **Under no circumstances do outbound messages disclose extracted amounts or financial figures.**
+   - Per-sender rate limiting (`RESEND_MAX_PER_SENDER_PER_DAY = 3`) prevents vendor notification spamming.
+
+4. **Safety Net Grounding (R2):**
+   - Digital PDFs with text streams run a strict grounding verification pass: all extracted financial amounts, invoice numbers, and GSTINs must appear in the normalized document text, or raise a blocking `not_in_source` error.
+   - When `SECOND_OPINION_ENABLED=true`, disagreement on total amount between primary and secondary extraction models raises an `extractors_disagree` warning and preserves both models' outputs for human review.

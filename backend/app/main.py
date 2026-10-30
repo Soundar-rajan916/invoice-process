@@ -62,8 +62,10 @@ def create_app() -> FastAPI:
     from app.api.files import router as files_router
     from app.api.invoices import router as invoices_router
     from app.api.metrics import router as metrics_router
+    from app.api.webhooks import router as webhooks_router
 
     app.include_router(files_router)
+    app.include_router(webhooks_router)
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(invoices_router, prefix="/api/v1")
     app.include_router(metrics_router, prefix="/api/v1")

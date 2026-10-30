@@ -133,3 +133,50 @@ All primary entities use UUID primary keys, timezone-aware UTC timestamps, and o
 - **`validation_issues`:** Structured validation warnings and errors mapped per field and invoice.
 - **`review_events`:** Tamper-proof, append-only audit trail protected by database triggers blocking `UPDATE` and `DELETE`.
 - **`push_attempts`:** Log of accounting API delivery attempts with HTTP status codes and idempotency tracking.
+
+
+---
+
+## 4. Phase 4 Architecture: Real Intake & Safety Nets
+
+```mermaid
+flowchart LR
+    subgraph Intake Channels
+        EM[Email Mailbox<br/>IMAP TLS / App Passwords] --> EP[Celery Beat: poll_mailbox<br/>Redis Lock Guarded]
+        WA[WhatsApp Cloud API<br/>HMAC-SHA256 Webhook] --> WAP[FastAPI Webhook / Tasks]
+    end
+
+    EP --> IMSG[(inbound_messages)]
+    WAP --> IMSG
+    IMSG --> PIPELINE[Core Processing Pipeline]
+
+    subgraph Extraction Safety Net
+        PIPELINE --> PREP[Hardened Preprocessing<br/>Perspective & Contrast CLAHE]
+        PREP --> EXT1[Primary Extractor]
+        EXT1 --> SEC{Second Opinion?}
+        SEC -- Enabled --> EXT2[Ensemble Model]
+        SEC -- Disagree --> DISAGREE[Issue: extractors_disagree]
+        EXT1 --> GROUND{Digital PDF?}
+        GROUND -- Yes --> GCHECK[Grounding Verification<br/>Issue: not_in_source]
+    end
+
+    subgraph Transactional Outbox
+        REJ[RESEND_REQUESTED] --> OBOX[(outbound_messages)]
+        OBOX --> DISPATCH[Celery Beat: dispatch_outbox]
+        DISPATCH --> NOTIF[Email SMTP / WhatsApp Cloud]
+    end
+```
+
+### 4.1 Inbound Message Tracking & Channels
+- `inbound_messages`: Central audit record keyed by unique `external_id` (`Message-ID` for email, `wamid` for WhatsApp). Idempotent handling ensures re-polling or webhook retries never duplicate work.
+- **Email Poller:** Polls unseen messages, strips logo/signature graphics (<5 KB, image patterns), processes attachments, and moves messages to `Processed` (or `Failed`).
+- **WhatsApp Webhook:** Validates `X-Hub-Signature-256` HMAC via constant-time comparison before processing. Aggregates photos sent within `WHATSAPP_GROUP_WINDOW_SECONDS` (90 s) into a single invoice, with reviewer `split-pages` action available in the UI.
+
+### 4.2 Extraction Safety Nets
+- **Grounding Verification:** For digital PDFs, extracted amounts, line items, and identifiers must appear verbatim in normalized source text. Unmatched amounts trigger blocking `not_in_source` errors.
+- **Second Opinion:** Config-gated (`SECOND_OPINION_ENABLED`) ensemble model checks primary predictions. Total differences exceeding `TOTAL_ROUNDING_TOLERANCE` raise `extractors_disagree` warnings.
+
+### 4.3 Transactional Outbox
+- Moving an invoice to `RESEND_REQUESTED` queues an outbox row atomically.
+- Dedicated worker task delivers notifications with daily sender rate limiting (`RESEND_MAX_PER_SENDER_PER_DAY = 3`).
+- Notification bodies render rejection reasons without disclosing financial figures or amounts.

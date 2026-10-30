@@ -15,21 +15,30 @@ router = APIRouter(prefix="/api/v1/files", tags=["File Ingestion"])
 
 @router.get("/raw/{file_path:path}")
 async def get_raw_file(file_path: str) -> Response:
-    """Serves stored file or page images directly (for local/fallback storage)."""
+    """Serves raw files (e.g. rendered page images or original documents) from storage."""
     try:
-        content = storage_service.download_bytes(file_path)
-        media_type = "image/jpeg"
-        if file_path.endswith(".png"):
-            media_type = "image/png"
-        elif file_path.endswith(".pdf"):
-            media_type = "application/pdf"
-        elif file_path.endswith(".webp"):
-            media_type = "image/webp"
-        return Response(content=content, media_type=media_type)
-    except FileNotFoundError:
+        data = storage_service.download_bytes(file_path)
+    except FileNotFoundError as err:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"File '{file_path}' not found"
-        )
+        ) from err
+
+    content_type = "application/octet-stream"
+    lower_path = file_path.lower()
+    if lower_path.endswith(".jpg") or lower_path.endswith(".jpeg"):
+        content_type = "image/jpeg"
+    elif lower_path.endswith(".png"):
+        content_type = "image/png"
+    elif lower_path.endswith(".pdf"):
+        content_type = "application/pdf"
+    elif lower_path.endswith(".webp"):
+        content_type = "image/webp"
+
+    return Response(
+        content=data,
+        media_type=content_type,
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
@@ -72,31 +81,3 @@ async def upload_files(
         "count": len(results),
         "results": results,
     }
-
-
-@router.get("/raw/{file_path:path}")
-async def get_raw_file(file_path: str) -> Response:
-    """Serves raw files (e.g. rendered page images or original documents) from storage."""
-    from app.core.storage import storage_service
-
-    try:
-        data = storage_service.download_bytes(file_path)
-    except FileNotFoundError:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
-
-    content_type = "application/octet-stream"
-    lower_path = file_path.lower()
-    if lower_path.endswith(".jpg") or lower_path.endswith(".jpeg"):
-        content_type = "image/jpeg"
-    elif lower_path.endswith(".png"):
-        content_type = "image/png"
-    elif lower_path.endswith(".pdf"):
-        content_type = "application/pdf"
-    elif lower_path.endswith(".webp"):
-        content_type = "image/webp"
-
-    return Response(
-        content=data,
-        media_type=content_type,
-        headers={"Cache-Control": "public, max-age=86400"},
-    )

@@ -70,6 +70,52 @@ class SourceFile(Base, TimestampMixin):
     invoices = relationship("Invoice", back_populates="source_file")
 
 
+class InboundMessage(Base, TimestampMixin):
+    __tablename__ = "inbound_messages"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    channel: Mapped[str] = mapped_column(String(30), nullable=False)  # email | whatsapp
+    external_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    sender: Mapped[str] = mapped_column(String(255), nullable=False)
+    subject: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    received_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+    status: Mapped[str] = mapped_column(
+        String(30), default="received", nullable=False, index=True
+    )  # received | ignored | ingested | failed
+    status_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_file_ids: Mapped[list[Any]] = mapped_column(JSONType, default=list, nullable=False)
+    raw_meta: Mapped[dict[str, Any]] = mapped_column(JSONType, default=dict, nullable=False)
+
+    invoices = relationship("Invoice", back_populates="inbound_message")
+
+    __table_args__ = (
+        Index("ix_inbound_messages_channel_external_id", "channel", "external_id", unique=True),
+    )
+
+
+class OutboundMessage(Base, TimestampMixin):
+    __tablename__ = "outbound_messages"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    invoice_id: Mapped[uuid.UUID | None] = mapped_column(
+        GUID, ForeignKey("invoices.id"), nullable=True, index=True
+    )
+    channel: Mapped[str] = mapped_column(String(30), nullable=False)  # email | whatsapp
+    recipient: Mapped[str] = mapped_column(String(255), nullable=False)
+    template_key: Mapped[str] = mapped_column(String(100), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(30), default="pending", nullable=False, index=True
+    )  # pending | sent | failed
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    external_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    invoice = relationship("Invoice", back_populates="outbound_messages")
+
+
 class Invoice(Base, TimestampMixin):
     __tablename__ = "invoices"
 
@@ -81,6 +127,16 @@ class Invoice(Base, TimestampMixin):
     status_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     page_count: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     extraction_path: Mapped[str | None] = mapped_column(String(20), nullable=True)  # text | vision
+
+    # Phase 4 Intake & Claims
+    inbound_message_id: Mapped[uuid.UUID | None] = mapped_column(
+        GUID, ForeignKey("inbound_messages.id"), nullable=True, index=True
+    )
+    claimed_by: Mapped[uuid.UUID | None] = mapped_column(
+        GUID, ForeignKey("users.id"), nullable=True, index=True
+    )
+    claim_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    sender: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     current_extraction_id: Mapped[uuid.UUID | None] = mapped_column(
         GUID,
@@ -115,12 +171,15 @@ class Invoice(Base, TimestampMixin):
     row_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
     source_file = relationship("SourceFile", back_populates="invoices")
+    inbound_message = relationship("InboundMessage", back_populates="invoices")
+    claimed_by_user = relationship("User", foreign_keys=[claimed_by])
     extractions = relationship(
         "Extraction", back_populates="invoice", foreign_keys="Extraction.invoice_id"
     )
     validation_issues = relationship("ValidationIssue", back_populates="invoice")
     review_events = relationship("ReviewEvent", back_populates="invoice")
     push_attempts = relationship("PushAttempt", back_populates="invoice")
+    outbound_messages = relationship("OutboundMessage", back_populates="invoice")
 
     __table_args__ = (
         # R2 Guarantee: Never push without reviewer approval
@@ -198,7 +257,7 @@ class ReviewEvent(Base, TimestampMixin):
     )
     actor_id: Mapped[uuid.UUID | None] = mapped_column(GUID, ForeignKey("users.id"), nullable=True)
     action: Mapped[str] = mapped_column(String(50), nullable=False)
-    # actions: status_change, edit, approve, reject, request_resend, confirm_duplicate, override_duplicate, override_issue, duplicate_file_skipped
+    # actions: status_change, edit, approve, reject, request_resend, confirm_duplicate, override_duplicate, override_issue, duplicate_file_skipped, claim, claim_heartbeat, claim_release, claim_takeover, split_pages
     payload: Mapped[dict[str, Any]] = mapped_column(JSONType, default=dict, nullable=False)
 
     invoice = relationship("Invoice", back_populates="review_events")

@@ -1,7 +1,9 @@
 from app.models.entities import (
     Base,
     Extraction,
+    InboundMessage,
     Invoice,
+    OutboundMessage,
     PushAttempt,
     ReviewEvent,
     SourceFile,
@@ -15,6 +17,8 @@ __all__ = [
     "User",
     "Supplier",
     "SourceFile",
+    "InboundMessage",
+    "OutboundMessage",
     "Invoice",
     "Extraction",
     "ValidationIssue",

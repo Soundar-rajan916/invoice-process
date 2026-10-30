@@ -10,13 +10,18 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
+  Mail,
+  MessageSquare,
+  Upload,
 } from "lucide-react";
+import { maskSender } from "@/lib/mask";
 import { StatusPill } from "@/components/StatusPill";
 import { IssueChip } from "@/components/IssueChip";
 
 export function ReviewQueue() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("NEEDS_REVIEW");
+  const [channelFilter, setChannelFilter] = useState("ALL");
   const [flaggedOnly, setFlaggedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"oldest" | "newest">("oldest");
@@ -27,6 +32,7 @@ export function ReviewQueue() {
     queryKey: [
       "invoices-queue",
       statusFilter,
+      channelFilter,
       flaggedOnly,
       searchQuery,
       sortOrder,
@@ -36,6 +42,9 @@ export function ReviewQueue() {
       const params = new URLSearchParams();
       if (statusFilter && statusFilter !== "ALL") {
         params.set("status", statusFilter);
+      }
+      if (channelFilter && channelFilter !== "ALL") {
+        params.set("channel", channelFilter.toLowerCase());
       }
       if (flaggedOnly) {
         params.set("flagged", "true");
@@ -161,6 +170,33 @@ export function ReviewQueue() {
           );
         })}
       </div>
+      {/* Channel Filters */}
+      <div className="flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
+        <span className="text-[11px] font-semibold uppercase tracking-wider mr-1" style={{ color: "var(--text-muted)" }}>Channel:</span>
+        {["ALL", "UPLOAD", "EMAIL", "WHATSAPP"].map((ch) => {
+          const isSelected = channelFilter === ch;
+          return (
+            <button
+              key={ch}
+              onClick={() => {
+                setChannelFilter(ch);
+                setPage(1);
+              }}
+              className="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer flex items-center space-x-1"
+              style={{
+                backgroundColor: isSelected ? "var(--ink)" : "var(--bg-inset)",
+                color: isSelected ? "#FFFFFF" : "var(--text-secondary)",
+                borderColor: isSelected ? "var(--ink)" : "var(--border)",
+              }}
+            >
+              {ch === "EMAIL" && <Mail className="h-3 w-3 mr-1" aria-hidden="true" />}
+              {ch === "WHATSAPP" && <MessageSquare className="h-3 w-3 mr-1" aria-hidden="true" />}
+              {ch === "UPLOAD" && <Upload className="h-3 w-3 mr-1" aria-hidden="true" />}
+              <span>{ch}</span>
+            </button>
+          );
+        })}
+      </div>
 
       {/* Filter Bar Card (Search, Flagged toggle, Sort) on --bg-card */}
       <div
@@ -256,6 +292,7 @@ export function ReviewQueue() {
                   <th className="px-6 py-3.5">Invoice #</th>
                   <th className="px-6 py-3.5">Supplier GSTIN</th>
                   <th className="px-6 py-3.5">Status</th>
+                  <th className="px-6 py-3.5">Source & Sender</th>
                   <th className="px-6 py-3.5">Received / Age</th>
                   <th className="px-6 py-3.5">Flags & Issues</th>
                   <th className="px-6 py-3.5 text-right">Actions</th>
@@ -295,6 +332,29 @@ export function ReviewQueue() {
                     </td>
                     <td className="px-6 py-4">
                       <StatusPill status={inv.status} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-1.5">
+                        {inv.channel === "email" ? (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent-soft text-accent-strong">
+                            <Mail className="h-3 w-3" aria-hidden="true" />
+                            <span>Email</span>
+                          </span>
+                        ) : inv.channel === "whatsapp" ? (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-success-soft text-success-strong">
+                            <MessageSquare className="h-3 w-3" aria-hidden="true" />
+                            <span>WhatsApp</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-bg-inset text-text-muted border border-border">
+                            <Upload className="h-3 w-3" aria-hidden="true" />
+                            <span>Upload</span>
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] truncate max-w-[160px] mt-1" style={{ color: "var(--text-muted)" }} title={inv.sender || inv.original_filename || ""}>
+                        {inv.sender ? maskSender(inv.sender, inv.channel) : inv.original_filename || "—"}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-xs">
                       <div className="font-medium tabular-nums" style={{ color: "var(--text)" }}>

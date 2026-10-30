@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import asyncio
 import uuid
 from typing import Any
 
+import redis
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -11,7 +14,7 @@ from app.services.pipeline import process_invoice_pipeline
 from app.workers.celery_app import celery_app
 
 
-def _get_worker_session():
+def _get_worker_session() -> tuple[async_sessionmaker[AsyncSession], Any]:
     task_engine = create_async_engine(settings.DATABASE_URL, poolclass=NullPool)
     maker = async_sessionmaker(task_engine, class_=AsyncSession, expire_on_commit=False)
     return maker, task_engine
@@ -78,8 +81,6 @@ def process_invoice(self: Any, invoice_id_str: str) -> dict[str, str]:
 )
 def push_invoice_task(self: Any, invoice_id_str: str) -> dict[str, str]:
     """Celery task executing idempotent push of approved invoice to accounting API."""
-    import uuid
-
     from app.services.push import push_invoice
 
     invoice_id = uuid.UUID(invoice_id_str)
@@ -101,3 +102,118 @@ def push_invoice_task(self: Any, invoice_id_str: str) -> dict[str, str]:
             "Error executing push_invoice_task", invoice_id=invoice_id_str, error=str(exc)
         )
         raise self.retry(exc=exc) from exc
+
+
+@celery_app.task(
+    bind=True,
+    name="app.workers.tasks.poll_mailbox_task",
+    max_retries=1,
+    acks_late=True,
+)
+def poll_mailbox_task(self: Any) -> dict[str, Any]:
+    """Celery beat task polling unseen messages from configured mailbox under Redis lock."""
+    # 1. Distributed lock to ensure only one poller runs at a time
+    try:
+        r = redis.Redis.from_url(settings.REDIS_URL)
+        lock = r.lock("lock:poll_mailbox", timeout=120)
+        have_lock = lock.acquire(blocking=False)
+        if not have_lock:
+            logger.info("Another poll_mailbox task is running, skipping iteration")
+            return {"status": "skipped", "reason": "lock_acquired_by_other_worker"}
+    except Exception as e:
+        logger.warning("Redis lock check failed, proceeding without lock", error=str(e))
+        lock = None
+
+    from app.services.email_intake import EmailIngestor, ImapMailboxClient
+
+    client = ImapMailboxClient()
+
+    async def _poll() -> list[dict[str, Any]]:
+        maker, task_engine = _get_worker_session()
+        results: list[dict[str, Any]] = []
+        try:
+            client.connect()
+            messages = client.fetch_unseen_messages(settings.EMAIL_FOLDER)
+            async with maker() as session:
+                ingestor = EmailIngestor(session)
+                for msg in messages:
+                    res = await ingestor.process_message(msg)
+                    results.append(res)
+                    # Move to Processed (or Failed on error)
+                    target_folder = (
+                        settings.EMAIL_PROCESSED_FOLDER
+                        if res.get("status") in ("ingested", "ignored")
+                        else settings.EMAIL_FAILED_FOLDER
+                    )
+                    client.move_message(msg.message_id, settings.EMAIL_FOLDER, target_folder)
+            return results
+        finally:
+            client.disconnect()
+            await task_engine.dispose()
+
+    try:
+        processed = asyncio.run(_poll())
+        return {"status": "completed", "count": len(processed), "details": processed}
+    except Exception as exc:
+        logger.exception("Error executing poll_mailbox_task", error=str(exc))
+        return {"status": "failed", "error": str(exc)}
+    finally:
+        if lock:
+            try:
+                lock.release()
+            except Exception:
+                pass
+
+
+@celery_app.task(
+    name="app.workers.tasks.dispatch_outbox_task",
+    acks_late=True,
+)
+def dispatch_outbox_task() -> dict[str, Any]:
+    """Celery beat task dispatching pending outbox messages."""
+    from app.services.outbox import dispatch_pending_outbox_messages
+
+    async def _dispatch() -> int:
+        maker, task_engine = _get_worker_session()
+        try:
+            async with maker() as session:
+                return await dispatch_pending_outbox_messages(session)
+        finally:
+            await task_engine.dispose()
+
+    sent = asyncio.run(_dispatch())
+    return {"status": "completed", "sent": sent}
+
+
+@celery_app.task(
+    name="app.workers.tasks.process_whatsapp_message_task",
+    acks_late=True,
+)
+def process_whatsapp_message_task(
+    message_id: str,
+    sender: str,
+    media_id: str,
+    media_type: str,
+    filename: str | None = None,
+    mime_type: str | None = None,
+) -> dict[str, Any]:
+    """Celery task downloading WhatsApp media and running ingestion."""
+    from app.services.whatsapp import WhatsAppIngestor
+
+    async def _run() -> dict[str, Any]:
+        maker, task_engine = _get_worker_session()
+        try:
+            async with maker() as session:
+                ingestor = WhatsAppIngestor(session)
+                return await ingestor.handle_media_message(
+                    message_id=message_id,
+                    sender=sender,
+                    media_id=media_id,
+                    media_type=media_type,
+                    filename=filename,
+                    mime_type=mime_type,
+                )
+        finally:
+            await task_engine.dispose()
+
+    return asyncio.run(_run())

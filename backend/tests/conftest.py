@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import AsyncGenerator
+from decimal import Decimal
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -13,6 +14,8 @@ from app.core.database import Base, get_db_session
 from app.main import app
 
 settings.ENVIRONMENT = "test"
+settings.TOTAL_ROUNDING_TOLERANCE = Decimal("0.00")
+settings.EXTRACTOR = "mock"
 
 # SQLite in-memory test database for unit test suite
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import uuid
 from datetime import UTC, datetime
 from typing import Any
@@ -12,11 +13,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import get_db_session
 from app.core.errors import OptimisticLockError, UnresolvedErrorsApprovalError
-import hashlib
 from app.core.logging import logger
-from app.ingestors.upload import convert_heic_to_jpeg, detect_content_type
 from app.core.security import get_current_user, require_reviewer, verify_csrf_header
 from app.core.storage import storage_service
+from app.ingestors.upload import convert_heic_to_jpeg, detect_content_type
 from app.models.entities import (
     Extraction,
     Invoice,
@@ -782,3 +782,51 @@ async def get_invoice_audit_trail(
             }
         )
     return audit_events
+
+@router.post("/{invoice_id}/split-pages")
+async def split_invoice_pages(
+    invoice_id: uuid.UUID,
+    user: User = Depends(require_reviewer),
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf_header),
+) -> dict[str, Any]:
+    """Splits a grouped multi-page invoice into individual invoices (R1)."""
+    invoice = await db.get(Invoice, invoice_id)
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    if (invoice.page_count or 1) <= 1:
+        raise HTTPException(status_code=400, detail="Invoice has only 1 page, cannot split")
+
+    total_pages = invoice.page_count
+    invoice.page_count = 1
+    invoice.row_version += 1
+
+    created_invoices = [str(invoice.id)]
+
+    for _p in range(2, total_pages + 1):
+        new_inv = Invoice(
+            id=uuid.uuid4(),
+            source_file_id=invoice.source_file_id,
+            status="RECEIVED",
+            page_count=1,
+            inbound_message_id=invoice.inbound_message_id,
+            sender=invoice.sender,
+        )
+        db.add(new_inv)
+        await db.flush()
+        created_invoices.append(str(new_inv.id))
+
+    db.add(
+        ReviewEvent(
+            invoice_id=invoice.id,
+            actor_id=user.id,
+            action="split_pages",
+            payload={"original_pages": total_pages, "resulting_invoices": created_invoices},
+        )
+    )
+    await db.commit()
+    return {
+        "message": f"Successfully split document into {len(created_invoices)} invoices",
+        "invoices": created_invoices,
+    }
+

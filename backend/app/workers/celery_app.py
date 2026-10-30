@@ -20,4 +20,14 @@ celery_app.conf.update(
     task_default_retry_delay=5,
     task_max_retries=3,
     broker_connection_retry_on_startup=True,
+    beat_schedule={
+        "poll-mailbox-every-interval": {
+            "task": "app.workers.tasks.poll_mailbox_task",
+            "schedule": float(settings.EMAIL_POLL_INTERVAL_SECONDS),
+        },
+        "dispatch-outbox-every-30s": {
+            "task": "app.workers.tasks.dispatch_outbox_task",
+            "schedule": 30.0,
+        },
+    },
 )

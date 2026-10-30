@@ -48,11 +48,103 @@ def validate_gstin_format(gstin: str) -> bool:
     return bool(GSTIN_FORMAT_REGEX.match(gstin.strip().upper()))
 
 
+def normalize_text_for_grounding(text: str) -> str:
+    """Normalizes Indian number grouping, currency symbols, and whitespace."""
+    t = text.lower()
+    for symbol in ("₹", "rs.", "rs", "inr"):
+        t = t.replace(symbol, " ")
+    # Remove commas between digits (Indian format 1,23,456.78 -> 123456.78)
+    t = re.sub(r"(\d),(\d)", r"\1\2", t)
+    t = re.sub(r"\s+", " ", t)
+    return t
+
+
+def is_value_in_text(value_str: str, norm_text: str) -> bool:
+    """Checks whether a string or formatted number appears in normalized text."""
+    v = value_str.strip().lower()
+    if not v:
+        return True
+    clean_v = re.sub(r"[, \-\/]", "", v)
+    text_no_punct = re.sub(r"[, \-\/]", "", norm_text)
+    return clean_v in text_no_punct
+
+
+def validate_grounding(extraction: InvoiceExtraction, source_text: str) -> list[ValidationIssueDto]:
+    """Safety net check for digital PDFs (R2).
+    Verifies that every extracted amount, invoice number, and GSTIN actually appears in document text.
+    Catches invented numbers before human reviewers see them.
+    """
+    issues: list[ValidationIssueDto] = []
+    norm_text = normalize_text_for_grounding(source_text)
+
+    # 1. Invoice Number
+    if extraction.invoice_number and not is_value_in_text(extraction.invoice_number, norm_text):
+        issues.append(
+            ValidationIssueDto(
+                "not_in_source",
+                "invoice_number",
+                "error",
+                f"Extracted invoice number '{extraction.invoice_number}' not found in document text",
+            )
+        )
+
+    # 2. Supplier GSTIN
+    if extraction.supplier_gstin and not is_value_in_text(extraction.supplier_gstin, norm_text):
+        issues.append(
+            ValidationIssueDto(
+                "not_in_source",
+                "supplier_gstin",
+                "error",
+                f"Extracted supplier GSTIN '{extraction.supplier_gstin}' not found in document text",
+            )
+        )
+
+    # 3. Key financial amounts
+    amount_fields = [
+        ("taxable_value", extraction.taxable_value),
+        ("cgst", extraction.cgst),
+        ("sgst", extraction.sgst),
+        ("igst", extraction.igst),
+        ("total", extraction.total),
+    ]
+    for field_name, amount in amount_fields:
+        if amount is not None and amount > Decimal("0.00"):
+            str_val_2dec = f"{amount:.2f}"
+            str_val_0dec = f"{amount:.0f}"
+            if not (is_value_in_text(str_val_2dec, norm_text) or is_value_in_text(str_val_0dec, norm_text)):
+                issues.append(
+                    ValidationIssueDto(
+                        "not_in_source",
+                        field_name,
+                        "error",
+                        f"Extracted {field_name} '₹{amount:.2f}' not found in document text",
+                    )
+                )
+
+    # 4. Line item amounts
+    for idx, item in enumerate(extraction.line_items):
+        if item.amount is not None and item.amount > Decimal("0.00"):
+            amt_str = f"{item.amount:.2f}"
+            amt_str0 = f"{item.amount:.0f}"
+            if not (is_value_in_text(amt_str, norm_text) or is_value_in_text(amt_str0, norm_text)):
+                issues.append(
+                    ValidationIssueDto(
+                        "not_in_source",
+                        f"line_items[{idx}].amount",
+                        "error",
+                        f"Line item {idx+1} amount '₹{item.amount:.2f}' not found in document text",
+                    )
+                )
+
+    return issues
+
+
 def validate_extraction(
     extraction: InvoiceExtraction,
     known_suppliers: dict[str, str] | None = None,  # gstin -> supplier_name
     min_page_blur: float | None = None,
     current_date: date | None = None,
+    source_text: str | None = None,
 ) -> list[ValidationIssueDto]:
     """Pure, deterministic validation engine enforcing R2 financial accuracy rules."""
     issues: list[ValidationIssueDto] = []
@@ -100,65 +192,32 @@ def validate_extraction(
             )
         )
 
-    # 2. GSTIN format & checksum
+    # 2. gstin_checksum & format
     if extraction.supplier_gstin:
-        gstin = extraction.supplier_gstin.strip().upper()
-        if not GSTIN_FORMAT_REGEX.match(gstin):
+        gstin_clean = extraction.supplier_gstin.strip().upper()
+        if not validate_gstin_format(gstin_clean):
             issues.append(
                 ValidationIssueDto(
-                    "gstin_format", "supplier_gstin", "error", f"Invalid GSTIN structure '{gstin}'"
+                    "gstin_format",
+                    "supplier_gstin",
+                    "error",
+                    f"Supplier GSTIN '{gstin_clean}' does not match statutory format (2-digit state code + 10-char PAN + 3-char entity code)",
                 )
             )
-        elif not is_valid_gstin_checksum(gstin):
+        elif not is_valid_gstin_checksum(gstin_clean):
             issues.append(
                 ValidationIssueDto(
                     "gstin_checksum",
                     "supplier_gstin",
                     "error",
-                    f"GSTIN checksum verification failed for '{gstin}'",
+                    f"Supplier GSTIN '{gstin_clean}' checksum character '{gstin_clean[-1]}' is invalid",
                 )
             )
 
-    # 3. Line items and calculations
+    # 3. line_amount_mismatch
     sum_line_amounts = Decimal("0.00")
     for idx, item in enumerate(extraction.line_items):
-        if not item.description:
-            issues.append(
-                ValidationIssueDto(
-                    "missing_field",
-                    f"line_items[{idx}].description",
-                    "error",
-                    f"Line item {idx + 1} has no description",
-                )
-            )
-        if item.quantity is None:
-            issues.append(
-                ValidationIssueDto(
-                    "missing_field",
-                    f"line_items[{idx}].quantity",
-                    "error",
-                    f"Line item {idx + 1} has no quantity",
-                )
-            )
-        if item.rate is None:
-            issues.append(
-                ValidationIssueDto(
-                    "missing_field",
-                    f"line_items[{idx}].rate",
-                    "error",
-                    f"Line item {idx + 1} has no rate",
-                )
-            )
-        if item.amount is None:
-            issues.append(
-                ValidationIssueDto(
-                    "missing_field",
-                    f"line_items[{idx}].amount",
-                    "error",
-                    f"Line item {idx + 1} has no amount",
-                )
-            )
-        elif item.quantity is not None and item.rate is not None:
+        if item.quantity is not None and item.rate is not None and item.amount is not None:
             expected_amt = item.quantity * item.rate
             if abs(expected_amt - item.amount) > amount_tol:
                 issues.append(
@@ -166,7 +225,7 @@ def validate_extraction(
                         "line_amount_mismatch",
                         f"line_items[{idx}].amount",
                         "error",
-                        f"Line {idx + 1}: quantity ({item.quantity}) × rate ({item.rate}) = {expected_amt:.2f}, but amount is {item.amount:.2f}",
+                        f"Line item {idx+1} amount ({item.amount:.2f}) != qty ({item.quantity:.2f}) * rate ({item.rate:.2f}) = {expected_amt:.2f}",
                     )
                 )
         if item.amount is not None:
@@ -252,30 +311,29 @@ def validate_extraction(
                     f"Invoice date {extraction.invoice_date} is in the future",
                 )
             )
-        elif extraction.invoice_date < today - timedelta(days=730):
+        elif extraction.invoice_date < (today - timedelta(days=365)):
             issues.append(
                 ValidationIssueDto(
                     "date_invalid",
                     "invoice_date",
-                    "error",
-                    f"Invoice date {extraction.invoice_date} is more than 2 years in the past",
+                    "warning",
+                    f"Invoice date {extraction.invoice_date} is more than 1 year in the past",
                 )
             )
 
-    # 8. unknown_supplier & supplier_name_differs
-    if extraction.supplier_gstin and known_suppliers is not None:
-        gstin_clean = extraction.supplier_gstin.strip().upper()
-        if gstin_clean not in known_suppliers:
+    # 8. unknown_supplier / supplier_name_differs
+    if known_suppliers is not None and extraction.supplier_gstin:
+        known_name = known_suppliers.get(extraction.supplier_gstin)
+        if not known_name:
             issues.append(
                 ValidationIssueDto(
                     "unknown_supplier",
                     "supplier_gstin",
                     "warning",
-                    f"Supplier GSTIN '{gstin_clean}' not found in supplier directory",
+                    f"Supplier with GSTIN '{extraction.supplier_gstin}' is not registered in the supplier master",
                 )
             )
         elif extraction.supplier_name:
-            known_name = known_suppliers[gstin_clean]
             ratio = fuzz.ratio(extraction.supplier_name.lower(), known_name.lower())
             if ratio < 70:
                 issues.append(
@@ -319,5 +377,10 @@ def validate_extraction(
                 f"Page image quality is low (Laplacian variance {min_page_blur:.1f})",
             )
         )
+
+    # 11. Grounding check (R2) for digital PDFs
+    if source_text:
+        grounding_issues = validate_grounding(extraction, source_text)
+        issues.extend(grounding_issues)
 
     return issues

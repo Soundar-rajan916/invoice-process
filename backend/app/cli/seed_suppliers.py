@@ -3,10 +3,9 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-from pathlib import Path
 import uuid
+from pathlib import Path
 
-from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.core.database import async_session_maker
@@ -20,7 +19,7 @@ async def seed_suppliers_from_manifest(manifest_path: str) -> int:
         return 0
 
     suppliers: dict[str, str] = {}
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             if not line.strip():
                 continue
