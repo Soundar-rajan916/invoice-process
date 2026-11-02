@@ -11,6 +11,11 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  MessageSquare,
+  ExternalLink,
+  RefreshCw,
+  Clock,
+  Send,
 } from "lucide-react";
 import { SuppliersTableSkeleton } from "@/components/Skeleton";
 
@@ -64,7 +69,14 @@ export function formatStateDisplay(code?: string): string {
 
 export function Admin() {
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"suppliers" | "users">("suppliers");
+  const [activeTab, setActiveTab] = useState<"suppliers" | "users" | "whatsapp">("suppliers");
+
+  const { data: whatsappStatus, isLoading: loadingWhatsApp, refetch: refetchWhatsApp } = useQuery({
+    queryKey: ["admin-whatsapp-status"],
+    queryFn: () => apiRequest("/api/v1/admin/whatsapp/status"),
+    enabled: activeTab === "whatsapp",
+    refetchInterval: activeTab === "whatsapp" ? 10000 : false,
+  });
 
   // Supplier state
   const [newGstin, setNewGstin] = useState("");
@@ -258,6 +270,17 @@ export function Admin() {
           >
             <Users className="h-3.5 w-3.5" />
             <span>User Accounts</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("whatsapp")}
+            className="flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer"
+            style={{
+              backgroundColor: activeTab === "whatsapp" ? "var(--ink)" : "transparent",
+              color: activeTab === "whatsapp" ? "#FFFFFF" : "var(--text-muted)",
+            }}
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            <span>WhatsApp Gateway</span>
           </button>
         </div>
       </div>
@@ -834,6 +857,176 @@ export function Admin() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      )}
+      {activeTab === "whatsapp" && (
+        <div className="space-y-6">
+          <div
+            className="p-6 rounded-card border shadow-xs space-y-6"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style={{ borderColor: "var(--border)" }}>
+              <div>
+                <h3 className="font-semibold text-base flex items-center space-x-2" style={{ color: "var(--text)" }}>
+                  <MessageSquare className="h-5 w-5 text-accent" />
+                  <span>WhatsApp Ingestion Gateway</span>
+                </h3>
+                <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+                  Monitor WhatsApp session connectivity, inbound message receipt, and safe outbound pacing.
+                </p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => refetchWhatsApp()}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-btn text-xs font-medium border transition-colors cursor-pointer"
+                  style={{
+                    backgroundColor: "var(--bg-inset)",
+                    borderColor: "var(--border)",
+                    color: "var(--text)",
+                  }}
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  <span>Refresh</span>
+                </button>
+                {whatsappStatus?.dashboard_url && (
+                  <a
+                    href={whatsappStatus.dashboard_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-btn text-xs font-semibold transition-colors shadow-2xs"
+                    style={{
+                      backgroundColor: "var(--ink)",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    <span>OpenWA Dashboard</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {loadingWhatsApp ? (
+              <div className="py-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                Loading gateway status...
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Active Provider */}
+                <div
+                  className="p-4 rounded-card border space-y-1"
+                  style={{ backgroundColor: "var(--bg-inset)", borderColor: "var(--border)" }}
+                >
+                  <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                    Active Provider
+                  </span>
+                  <div className="text-lg font-bold capitalize" style={{ color: "var(--text)" }}>
+                    {whatsappStatus?.provider || "openwa"}
+                  </div>
+                  <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    {whatsappStatus?.provider === "openwa" ? "OpenWA Gateway (Self-hosted)" : "Meta Cloud API"}
+                  </div>
+                </div>
+
+                {/* Session Connectivity */}
+                <div
+                  className="p-4 rounded-card border space-y-1"
+                  style={{ backgroundColor: "var(--bg-inset)", borderColor: "var(--border)" }}
+                >
+                  <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                    Session State
+                  </span>
+                  <div className="pt-1">
+                    {(() => {
+                      const state = (whatsappStatus?.state || "unknown").toLowerCase();
+                      let bg = "var(--danger)";
+                      let text = "var(--ink)";
+                      let label = state;
+                      if (state === "connected") {
+                        bg = "var(--success)";
+                        label = "Connected";
+                      } else if (state === "needs_qr") {
+                        bg = "var(--warning)";
+                        label = "Needs QR Scan";
+                      } else if (state === "disconnected") {
+                        bg = "var(--danger)";
+                        label = "Disconnected";
+                      } else {
+                        bg = "var(--danger)";
+                        label = "Unknown";
+                      }
+                      return (
+                        <span
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shadow-2xs"
+                          style={{ backgroundColor: bg, color: text }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-black/40" />
+                          {label}
+                        </span>
+                      );
+                    })()}
+                  </div>
+                  <div className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
+                    {whatsappStatus?.last_changed_at
+                      ? `Updated ${new Date(whatsappStatus.last_changed_at).toLocaleTimeString()}`
+                      : "No state change recorded"}
+                  </div>
+                </div>
+
+                {/* Last Message Received */}
+                <div
+                  className="p-4 rounded-card border space-y-1"
+                  style={{ backgroundColor: "var(--bg-inset)", borderColor: "var(--border)" }}
+                >
+                  <span className="text-[11px] font-medium uppercase tracking-wider flex items-center space-x-1" style={{ color: "var(--text-muted)" }}>
+                    <Clock className="h-3 w-3" />
+                    <span>Last Received</span>
+                  </span>
+                  <div className="text-base font-semibold" style={{ color: "var(--text)" }}>
+                    {whatsappStatus?.last_received_at
+                      ? new Date(whatsappStatus.last_received_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                      : "None yet"}
+                  </div>
+                  <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    {whatsappStatus?.last_received_at
+                      ? new Date(whatsappStatus.last_received_at).toLocaleDateString()
+                      : "Awaiting first inbound invoice"}
+                  </div>
+                </div>
+
+                {/* Hourly Outbound vs Cap */}
+                <div
+                  className="p-4 rounded-card border space-y-1"
+                  style={{ backgroundColor: "var(--bg-inset)", borderColor: "var(--border)" }}
+                >
+                  <span className="text-[11px] font-medium uppercase tracking-wider flex items-center space-x-1" style={{ color: "var(--text-muted)" }}>
+                    <Send className="h-3 w-3" />
+                    <span>Hourly Outbound</span>
+                  </span>
+                  <div className="text-lg font-bold" style={{ color: "var(--text)" }}>
+                    {whatsappStatus?.outbound_last_hour ?? 0}
+                    <span className="text-xs font-normal text-muted ml-1" style={{ color: "var(--text-muted)" }}>
+                      / {whatsappStatus?.outbound_cap_per_hour ?? 20} max
+                    </span>
+                  </div>
+                  <div className="w-full bg-border rounded-full h-1.5 mt-2 overflow-hidden" style={{ backgroundColor: "var(--border)" }}>
+                    <div
+                      className="h-1.5 rounded-full transition-all"
+                      style={{
+                        width: `${Math.min(100, Math.round(((whatsappStatus?.outbound_last_hour ?? 0) / (whatsappStatus?.outbound_cap_per_hour || 20)) * 100))}%`,
+                        backgroundColor: (whatsappStatus?.outbound_last_hour ?? 0) >= (whatsappStatus?.outbound_cap_per_hour || 20)
+                          ? "var(--danger)"
+                          : "var(--accent)",
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

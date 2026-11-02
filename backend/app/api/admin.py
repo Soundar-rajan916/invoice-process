@@ -3,12 +3,12 @@ from __future__ import annotations
 import csv
 import io
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -511,6 +511,7 @@ async def trigger_reconciliation(
     _: None = Depends(verify_csrf_header),
 ) -> dict[str, Any]:
     from datetime import UTC, datetime
+
     from app.services.reconciliation import run_accounting_reconciliation
 
     run = await run_accounting_reconciliation(db, target_date=datetime.now(UTC).date())
@@ -726,4 +727,56 @@ async def get_shadow_report(
         "date_matches": date_matches,
         "missing_in_invoiceflow": missing_in_invoiceflow[:20],
         "mismatches_by_supplier": mismatches_by_supplier,
+    }
+
+
+@router.get("/whatsapp/status")
+async def get_whatsapp_status(
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    """Returns WhatsApp gateway & session status for the Admin dashboard."""
+    from app.models.entities import InboundMessage, OutboundMessage, WhatsAppSessionState
+
+    provider_name = settings.WHATSAPP_PROVIDER
+
+    stmt = (
+        select(WhatsAppSessionState)
+        .where(WhatsAppSessionState.provider == provider_name)
+        .order_by(WhatsAppSessionState.last_changed_at.desc())
+    )
+    session_row = (await db.execute(stmt)).scalars().first()
+
+    current_state = session_row.state if session_row else "unknown"
+    last_changed_at = session_row.last_changed_at.isoformat() if session_row else None
+    last_webhook_at = session_row.last_webhook_at.isoformat() if session_row and session_row.last_webhook_at else None
+
+    last_inb_stmt = (
+        select(InboundMessage.received_at)
+        .where(InboundMessage.channel == "whatsapp")
+        .order_by(InboundMessage.received_at.desc())
+        .limit(1)
+    )
+    last_received_at = (await db.execute(last_inb_stmt)).scalar_one_or_none()
+
+    one_hour_ago = datetime.now(UTC) - timedelta(hours=1)
+    outbound_stmt = (
+        select(func.count(OutboundMessage.id))
+        .where(
+            OutboundMessage.channel == "whatsapp",
+            OutboundMessage.status == "sent",
+            OutboundMessage.sent_at >= one_hour_ago,
+        )
+    )
+    outbound_last_hour = (await db.execute(outbound_stmt)).scalar() or 0
+
+    return {
+        "provider": provider_name,
+        "state": current_state,
+        "last_changed_at": last_changed_at,
+        "last_webhook_at": last_webhook_at,
+        "last_received_at": last_received_at.isoformat() if last_received_at else None,
+        "outbound_last_hour": outbound_last_hour,
+        "outbound_cap_per_hour": settings.WHATSAPP_MAX_OUTBOUND_PER_HOUR,
+        "dashboard_url": settings.OPENWA_DASHBOARD_URL if provider_name == "openwa" else None,
     }

@@ -198,35 +198,39 @@ async def get_prometheus_metrics(
         Invoice.claim_expires_at > now,
     )
     active_claims = (await db.execute(claim_stmt)).scalar() or 0
-    lines.append("# HELP invoiceflow_review_claims_active Currently claimed invoices in review workspace")
+    lines.append("# HELP invoiceflow_active_review_claims Count of active reviewer claims")
+    lines.append("# TYPE invoiceflow_active_review_claims gauge")
+    lines.append(f"invoiceflow_active_review_claims {active_claims}")
+    lines.append("# HELP invoiceflow_review_claims_active Count of active reviewer claims")
     lines.append("# TYPE invoiceflow_review_claims_active gauge")
     lines.append(f"invoiceflow_review_claims_active {active_claims}")
 
-    # 4. Reconciliation findings by severity
-    lines.append("# HELP invoiceflow_reconciliation_findings_total Total findings discovered by nightly reconciliation")
-    lines.append("# TYPE invoiceflow_reconciliation_findings_total gauge")
-    recon_stmt = select(ReconciliationFinding.severity, func.count(ReconciliationFinding.id)).group_by(ReconciliationFinding.severity)
-    for row in (await db.execute(recon_stmt)).all():
-        lines.append(f'invoiceflow_reconciliation_findings_total{{severity="{row[0]}"}} {row[1]}')
-
-    # 5. Queue depths & ages from Redis
-    lines.append("# HELP invoiceflow_queue_depth Celery queue backlog count")
+    # 4. Redis Queue depths (backpressure monitoring)
+    lines.append("# HELP invoiceflow_queue_depth Celery queue lengths")
     lines.append("# TYPE invoiceflow_queue_depth gauge")
-    lines.append("# HELP invoiceflow_queue_age_seconds Age of oldest message in queue")
-    lines.append("# TYPE invoiceflow_queue_age_seconds gauge")
     try:
-        r = redis.Redis.from_url(settings.REDIS_URL, socket_timeout=0.5)
+        r = redis.from_url(settings.REDIS_URL)
         for q in ["ingest", "extract", "push", "notify", "maintenance"]:
             depth = r.llen(q)
             lines.append(f'invoiceflow_queue_depth{{queue="{q}"}} {depth}')
-            lines.append(f'invoiceflow_queue_age_seconds{{queue="{q}"}} {0.0}')
     except Exception:
         for q in ["ingest", "extract", "push", "notify", "maintenance"]:
             lines.append(f'invoiceflow_queue_depth{{queue="{q}"}} 0')
-            lines.append(f'invoiceflow_queue_age_seconds{{queue="{q}"}} 0.0')
 
-    # 6. LLM Token, Cost & 429 Metrics
-    lines.append("# HELP invoiceflow_llm_tokens_total Total tokens consumed by LLM models")
+    # 5. Unresolved Reconciliation findings
+    rec_stmt = select(func.count(ReconciliationFinding.id)).where(
+        ReconciliationFinding.resolved.is_(False)
+    )
+    unresolved_recs = (await db.execute(rec_stmt)).scalar() or 0
+    lines.append("# HELP invoiceflow_unresolved_reconciliation_findings Count of active discrepancy findings")
+    lines.append("# TYPE invoiceflow_unresolved_reconciliation_findings gauge")
+    lines.append(f"invoiceflow_unresolved_reconciliation_findings {unresolved_recs}")
+    lines.append("# HELP invoiceflow_reconciliation_findings_total Count of active discrepancy findings")
+    lines.append("# TYPE invoiceflow_reconciliation_findings_total gauge")
+    lines.append(f"invoiceflow_reconciliation_findings_total {unresolved_recs}")
+
+    # 6. LLM Token Usage, Costs & Rate Limiting
+    lines.append("# HELP invoiceflow_llm_tokens_total Cumulative tokens consumed by model and type")
     lines.append("# TYPE invoiceflow_llm_tokens_total counter")
     for key, val in metrics_registry.llm_tokens_total.items():
         model, ttype = key.split("|", 1)
@@ -254,6 +258,24 @@ async def get_prometheus_metrics(
     lines.append("# TYPE invoiceflow_watchdog_requeues_total counter")
     lines.append(f"invoiceflow_watchdog_requeues_total {metrics_registry.watchdog_requeues}")
 
+    # 8. WhatsApp Session and Throughput Metrics (Section 5)
+    lines.append("# HELP whatsapp_session_state WhatsApp session state gauge (1=connected, 0=other)")
+    lines.append("# TYPE whatsapp_session_state gauge")
+    lines.append(f"whatsapp_session_state {metrics_registry.whatsapp_session_state}")
+
+    lines.append("# HELP whatsapp_inbound_total Total inbound WhatsApp messages by result")
+    lines.append("# TYPE whatsapp_inbound_total counter")
+    for res_name, cnt in metrics_registry.whatsapp_inbound_total.items():
+        lines.append(f'whatsapp_inbound_total{{result="{res_name}"}} {cnt}')
+
+    lines.append("# HELP whatsapp_outbound_total Total outbound WhatsApp messages by result")
+    lines.append("# TYPE whatsapp_outbound_total counter")
+    for res_name, cnt in metrics_registry.whatsapp_outbound_total.items():
+        lines.append(f'whatsapp_outbound_total{{result="{res_name}"}} {cnt}')
+
+    lines.append("# HELP whatsapp_signature_failures_total Total rejected WhatsApp webhook signature checks")
+    lines.append("# TYPE whatsapp_signature_failures_total counter")
+    lines.append(f"whatsapp_signature_failures_total {metrics_registry.whatsapp_signature_failures_total}")
+
     body = "\n".join(lines) + "\n"
-    from fastapi.responses import Response
     return Response(content=body, media_type="text/plain; version=0.0.4; charset=utf-8")
