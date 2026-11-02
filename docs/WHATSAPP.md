@@ -3,7 +3,7 @@
 # WhatsApp Invoice Intake Guide (OpenWA & Meta Cloud API)
 
 InvoiceFlow supports WhatsApp invoice intake through two interchangeable providers managed under a unified provider abstraction:
-1. **OpenWA (`openwa`)**: A free, self-hosted, MIT-licensed WhatsApp gateway container (`ghcr.io/rmyndharis/openwa:v0.27.0`) running locally via Docker Compose.
+1. **OpenWA (`openwa`)**: A free, self-hosted, MIT-licensed WhatsApp gateway container (`rmyndharis/openwa:latest`) running locally via Docker Compose.
 2. **Meta Cloud API (`meta`)**: The official Meta WhatsApp Business Platform Cloud API.
 
 Switching between providers requires updating a single setting: `WHATSAPP_PROVIDER=openwa` or `WHATSAPP_PROVIDER=meta`.

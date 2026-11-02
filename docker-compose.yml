@@ -131,7 +131,7 @@ services:
         condition: service_started
 
   openwa:
-    image: ghcr.io/rmyndharis/openwa:v0.27.0
+    image: ${OPENWA_IMAGE:-rmyndharis/openwa:latest}
     container_name: invoiceflow_openwa
     profiles:
       - whatsapp
