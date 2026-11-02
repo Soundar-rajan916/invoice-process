@@ -116,6 +116,18 @@ async def list_invoices(
             )
         )
 
+    if flagged:
+        flagged_sub = (
+            select(ValidationIssue.invoice_id)
+            .where(ValidationIssue.severity.in_(["error", "warning"]))
+            .distinct()
+        )
+        query = query.where(Invoice.id.in_(flagged_sub))
+
+    # Total count for the filtered query (without order/limit)
+    count_query = select(func.count()).select_from(query.order_by(None).subquery())
+    total_count = (await db.execute(count_query)).scalar() or 0
+
     # Sorting: oldest received_at first by default (R4 queue pressure)
     if sort == "newest":
         query = query.order_by(Invoice.created_at.desc())
@@ -131,8 +143,6 @@ async def list_invoices(
     paged_query = query.offset(offset).limit(page_size)
     rows = (await db.execute(paged_query)).all()
 
-    # Total count
-    total_count = sum(counts.values())
     results = []
 
     for inv, orig_filename, inb_channel in rows:
@@ -142,9 +152,6 @@ async def list_invoices(
             func.count(ValidationIssue.id).filter(ValidationIssue.severity == "warning"),
         ).where(ValidationIssue.invoice_id == inv.id)
         err_count, warn_count = (await db.execute(issue_stmt)).one()
-
-        if flagged and err_count == 0 and warn_count == 0:
-            continue
 
         results.append(
             {
@@ -911,6 +918,22 @@ async def request_resend_invoice(
             payload={"reason": req.reason},
         )
     )
+
+    if invoice.sender:
+        from app.services.outbox import queue_resend_notification
+
+        channel = (
+            "whatsapp"
+            if (invoice.sender.startswith("+") or invoice.sender.replace("+", "").isdigit())
+            else "email"
+        )
+        await queue_resend_notification(
+            db,
+            invoice=invoice,
+            channel=channel,
+            recipient=invoice.sender,
+            reason=req.reason or "Invoice document needs correction",
+        )
 
     await db.commit()
 

@@ -492,8 +492,10 @@ async def get_reconciliation_run_detail(
                 "id": str(f.id),
                 "invoice_id": str(f.invoice_id) if f.invoice_id else None,
                 "finding_type": f.finding_type,
+                "discrepancy_type": f.finding_type,
                 "severity": f.severity,
                 "details": f.details,
+                "accounting_id": f.details.get("accounting_id") if isinstance(f.details, dict) else None,
                 "resolved": f.resolved,
                 "created_at": f.created_at.isoformat(),
             }
@@ -508,9 +510,10 @@ async def trigger_reconciliation(
     db: AsyncSession = Depends(get_db_session),
     _: None = Depends(verify_csrf_header),
 ) -> dict[str, Any]:
+    from datetime import UTC, datetime
     from app.services.reconciliation import run_accounting_reconciliation
 
-    run = await run_accounting_reconciliation(db)
+    run = await run_accounting_reconciliation(db, target_date=datetime.now(UTC).date())
     return {
         "status": "triggered",
         "run_id": str(run.id),

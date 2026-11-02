@@ -1,5 +1,4 @@
-import { Pagination, PaginationItemType } from '@heroui/react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { apiRequest } from "@/lib/api";
@@ -17,6 +16,7 @@ import {
 import { maskSender } from "@/lib/mask";
 import { StatusPill } from "@/components/StatusPill";
 import { IssueChip } from "@/components/IssueChip";
+import { QueueTableSkeleton } from "@/components/Skeleton";
 
 export function ReviewQueue() {
   const navigate = useNavigate();
@@ -64,7 +64,31 @@ export function ReviewQueue() {
   const items = data?.items || [];
   const counts = data?.counts || {};
   const total = data?.total || 0;
-  const totalPages = Math.ceil(total / pageSize) || 1;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  // Reset page if totalPages shrinks below current page
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [totalPages, page]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const getPageItems = (current: number, maxPages: number): (number | "...")[] => {
+    if (maxPages <= 7) {
+      return Array.from({ length: maxPages }, (_, i) => i + 1);
+    }
+    if (current <= 4) {
+      return [1, 2, 3, 4, 5, "...", maxPages];
+    }
+    if (current >= maxPages - 3) {
+      return [1, "...", maxPages - 4, maxPages - 3, maxPages - 2, maxPages - 1, maxPages];
+    }
+    return [1, "...", current - 1, current, current + 1, "...", maxPages];
+  };
 
   // Find oldest unreviewed invoice for "Start reviewing" button
   const startReviewing = () => {
@@ -114,7 +138,7 @@ export function ReviewQueue() {
             Review Queue
           </h1>
           <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-            Accounts team review and approval verification workspace (R2 guarantee).
+            Accounts team review and approval verification workspace.
           </p>
         </div>
 
@@ -267,9 +291,7 @@ export function ReviewQueue() {
         }}
       >
         {isLoading ? (
-          <div className="py-20 text-center text-xs" style={{ color: "var(--text-muted)" }}>
-            Loading invoice queue...
-          </div>
+          <QueueTableSkeleton rows={8} />
         ) : items.length === 0 ? (
           <div className="py-20 text-center">
             <FileText className="h-10 w-10 mx-auto mb-2 opacity-40" style={{ color: "var(--text-muted)" }} aria-hidden="true" />
@@ -419,7 +441,7 @@ export function ReviewQueue() {
         )}
 
         {/* Pagination Bar */}
-        {totalPages > 1 && (
+        {total > 0 && (
           <div
             className="px-6 py-3.5 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
             style={{
@@ -429,98 +451,91 @@ export function ReviewQueue() {
             }}
           >
             <div className="tabular-nums">
-              Showing page <strong className="font-semibold" style={{ color: "var(--text)" }}>{page}</strong> of{" "}
-              <strong className="font-semibold" style={{ color: "var(--text)" }}>{totalPages}</strong> ({total} total invoices)
+              Showing{" "}
+              <strong className="font-semibold" style={{ color: "var(--text)" }}>
+                {(page - 1) * pageSize + 1}
+              </strong>
+              {" "}–{" "}
+              <strong className="font-semibold" style={{ color: "var(--text)" }}>
+                {Math.min(page * pageSize, total)}
+              </strong>
+              {" "}of{" "}
+              <strong className="font-semibold" style={{ color: "var(--text)" }}>
+                {total}
+              </strong>{" "}
+              invoices
             </div>
-            <Pagination
-              total={totalPages}
-              page={page}
-              onChange={(newPage) => setPage(newPage)}
-              showControls
-              disableCursorAnimation
-              classNames={{
-                base: "overflow-visible",
-                wrapper: "gap-1.5",
-              }}
-              renderItem={({
-                ref,
-                key,
-                value,
-                isActive,
-                onNext,
-                onPrevious,
-                setPage,
-              }) => {
-                if (value === PaginationItemType.NEXT) {
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={onNext}
-                      disabled={page >= totalPages}
-                      className="w-8 h-8 flex items-center justify-center border rounded-btn disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                      style={{
-                        backgroundColor: "var(--bg-inset)",
-                        borderColor: "var(--border)",
-                        color: "var(--text)",
-                      }}
-                      title="Next page"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                  );
-                }
 
-                if (value === PaginationItemType.PREV) {
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={onPrevious}
-                      disabled={page <= 1}
-                      className="w-8 h-8 flex items-center justify-center border rounded-btn disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                      style={{
-                        backgroundColor: "var(--bg-inset)",
-                        borderColor: "var(--border)",
-                        color: "var(--text)",
-                      }}
-                      title="Previous page"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
-                  );
-                }
+            {totalPages > 1 && (
+              <div className="flex items-center space-x-1.5">
+                <button
+                  type="button"
+                  onClick={() => handlePageChange(Math.max(1, page - 1))}
+                  disabled={page <= 1}
+                  className="px-2.5 h-8 flex items-center justify-center space-x-1 border rounded-btn disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer select-none"
+                  style={{
+                    backgroundColor: "var(--bg-card)",
+                    borderColor: "var(--border)",
+                    color: "var(--text)",
+                  }}
+                  title="Previous page"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline text-xs font-medium">Prev</span>
+                </button>
 
-                if (value === PaginationItemType.DOTS) {
-                  return (
-                    <span
-                      key={key}
-                      className="w-8 h-8 flex items-center justify-center text-xs font-semibold"
-                      style={{ color: "var(--text-muted)" }}
-                    >
-                      ...
-                    </span>
-                  );
-                }
+                <div className="flex items-center space-x-1">
+                  {getPageItems(page, totalPages).map((item, idx) => {
+                    if (item === "...") {
+                      return (
+                        <span
+                          key={`dots-${idx}`}
+                          className="w-8 h-8 flex items-center justify-center text-xs font-semibold select-none"
+                          style={{ color: "var(--text-muted)" }}
+                        >
+                          …
+                        </span>
+                      );
+                    }
 
-                return (
-                  <button
-                    ref={ref}
-                    key={key}
-                    type="button"
-                    onClick={() => setPage(value)}
-                    className="w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer"
-                    style={{
-                      backgroundColor: isActive ? "var(--ink)" : "var(--bg-inset)",
-                      color: isActive ? "#FFFFFF" : "var(--text)",
-                      borderColor: isActive ? "var(--ink)" : "var(--border)",
-                    }}
-                  >
-                    {value}
-                  </button>
-                );
-              }}
-            />
+                    const pageNum = Number(item);
+                    const isActive = pageNum === page;
+
+                    return (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => handlePageChange(pageNum)}
+                        className="w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-btn border transition-colors cursor-pointer"
+                        style={{
+                          backgroundColor: isActive ? "var(--ink)" : "var(--bg-card)",
+                          color: isActive ? "#FFFFFF" : "var(--text)",
+                          borderColor: isActive ? "var(--ink)" : "var(--border)",
+                        }}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+                  disabled={page >= totalPages}
+                  className="px-2.5 h-8 flex items-center justify-center space-x-1 border rounded-btn disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer select-none"
+                  style={{
+                    backgroundColor: "var(--bg-card)",
+                    borderColor: "var(--border)",
+                    color: "var(--text)",
+                  }}
+                  title="Next page"
+                >
+                  <span className="hidden sm:inline text-xs font-medium">Next</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

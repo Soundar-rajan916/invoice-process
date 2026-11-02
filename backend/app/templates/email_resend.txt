@@ -3,6 +3,8 @@ Dear Supplier,
 We received an invoice document from you, but were unable to process it due to the following reason:
 {{ reason }}
 
+For your reference, the original document received is attached to this email.
+
 Please review the document and submit a replacement copy.
 Note: Ensure the file is not password-protected, the image is clear and not blurry, and all line items and totals are clearly legible.
 

@@ -4,12 +4,12 @@
 
 @layer base {
   :root {
-    /* Surfaces from Reference B */
-    --bg-app: #ECEDF1;
-    --bg-card: #F7F7F9;
+    /* Surfaces: Very mild, clean ice-blue ambient background */
+    --bg-app: #EBF2F9;
+    --bg-card: #F7FAFD;
     --bg-inset: #FFFFFF;
-    --bg-disabled: #F0F1F3;
-    --border: #E3E4EA;
+    --bg-disabled: #E2EAF3;
+    --border: #DCE5EF;
 
     /* Ink & Text */
     --ink: #292929;
@@ -138,9 +138,9 @@ button, a, input, select {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D5D6DC;
+  background: #CBD8E6;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #B8B9C2;
+  background: #AEC2D6;
 }

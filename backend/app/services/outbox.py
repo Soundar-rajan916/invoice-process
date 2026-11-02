@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.logging import logger
-from app.models.entities import Invoice, OutboundMessage, ReviewEvent
+from app.models.entities import Invoice, OutboundMessage, ReviewEvent, SourceFile
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 
@@ -37,6 +37,7 @@ class Notifier(Protocol):
         subject: str,
         body: str,
         in_reply_to: str | None = None,
+        attachments: list[tuple[str, bytes, str]] | None = None,
     ) -> str: ...
 
     async def send_whatsapp(
@@ -61,6 +62,7 @@ class FakeNotifier:
         subject: str,
         body: str,
         in_reply_to: str | None = None,
+        attachments: list[tuple[str, bytes, str]] | None = None,
     ) -> str:
         msg_id = f"<fake-email-{uuid.uuid4()}@invoiceflow.local>"
         self.sent_emails.append(
@@ -70,6 +72,7 @@ class FakeNotifier:
                 "subject": subject,
                 "body": body,
                 "in_reply_to": in_reply_to,
+                "attachments": attachments or [],
             }
         )
         return msg_id
@@ -110,6 +113,7 @@ class SmtpEmailNotifier:
         subject: str,
         body: str,
         in_reply_to: str | None = None,
+        attachments: list[tuple[str, bytes, str]] | None = None,
     ) -> str:
         msg = email.message.EmailMessage()
         msg["From"] = self.from_addr
@@ -121,6 +125,16 @@ class SmtpEmailNotifier:
             msg["In-Reply-To"] = in_reply_to
             msg["References"] = in_reply_to
         msg.set_content(body)
+
+        if attachments:
+            for fname, content, ctype in attachments:
+                maintype, _, subtype = (ctype or "application/octet-stream").partition("/")
+                msg.add_attachment(
+                    content,
+                    maintype=maintype or "application",
+                    subtype=subtype or "octet-stream",
+                    filename=fname,
+                )
 
         with smtplib.SMTP(self.host, self.port, timeout=15) as server:
             server.starttls()
@@ -204,8 +218,11 @@ class CompositeNotifier:
         subject: str,
         body: str,
         in_reply_to: str | None = None,
+        attachments: list[tuple[str, bytes, str]] | None = None,
     ) -> str:
-        return await self.email_notifier.send_email(recipient, subject, body, in_reply_to)
+        return await self.email_notifier.send_email(
+            recipient, subject, body, in_reply_to, attachments=attachments
+        )
 
     async def send_whatsapp(
         self,
@@ -320,10 +337,35 @@ async def dispatch_pending_outbox_messages(session: AsyncSession, limit: int = 5
         msg.attempts += 1
         try:
             if msg.channel == "email":
+                attachments: list[tuple[str, bytes, str]] = []
+                if msg.invoice_id:
+                    inv = await session.get(Invoice, msg.invoice_id)
+                    if inv and inv.source_file_id:
+                        sf = await session.get(SourceFile, inv.source_file_id)
+                        if sf and sf.storage_key:
+                            try:
+                                from app.core.storage import storage_service
+
+                                file_bytes = storage_service.download_bytes(sf.storage_key)
+                                attachments.append(
+                                    (
+                                        sf.original_filename or f"invoice_{inv.id}.pdf",
+                                        file_bytes,
+                                        sf.content_type or "application/pdf",
+                                    )
+                                )
+                            except Exception as dl_err:
+                                logger.warning(
+                                    "Could not attach original invoice to resend email",
+                                    invoice_id=str(inv.id),
+                                    error=str(dl_err),
+                                )
+
                 external_id = await notifier.send_email(
                     recipient=msg.recipient,
                     subject="Invoice processing update - Action required",
                     body=msg.body,
+                    attachments=attachments,
                 )
             elif msg.channel == "whatsapp":
                 external_id = await notifier.send_whatsapp(

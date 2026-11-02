@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { SuppliersTableSkeleton } from "@/components/Skeleton";
 
 export const GST_STATE_MAP: Record<string, string> = {
   "01": "Jammu & Kashmir",
@@ -410,9 +411,7 @@ export function Admin() {
               </div>
             </div>
             {loadingSuppliers ? (
-              <div className="p-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
-                Loading suppliers...
-              </div>
+              <SuppliersTableSkeleton rows={5} />
             ) : suppliers.length === 0 ? (
               <div className="p-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
                 No suppliers registered.

@@ -11,6 +11,7 @@ import { Dashboard } from "@/pages/Dashboard";
 import { Admin } from "@/pages/Admin";
 import { DeadLetters } from "@/pages/DeadLetters";
 import { Reconciliation } from "@/pages/Reconciliation";
+import { AppLoadingSkeleton } from "@/components/Skeleton";
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   constructor(props: { children: ReactNode }) {
@@ -77,11 +78,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">
-        Loading session...
-      </div>
-    );
+    return <AppLoadingSkeleton />;
   }
 
   if (!user) {
@@ -95,7 +92,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-500">Loading session...</div>;
+    return <AppLoadingSkeleton />;
   }
 
   if (!user || user.role !== "admin") {

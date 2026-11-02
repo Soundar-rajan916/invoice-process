@@ -180,7 +180,7 @@ describe("ReviewDetail Component Tests", () => {
     });
   });
 
-  it("requires at least 10 chars override reason when approving with remaining errors (R2)", async () => {
+  it("requires at least 10 chars override reason when approving with remaining errors", async () => {
     const user = userEvent.setup();
     renderComponent();
 
@@ -195,7 +195,7 @@ describe("ReviewDetail Component Tests", () => {
     // Because there is a blocking error issue, override dialog must appear
     expect(screen.getByText(/Approve with Remaining Errors/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/R2 policy requires an audit override reason/i)
+      screen.getByText(/Verification policy requires an audit override reason/i)
     ).toBeInTheDocument();
 
     const confirmBtn = screen.getByRole("button", {

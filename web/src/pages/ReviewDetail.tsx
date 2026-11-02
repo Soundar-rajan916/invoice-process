@@ -10,6 +10,7 @@ import { maskSender } from "@/lib/mask";
 import { StatusPill } from "@/components/StatusPill";
 import { AuditTrailFlowchart } from "@/components/AuditTrailFlowchart";
 import { DocumentViewer } from "@/components/DocumentViewer";
+import { ReviewDetailSkeleton } from "@/components/Skeleton";
 import {
   Check,
   X,
@@ -470,12 +471,7 @@ export function ReviewDetail() {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-12 text-findeck-muted">
-        <RefreshCw className="h-5 w-5 animate-spin mr-2 text-success-strong" />
-        <span>Loading invoice document and extractions...</span>
-      </div>
-    );
+    return <ReviewDetailSkeleton />;
   }
 
   if (!isLoading && !invoice) {
@@ -813,7 +809,7 @@ export function ReviewDetail() {
               <div className="flex items-start space-x-3">
                 <Copy className="h-5 w-5 text-warning-strong mt-0.5 shrink-0" />
                 <div className="flex-1 text-sm text-warning-strong">
-                  <div className="font-bold">Duplicate Detected (R3 Layer 2)</div>
+                  <div className="font-bold">Duplicate Detected</div>
                   <p className="text-xs mt-0.5">
                     Matches invoice <strong>{invoice.duplicate_info?.invoice_number}</strong> from GSTIN{" "}
                     <strong>{invoice.duplicate_info?.supplier_gstin}</strong>.
@@ -1133,7 +1129,7 @@ export function ReviewDetail() {
               <h3 className="text-lg font-bold text-findeck-text">Approve with Remaining Errors</h3>
             </div>
             <p className="text-xs text-findeck-muted">
-              This invoice has unresolved validation errors. R2 policy requires an audit override reason (at least 10 characters) to push to accounting.
+              This invoice has unresolved validation errors. Verification policy requires an audit override reason (at least 10 characters) to push to accounting.
             </p>
             <textarea
               rows={3}

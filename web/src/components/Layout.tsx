@@ -194,6 +194,7 @@ export function Layout() {
                 <>
                   <NavLink
                     to="/admin"
+                    end
                     className={({ isActive }) =>
                       `flex items-center justify-between px-3 py-2 rounded-[10px] text-sm font-medium transition-all ${
                         isActive

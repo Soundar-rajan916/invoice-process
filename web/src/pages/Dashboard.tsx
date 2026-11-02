@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
+import { DashboardSkeleton } from "@/components/Skeleton";
 import {
   Clock,
   CheckCircle2,
@@ -18,11 +19,7 @@ export function Dashboard() {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-12 text-xs" style={{ color: "var(--text-muted)" }}>
-        Loading metrics...
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   const counts = metrics?.status_counts || {};

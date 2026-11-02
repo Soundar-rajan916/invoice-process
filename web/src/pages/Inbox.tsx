@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { StatusPill } from "@/components/StatusPill";
 import { IssueChip } from "@/components/IssueChip";
+import { Skeleton, SkeletonPill } from "@/components/Skeleton";
 
 interface UploadFileResult {
   file_name: string;
@@ -28,7 +29,7 @@ export function Inbox() {
   const [uploadResults, setUploadResults] = useState<UploadFileResult[]>([]);
 
   // Fetch recent invoices with automatic polling if anything is PROCESSING or in uploadResults
-  const { data: queueData, isFetching, refetch } = useQuery({
+  const { data: queueData, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["recent-invoices"],
     queryFn: () => apiRequest("/api/v1/invoices?sort=newest&page=1&page_size=20"),
     refetchInterval: (query) => {
@@ -264,7 +265,25 @@ export function Inbox() {
           </button>
         </div>
 
-        {recentItems.length === 0 ? (
+        {isLoading ? (
+          <div className="p-4 space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between py-2 border-b last:border-b-0"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <div className="space-y-1.5">
+                  <Skeleton className="h-3.5 w-36" />
+                  <Skeleton className="h-2.5 w-24 opacity-50" />
+                </div>
+                <SkeletonPill className="h-5 w-20" />
+                <Skeleton className="h-3 w-16" />
+                <Skeleton rounded="btn" className="h-7 w-16" />
+              </div>
+            ))}
+          </div>
+        ) : recentItems.length === 0 ? (
           <div className="px-6 py-12 text-center text-xs" style={{ color: "var(--text-muted)" }}>
             No invoices uploaded yet. Drop files above to start processing.
           </div>

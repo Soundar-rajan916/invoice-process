@@ -67,7 +67,7 @@ async def run_accounting_reconciliation(
                 accounting_records = raw_data
             elif isinstance(raw_data, dict):
                 accounting_records = raw_data.get("items") or raw_data.get("invoices") or []
-        elif resp.status_code == 404:
+        elif resp.status_code in (404, 405):
             # Fallback to debug endpoint if running with mock accounting
             debug_resp = await local_client.get(f"{accounting_url}/api/_debug/invoices")
             if debug_resp.status_code == 200:
