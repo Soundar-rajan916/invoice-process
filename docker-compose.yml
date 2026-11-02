@@ -48,10 +48,12 @@ services:
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       GROQ_TEXT_MODEL: ${GROQ_TEXT_MODEL:-llama-3.3-70b-versatile}
       GROQ_VISION_MODEL: ${GROQ_VISION_MODEL:-llama-3.2-11b-vision-preview}
+      OPENWA_BASE_URL: http://openwa:2785/api
     ports:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/backend/app
+      - ./backend/alembic:/app/backend/alembic
       - ./data:/app/data
     depends_on:
       postgres:
@@ -88,8 +90,10 @@ services:
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       GROQ_TEXT_MODEL: ${GROQ_TEXT_MODEL:-llama-3.3-70b-versatile}
       GROQ_VISION_MODEL: ${GROQ_VISION_MODEL:-llama-3.2-11b-vision-preview}
+      OPENWA_BASE_URL: http://openwa:2785/api
     volumes:
       - ./backend/app:/app/backend/app
+      - ./backend/alembic:/app/backend/alembic
       - ./data:/app/data
     depends_on:
       postgres:
@@ -144,7 +148,8 @@ services:
       - PORT=2785
       - ENGINE_TYPE=whatsapp-web.js
       - SEND_PACING_ENABLED=true
-      - SSRF_ALLOWED_HOSTS=api
+      - SSRF_ALLOWED_HOSTS=api,host.docker.internal
+      - WEBHOOK_SSRF_PROTECT=false
       - MEDIA_DOWNLOAD_MAX_BYTES=20971520
       - NODE_ENV=production
     deploy:

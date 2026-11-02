@@ -747,6 +747,29 @@ async def get_whatsapp_status(
     )
     session_row = (await db.execute(stmt)).scalars().first()
 
+    # Query provider for real-time status to ensure immediate sync on refresh
+    try:
+        from app.ingestors.whatsapp.factory import get_whatsapp_provider
+
+        prov = get_whatsapp_provider()
+        live_status = await prov.session_status()
+        if live_status and live_status != "unknown":
+            now = datetime.now(UTC)
+            if not session_row:
+                session_row = WhatsAppSessionState(
+                    provider=provider_name,
+                    state=live_status,
+                    last_changed_at=now,
+                    detail={"session_id": getattr(settings, "OPENWA_SESSION_ID", None)},
+                )
+                db.add(session_row)
+            else:
+                session_row.state = live_status
+                session_row.last_changed_at = now
+            await db.commit()
+    except Exception as e:
+        logger.warning("Could not sync live WhatsApp session state", error=str(e))
+
     current_state = session_row.state if session_row else "unknown"
     last_changed_at = session_row.last_changed_at.isoformat() if session_row else None
     last_webhook_at = session_row.last_webhook_at.isoformat() if session_row and session_row.last_webhook_at else None
