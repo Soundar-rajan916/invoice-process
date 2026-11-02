@@ -33,6 +33,8 @@ services:
       dockerfile: backend/Dockerfile
     container_name: invoiceflow_api
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/invoiceflow
       DATABASE_URL_SYNC: postgresql://postgres:postgres@postgres:5432/invoiceflow
@@ -70,7 +72,9 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: invoiceflow_worker
-    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=4 -Ofair
+    command: celery -A app.workers.celery_app worker --beat --loglevel=info --concurrency=4 -Ofair
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/invoiceflow
       DATABASE_URL_SYNC: postgresql://postgres:postgres@postgres:5432/invoiceflow

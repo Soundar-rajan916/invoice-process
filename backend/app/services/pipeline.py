@@ -423,15 +423,28 @@ async def process_invoice_pipeline(session: AsyncSession, invoice_id: uuid.UUID)
             await session.rollback()
             failed_inv = await session.get(Invoice, invoice_id)
             if failed_inv:
-                failed_inv.status = "FAILED"
-                failed_inv.status_reason = f"Processing failed: {str(e)}"
+                is_encrypted_or_corrupt = any(
+                    term in str(e).lower()
+                    for term in ("encrypted", "password", "corrupt", "closed or encrypted")
+                )
+                if is_encrypted_or_corrupt:
+                    failed_inv.status = "RESEND_REQUESTED"
+                    failed_inv.status_reason = (
+                        "PDF is password-protected or corrupt. Please resend an unencrypted document."
+                    )
+                    action = "request_resend"
+                else:
+                    failed_inv.status = "FAILED"
+                    failed_inv.status_reason = f"Processing failed: {str(e)}"
+                    action = "status_change"
+
                 session.add(
                     ReviewEvent(
                         invoice_id=failed_inv.id,
-                        action="status_change",
+                        action=action,
                         payload={
                             "from_status": "PROCESSING",
-                            "to_status": "FAILED",
+                            "to_status": failed_inv.status,
                             "error": str(e),
                         },
                     )

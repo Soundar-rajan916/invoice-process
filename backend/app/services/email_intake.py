@@ -100,7 +100,9 @@ class ImapMailboxClient:
             return []
 
         messages: list[MailMessage] = []
-        msg_ids = data[0].split()
+        all_ids = data[0].split()
+        # Cap batch to latest 20 unread messages to prevent latency spikes with massive inboxes
+        msg_ids = all_ids[-20:]
 
         for msg_id in msg_ids:
             res_status, msg_data = self._conn.fetch(msg_id, "(RFC822)")
