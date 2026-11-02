@@ -1,0 +1,10 @@
+{
+  "_comment": "Synthetic OpenWA fixture for session.status webhook",
+  "event": "session.status",
+  "sessionId": "test-session-01",
+  "data": {
+    "status": "connected",
+    "timestamp": 1714650240,
+    "phone": "919999999999"
+  }
+}

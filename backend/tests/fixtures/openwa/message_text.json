@@ -1,0 +1,15 @@
+{
+  "_comment": "Synthetic OpenWA fixture for text-only message",
+  "event": "message.received",
+  "sessionId": "test-session-01",
+  "data": {
+    "id": "false_919876543210@c.us_3EB0TEXTONLY12345678",
+    "from": "919876543210@c.us",
+    "to": "919999999999@c.us",
+    "fromMe": false,
+    "isGroup": false,
+    "type": "chat",
+    "timestamp": 1714650120,
+    "text": "Hello, please confirm receipt of our payment."
+  }
+}

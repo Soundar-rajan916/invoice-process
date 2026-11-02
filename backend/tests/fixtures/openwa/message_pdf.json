@@ -1,0 +1,22 @@
+{
+  "_comment": "Synthetic OpenWA fixture for message.received with an inline PDF document",
+  "event": "message.received",
+  "sessionId": "test-session-01",
+  "data": {
+    "id": "false_919876543210@c.us_3EB09876543210FEDCBA",
+    "from": "919876543210@c.us",
+    "to": "919999999999@c.us",
+    "fromMe": false,
+    "isGroup": false,
+    "type": "document",
+    "timestamp": 1714650060,
+    "caption": "Tax invoice attached",
+    "filename": "INV-2026-004.pdf",
+    "mimetype": "application/pdf",
+    "media": {
+      "mimetype": "application/pdf",
+      "data": "JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqIDIgMCBvYmo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iaiAzIDAgb2JqPDwvVHlwZS9QYWdlL01lZGlhQm94WzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDw+Pj5lbmRvYmoKeHJlZgowIDQKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDEwIDAwMDAwIG4gCjAwMDAwMDAwNjAgMDAwMDAgbiAKMDAwMDAwMDExNyAwMDAwMCBuIAp0cmFpbGVyCjw8L1NpemUgNC9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjIxMAolJUVPRg==",
+      "filename": "INV-2026-004.pdf"
+    }
+  }
+}

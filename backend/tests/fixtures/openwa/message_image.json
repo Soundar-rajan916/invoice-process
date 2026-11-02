@@ -1,0 +1,22 @@
+{
+  "_comment": "Synthetic OpenWA fixture for message.received with an inline image",
+  "event": "message.received",
+  "sessionId": "test-session-01",
+  "data": {
+    "id": "false_919876543210@c.us_3EB0123456789ABCDEF0",
+    "from": "919876543210@c.us",
+    "to": "919999999999@c.us",
+    "fromMe": false,
+    "isGroup": false,
+    "type": "image",
+    "timestamp": 1714650000,
+    "caption": "April ACME Supplies invoice",
+    "filename": "invoice_page1.png",
+    "mimetype": "image/png",
+    "media": {
+      "mimetype": "image/png",
+      "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      "filename": "invoice_page1.png"
+    }
+  }
+}
