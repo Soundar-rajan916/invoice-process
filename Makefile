@@ -1,4 +1,4 @@
-.PHONY: help up down logs migrate seed seed-admin seed-suppliers check test eval gen-data lint typecheck frontend-test invariants
+.PHONY: help up down logs migrate seed seed-admin seed-suppliers check test eval gen-data lint typecheck frontend-test invariants whatsapp-setup whatsapp-simulate openwa-key openwa-logs
 
 PYTHON := .venv/bin/python
 ifeq ($(OS),Windows_NT)
@@ -7,17 +7,21 @@ endif
 
 help:
 	@echo "InvoiceFlow Makefile commands:"
-	@echo "  make up          - Start all Docker services"
-	@echo "  make down        - Stop all Docker services"
-	@echo "  make logs        - Follow Docker compose logs"
-	@echo "  make migrate     - Run database migrations with Alembic"
-	@echo "  make seed-admin  - Create initial admin user"
-	@echo "  make gen-data    - Generate synthetic invoices"
-	@echo "  make seed        - Ingest generated invoices into system"
-	@echo "  make check       - Run lint, type-check, backend & frontend tests"
-	@echo "  make test        - Run backend test suite with coverage"
-	@echo "  make eval        - Run extraction evaluation harness"
-	@echo "  make invariants  - Run operational consistency invariant checks"
+	@echo "  make up                 - Start all core Docker services"
+	@echo "  make down               - Stop all Docker services"
+	@echo "  make logs               - Follow Docker compose logs"
+	@echo "  make migrate            - Run database migrations with Alembic"
+	@echo "  make seed-admin         - Create initial admin user"
+	@echo "  make gen-data           - Generate synthetic invoices"
+	@echo "  make seed               - Ingest generated invoices into system"
+	@echo "  make check              - Run lint, type-check, backend & frontend tests"
+	@echo "  make test               - Run backend test suite with coverage"
+	@echo "  make eval               - Run extraction evaluation harness"
+	@echo "  make invariants         - Run operational consistency invariant checks"
+	@echo "  make whatsapp-setup     - Idempotently configure OpenWA session and webhooks"
+	@echo "  make whatsapp-simulate  - Post simulated invoice to WhatsApp webhook"
+	@echo "  make openwa-key         - Print OpenWA admin API key from container"
+	@echo "  make openwa-logs        - Follow OpenWA container logs"
 
 up:
 	docker compose up -d
@@ -67,5 +71,17 @@ frontend-lint:
 
 frontend-build:
 	cd web && npm run build
+
+whatsapp-setup:
+	$(PYTHON) -m backend.app.cli.whatsapp setup-openwa
+
+whatsapp-simulate:
+	$(PYTHON) scripts/simulate_whatsapp_photo.py
+
+openwa-key:
+	docker exec invoiceflow_openwa cat /app/data/.api-key
+
+openwa-logs:
+	docker compose --profile whatsapp logs -f openwa
 
 check: lint typecheck test invariants frontend-lint frontend-test frontend-build

@@ -363,3 +363,20 @@ class ShadowRecord(Base, TimestampMixin):
     total: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
     raw_data: Mapped[dict[str, Any]] = mapped_column(JSONType, default=dict, nullable=False)
 
+
+
+class WhatsAppSessionState(Base, TimestampMixin):
+    __tablename__ = "whatsapp_session_state"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    provider: Mapped[str] = mapped_column(String(50), nullable=False, default="openwa")
+    state: Mapped[str] = mapped_column(
+        String(50), nullable=False, default="unknown"
+    )  # connected | needs_qr | disconnected | unknown
+    last_changed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+    last_webhook_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    detail: Mapped[dict[str, Any]] = mapped_column(JSONType, default=dict, nullable=False)

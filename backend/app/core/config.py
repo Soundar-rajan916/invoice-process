@@ -116,13 +116,27 @@ class Settings(BaseSettings):
     EMAIL_FROM_ADDRESS: str = Field(default="invoices@invoiceflow.local")
     RESEND_MAX_PER_SENDER_PER_DAY: int = Field(default=5)
 
-    # WhatsApp Intake Configuration (4.2)
+    # WhatsApp Intake Configuration
+    WHATSAPP_PROVIDER: str = Field(default="openwa")  # openwa | meta
     WHATSAPP_PHONE_NUMBER_ID: str = Field(default="100000000000001")
     WHATSAPP_API_TOKEN: str = Field(default="")
     WHATSAPP_APP_SECRET: str = Field(default="dev-whatsapp-app-secret")
     WHATSAPP_VERIFY_TOKEN: str = Field(default="invoiceflow-verify-token")
     WHATSAPP_GROUP_WINDOW_SECONDS: int = Field(default=90)
     WHATSAPP_RESEND_TEMPLATE: str = Field(default="invoice_resend_request")
+    WHATSAPP_MAX_OUTBOUND_PER_HOUR: int = Field(default=20)
+
+    # OpenWA Gateway Configuration
+    OPENWA_BASE_URL: str = Field(default="http://openwa:2785/api")
+    OPENWA_API_KEY: str = Field(default="")
+    OPENWA_SESSION_NAME: str = Field(default="invoiceflow")
+    OPENWA_SESSION_ID: str = Field(default="")
+    OPENWA_WEBHOOK_SECRET: str = Field(default="")
+    OPENWA_WEBHOOK_TARGET_URL: str = Field(default="")
+    OPENWA_DASHBOARD_URL: str = Field(default="http://localhost:2785")
+    OPENWA_ALLOW_GROUPS: bool = Field(default=False)
+    OPENWA_ALLOWED_SENDERS: list[str] | str = Field(default=[])
+    OPENWA_ACCEPT_UNOFFICIAL_RISK: bool = Field(default=False)
 
     # Antivirus (4.5)
     ANTIVIRUS_ENABLED: bool = Field(default=False)
@@ -145,10 +159,14 @@ class Settings(BaseSettings):
     # Shadow Mode (6.5)
     SHADOW_MODE: bool = Field(default=False)
 
-    # Accounting Push API
+    # Accounting Integration (Phase 3)
     ACCOUNTING_API_URL: str = Field(default="http://localhost:8001")
     ACCOUNTING_API_KEY: str = Field(default="accounting-secret-token")
     PUSH_MAX_ATTEMPTS: int = Field(default=3)
+    PUSH_MAX_RETRIES: int = Field(default=3)
+    PUSH_INITIAL_DELAY_SECONDS: float = Field(default=1.0)
+    PUSH_BACKOFF_FACTOR: float = Field(default=2.0)
+    ACCOUNTING_TIMEOUT_SECONDS: float = Field(default=15.0)
 
     # CORS
     CORS_ORIGINS: list[str] | str = Field(
@@ -181,6 +199,24 @@ class Settings(BaseSettings):
                 return []
             return [x.strip().lower() for x in v.split(",") if x.strip()]
         return [str(x).strip().lower() for x in v if str(x).strip()]
+
+    @field_validator("OPENWA_ALLOWED_SENDERS", mode="after")
+    @classmethod
+    def parse_openwa_senders(cls, v: list[str] | str) -> list[str]:
+        if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                return []
+            return [x.strip() for x in v.split(",") if x.strip()]
+        return [str(x).strip() for x in v if str(x).strip()]
+
+    @field_validator("WHATSAPP_PROVIDER")
+    @classmethod
+    def validate_whatsapp_provider(cls, v: str) -> str:
+        v_clean = v.strip().lower()
+        if v_clean not in ("openwa", "meta"):
+            raise ValueError(f"Invalid WHATSAPP_PROVIDER: {v}. Must be 'openwa' or 'meta'")
+        return v_clean
 
     @field_validator("EXTRACTOR")
     @classmethod

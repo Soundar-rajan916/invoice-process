@@ -130,5 +130,37 @@ services:
       api:
         condition: service_started
 
+  openwa:
+    image: ghcr.io/rmyndharis/openwa:v0.27.0
+    container_name: invoiceflow_openwa
+    profiles:
+      - whatsapp
+    shm_size: "256mb"
+    ports:
+      - "127.0.0.1:2785:2785"
+    volumes:
+      - openwa_data:/app/data
+    environment:
+      - PORT=2785
+      - ENGINE_TYPE=whatsapp-web.js
+      - SEND_PACING_ENABLED=true
+      - SSRF_ALLOWED_HOSTS=api
+      - MEDIA_DOWNLOAD_MAX_BYTES=20971520
+      - NODE_ENV=production
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:2785/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      api:
+        condition: service_started
+
 volumes:
   pgdata:
+  openwa_data:

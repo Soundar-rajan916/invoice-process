@@ -75,6 +75,7 @@ asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 markers = [
     "slow: marks tests as slow load tests (run with -m slow)",
+    "openwa_live: marks live contract tests against running OpenWA container (run with -m openwa_live)",
 ]
 addopts = "-v --cov=app --cov-report=term-missing --cov-fail-under=85 -m 'not slow'"
 

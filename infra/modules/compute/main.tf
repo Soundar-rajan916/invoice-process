@@ -376,3 +376,121 @@ resource "aws_ecs_service" "beat" {
     security_groups = [aws_security_group.app.id]
   }
 }
+
+
+# ---------------------------------------------------------------------------
+# Optional OpenWA Gateway ECS Service with EFS (Section 4)
+# ---------------------------------------------------------------------------
+resource "aws_security_group" "openwa" {
+  count       = var.enable_openwa ? 1 : 0
+  name        = "${var.project}-${var.environment}-openwa-sg"
+  description = "OpenWA gateway reachable only by API and worker tasks"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description     = "OpenWA API from API and worker tasks"
+    from_port       = 2785
+    to_port         = 2785
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${var.project}-${var.environment}-openwa-sg"
+    Environment = var.environment
+  }
+}
+
+resource "aws_efs_file_system" "openwa_data" {
+  count          = var.enable_openwa ? 1 : 0
+  creation_token = "${var.project}-${var.environment}-openwa-efs"
+  encrypted      = true
+
+  tags = {
+    Name        = "${var.project}-${var.environment}-openwa-efs"
+    Environment = var.environment
+  }
+}
+
+resource "aws_efs_mount_target" "openwa_mount" {
+  count           = var.enable_openwa ? length(var.private_app_subnet_ids) : 0
+  file_system_id  = aws_efs_file_system.openwa_data[0].id
+  subnet_id       = var.private_app_subnet_ids[count.index]
+  security_groups = [aws_security_group.openwa[0].id]
+}
+
+resource "aws_ecs_task_definition" "openwa" {
+  count                    = var.enable_openwa ? 1 : 0
+  family                   = "${var.project}-${var.environment}-openwa"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "1024"
+  memory                   = "2048"
+  execution_role_arn       = var.ecs_execution_role_arn
+  task_role_arn            = var.ecs_task_role_arn
+
+  volume {
+    name = "openwa_data"
+    efs_volume_configuration {
+      file_system_id     = aws_efs_file_system.openwa_data[0].id
+      transit_encryption = "ENABLED"
+    }
+  }
+
+  container_definitions = jsonencode([
+    {
+      name      = "openwa"
+      image     = var.openwa_image
+      essential = true
+      portMappings = [
+        {
+          containerPort = 2785
+          hostPort      = 2785
+        }
+      ]
+      environment = [
+        { name = "PORT", value = "2785" },
+        { name = "ENGINE_TYPE", value = "whatsapp-web.js" },
+        { name = "SEND_PACING_ENABLED", value = "true" },
+        { name = "SSRF_ALLOWED_HOSTS", value = "api" },
+        { name = "MEDIA_DOWNLOAD_MAX_BYTES", value = "20971520" }
+      ]
+      mountPoints = [
+        {
+          sourceVolume  = "openwa_data"
+          containerPath = "/app/data"
+          readOnly      = false
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "/ecs/${var.project}-${var.environment}-openwa"
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+    }
+  ])
+}
+
+resource "aws_ecs_service" "openwa" {
+  count           = var.enable_openwa ? 1 : 0
+  name            = "openwa"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.openwa[0].arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets         = var.private_app_subnet_ids
+    security_groups = [aws_security_group.openwa[0].id]
+  }
+}

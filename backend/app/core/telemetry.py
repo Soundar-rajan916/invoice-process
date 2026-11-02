@@ -34,7 +34,7 @@ def init_tracing() -> None:
     resource = Resource.create({"service.name": "invoiceflow", "environment": settings.ENVIRONMENT})
     provider = TracerProvider(resource=resource)
 
-    if settings.OTEL_EXPORTER_OTLP_ENDPOINT:
+    if getattr(settings, "OTEL_EXPORTER_OTLP_ENDPOINT", None):
         try:
             from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 
@@ -104,6 +104,21 @@ class MetricsRegistry:
         self.reviewer_edits: int = 0
         self.watchdog_requeues: int = 0
 
+        # WhatsApp metrics (Section 5)
+        self.whatsapp_session_state: int = 0  # 1=connected, 0=disconnected/needs_qr/unknown
+        self.whatsapp_inbound_total: dict[str, int] = {
+            "ingested": 0,
+            "ignored": 0,
+            "failed": 0,
+            "skipped": 0,
+        }
+        self.whatsapp_outbound_total: dict[str, int] = {
+            "sent": 0,
+            "failed": 0,
+            "skipped": 0,
+        }
+        self.whatsapp_signature_failures_total: int = 0
+
     def record_429(self) -> None:
         self.llm_429_count += 1
 
@@ -126,6 +141,18 @@ class MetricsRegistry:
 
     def record_watchdog_requeue(self) -> None:
         self.watchdog_requeues += 1
+
+    def set_whatsapp_session_state(self, state: str) -> None:
+        self.whatsapp_session_state = 1 if state.lower() == "connected" else 0
+
+    def record_whatsapp_inbound(self, result: str) -> None:
+        self.whatsapp_inbound_total[result] = self.whatsapp_inbound_total.get(result, 0) + 1
+
+    def record_whatsapp_outbound(self, result: str) -> None:
+        self.whatsapp_outbound_total[result] = self.whatsapp_outbound_total.get(result, 0) + 1
+
+    def record_whatsapp_signature_failure(self) -> None:
+        self.whatsapp_signature_failures_total += 1
 
 
 metrics_registry = MetricsRegistry()

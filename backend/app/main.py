@@ -28,6 +28,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         extractor=settings.EXTRACTOR,
     )
 
+    # 0. Production guard for OpenWA
+    if settings.ENVIRONMENT == "production" and settings.WHATSAPP_PROVIDER == "openwa":
+        if not settings.OPENWA_ACCEPT_UNOFFICIAL_RISK:
+            raise RuntimeError(
+                "OPENWA_ACCEPT_UNOFFICIAL_RISK must be set to true to run OpenWA in production. "
+                "OpenWA is an unofficial community-maintained WhatsApp gateway with account ban risks."
+            )
+        logger.warning(
+            "PROD RISK WARNING: Running unofficial OpenWA gateway in production. "
+            "Meta Cloud API should be used for regulated or finance deployments."
+        )
+
     # 1. Groq models check
     await check_groq_models_at_startup()
 
@@ -40,6 +52,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 def create_app() -> FastAPI:
+    if settings.ENVIRONMENT == "production" and settings.WHATSAPP_PROVIDER == "openwa":
+        if not settings.OPENWA_ACCEPT_UNOFFICIAL_RISK:
+            raise RuntimeError(
+                "OPENWA_ACCEPT_UNOFFICIAL_RISK must be set to true to run OpenWA in production. "
+                "OpenWA is an unofficial community-maintained WhatsApp gateway with account ban risks."
+            )
+        logger.warning(
+            "PROD RISK WARNING: Running unofficial OpenWA gateway in production. "
+            "Meta Cloud API should be used for regulated or finance deployments."
+        )
+
     app = FastAPI(
         title="InvoiceFlow API",
         version="0.1.0",
@@ -50,6 +73,8 @@ def create_app() -> FastAPI:
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(PayloadLimitMiddleware)
     app.add_middleware(RequestIdMiddleware)
+
+    # CORS
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS,
@@ -58,11 +83,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Error Handlers (RFC 7807)
+    # Error Handlers
     register_error_handlers(app)
 
     # Routers
-    app.include_router(health_router)
     from app.api.admin import router as admin_router
     from app.api.auth import router as auth_router
     from app.api.files import router as files_router
@@ -70,6 +94,7 @@ def create_app() -> FastAPI:
     from app.api.metrics import router as metrics_router
     from app.api.webhooks import router as webhooks_router
 
+    app.include_router(health_router)
     app.include_router(files_router)
     app.include_router(webhooks_router)
     app.include_router(auth_router, prefix="/api/v1")

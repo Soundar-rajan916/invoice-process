@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import uuid
+from datetime import UTC, datetime
 from typing import Any
 
 import redis
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -334,3 +336,88 @@ def watchdog_stuck_invoices_task() -> dict[str, Any]:
         "Watchdog sweep finished", requeued=len(res["requeued"]), escalated=len(res["escalated"])
     )
     return res
+
+
+@celery_app.task(
+    name="app.workers.tasks.process_whatsapp_inbound_task",
+    acks_late=True,
+)
+def process_whatsapp_inbound_task(msg_data: dict[str, Any]) -> dict[str, Any]:
+    """Celery task ingesting normalised WhatsApp message."""
+    from app.ingestors.whatsapp import InboundWhatsAppMessage, MediaRef, WhatsAppIngestor
+
+    async def _run() -> dict[str, Any]:
+        maker, task_engine = _get_worker_session()
+        try:
+            async with maker() as session:
+                media_data = msg_data.get("media")
+                media_ref = MediaRef(**media_data) if isinstance(media_data, dict) else None
+                ts_raw = msg_data.get("timestamp")
+                ts = datetime.fromisoformat(ts_raw) if isinstance(ts_raw, str) else datetime.now(UTC)
+
+                msg = InboundWhatsAppMessage(
+                    external_id=msg_data["external_id"],
+                    session_ref=msg_data.get("session_ref", "openwa"),
+                    chat_id=msg_data["chat_id"],
+                    sender_id=msg_data.get("sender_id", msg_data["chat_id"]),
+                    is_group=msg_data.get("is_group", False),
+                    from_me=msg_data.get("from_me", False),
+                    message_type=msg_data.get("message_type", "chat"),
+                    timestamp=ts,
+                    caption=msg_data.get("caption"),
+                    filename=msg_data.get("filename"),
+                    mimetype=msg_data.get("mimetype"),
+                    media=media_ref,
+                    raw_payload=msg_data.get("raw_payload", {}),
+                )
+                ingestor = WhatsAppIngestor(session)
+                return await ingestor.ingest_message(msg)
+        finally:
+            await task_engine.dispose()
+
+    return asyncio.run(_run())
+
+
+@celery_app.task(
+    name="app.workers.tasks.poll_whatsapp_session_task",
+    acks_late=True,
+)
+def poll_whatsapp_session_task() -> dict[str, Any]:
+    """Periodic beat task querying WhatsApp session status and updating state table."""
+    from app.core.telemetry import metrics_registry
+    from app.ingestors.whatsapp import get_whatsapp_provider
+    from app.models.entities import WhatsAppSessionState
+
+    async def _run() -> dict[str, Any]:
+        maker, task_engine = _get_worker_session()
+        try:
+            provider = get_whatsapp_provider()
+            session_state = await provider.session_status()
+            metrics_registry.set_whatsapp_session_state(session_state)
+
+            async with maker() as session:
+                stmt = select(WhatsAppSessionState).where(
+                    WhatsAppSessionState.provider == settings.WHATSAPP_PROVIDER
+                )
+                row = (await session.execute(stmt)).scalars().first()
+                now = datetime.now(UTC)
+                if row:
+                    if row.state != session_state:
+                        row.state = session_state
+                        row.last_changed_at = now
+                    row.detail = {"polled_at": now.isoformat(), "provider": settings.WHATSAPP_PROVIDER}
+                else:
+                    row = WhatsAppSessionState(
+                        id=uuid.uuid4(),
+                        provider=settings.WHATSAPP_PROVIDER,
+                        state=session_state,
+                        last_changed_at=now,
+                        detail={"polled_at": now.isoformat()},
+                    )
+                    session.add(row)
+                await session.commit()
+                return {"provider": settings.WHATSAPP_PROVIDER, "state": session_state}
+        finally:
+            await task_engine.dispose()
+
+    return asyncio.run(_run())

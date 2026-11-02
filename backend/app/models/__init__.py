@@ -14,6 +14,7 @@ from app.models.entities import (
     Supplier,
     User,
     ValidationIssue,
+    WhatsAppSessionState,
 )
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     "ReconciliationFinding",
     "RevokedToken",
     "ShadowRecord",
+    "WhatsAppSessionState",
 ]

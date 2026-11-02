@@ -78,3 +78,15 @@ variable "worker_desired_count" {
   default = 2
 }
 
+
+variable "enable_openwa" {
+  type        = bool
+  default     = false
+  description = "Enable optional self-hosted OpenWA gateway ECS service"
+}
+
+variable "openwa_image" {
+  type        = string
+  default     = "ghcr.io/rmyndharis/openwa:v0.27.0"
+  description = "Pinned OpenWA container image"
+}

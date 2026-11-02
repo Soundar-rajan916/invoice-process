@@ -31,10 +31,12 @@ celery_app.conf.update(
     task_default_queue="extract",
     task_routes={
         "app.workers.tasks.process_whatsapp_message_task": {"queue": "ingest"},
+        "app.workers.tasks.process_whatsapp_inbound_task": {"queue": "ingest"},
         "app.workers.tasks.process_invoice_task": {"queue": "extract"},
         "app.workers.tasks.push_invoice_task": {"queue": "push"},
         "app.workers.tasks.dispatch_outbox_task": {"queue": "notify"},
         "app.workers.tasks.poll_mailbox_task": {"queue": "maintenance"},
+        "app.workers.tasks.poll_whatsapp_session_task": {"queue": "maintenance"},
         "app.workers.tasks.watchdog_stuck_invoices_task": {"queue": "maintenance"},
         "app.workers.tasks.reconcile_accounting_task": {"queue": "maintenance"},
         "app.workers.tasks.verify_invariants_task": {"queue": "maintenance"},
@@ -44,6 +46,10 @@ celery_app.conf.update(
         "poll-mailbox-every-interval": {
             "task": "app.workers.tasks.poll_mailbox_task",
             "schedule": float(settings.EMAIL_POLL_INTERVAL_SECONDS),
+        },
+        "poll-whatsapp-session-every-60s": {
+            "task": "app.workers.tasks.poll_whatsapp_session_task",
+            "schedule": 60.0,
         },
         "dispatch-outbox-every-30s": {
             "task": "app.workers.tasks.dispatch_outbox_task",
