@@ -95,9 +95,8 @@ class ImapMailboxClient:
         assert self._conn is not None
 
         self._conn.select(folder)
-        # In a dedicated label like 'invoices', check ALL messages since user may have previewed/opened it; in INBOX only check UNSEEN
-        criteria = "UNSEEN" if folder.strip().upper() == "INBOX" else "ALL"
-        status, data = self._conn.search(None, criteria)
+        # Check latest messages in folder (handles both read and unread messages)
+        status, data = self._conn.search(None, "ALL")
         if status != "OK" or not data or not data[0]:
             return []
 
