@@ -95,13 +95,15 @@ class ImapMailboxClient:
         assert self._conn is not None
 
         self._conn.select(folder)
-        status, data = self._conn.search(None, "UNSEEN")
+        # In a dedicated label like 'invoices', check ALL messages since user may have previewed/opened it; in INBOX only check UNSEEN
+        criteria = "UNSEEN" if folder.strip().upper() == "INBOX" else "ALL"
+        status, data = self._conn.search(None, criteria)
         if status != "OK" or not data or not data[0]:
             return []
 
         messages: list[MailMessage] = []
         all_ids = data[0].split()
-        # Cap batch to latest 20 unread messages to prevent latency spikes with massive inboxes
+        # Cap batch to latest 20 messages to prevent latency spikes with large mailboxes
         msg_ids = all_ids[-20:]
 
         for msg_id in msg_ids:

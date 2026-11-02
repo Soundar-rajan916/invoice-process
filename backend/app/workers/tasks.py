@@ -142,7 +142,7 @@ def poll_mailbox_task(self: Any) -> dict[str, Any]:
                     # Move to Processed (or Failed on error)
                     target_folder = (
                         settings.EMAIL_PROCESSED_FOLDER
-                        if res.get("status") in ("ingested", "ignored")
+                        if res.get("status") in ("ingested", "ignored", "skipped")
                         else settings.EMAIL_FAILED_FOLDER
                     )
                     client.move_message(msg.message_id, settings.EMAIL_FOLDER, target_folder)
