@@ -4,21 +4,37 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Any
 
-from opentelemetry import trace
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter, SpanExportResult
+try:
+    from opentelemetry import trace
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import (
+        BatchSpanProcessor,
+        ConsoleSpanExporter,
+        SpanExportResult,
+    )
+    HAS_OTEL = True
+except ImportError:
+    HAS_OTEL = False
+    trace = None  # type: ignore[assignment]
+    Resource = None  # type: ignore[assignment, misc]
+    TracerProvider = None  # type: ignore[assignment, misc]
+    BatchSpanProcessor = None  # type: ignore[assignment, misc]
+    ConsoleSpanExporter = object  # type: ignore[assignment, misc]
+    SpanExportResult = None  # type: ignore[assignment, misc]
 
 from app.core.config import settings
 from app.core.logging import logger
 
 
-class SafeConsoleSpanExporter(ConsoleSpanExporter):
-    def export(self, spans: Any) -> SpanExportResult:
+class SafeConsoleSpanExporter(ConsoleSpanExporter):  # type: ignore[misc]
+    def export(self, spans: Any) -> Any:
         try:
-            return super().export(spans)
+            if hasattr(super(), "export"):
+                return super().export(spans)
         except Exception:
-            return SpanExportResult.SUCCESS
+            pass
+        return getattr(SpanExportResult, "SUCCESS", None)
 
 # ---------------------------------------------------------------------------
 # 1. OpenTelemetry Tracing Setup (6.2)
@@ -28,7 +44,7 @@ _tracer_initialized = False
 
 def init_tracing() -> None:
     global _tracer_initialized
-    if _tracer_initialized:
+    if _tracer_initialized or not HAS_OTEL:
         return
 
     resource = Resource.create({"service.name": "invoiceflow", "environment": settings.ENVIRONMENT})
@@ -52,7 +68,20 @@ def init_tracing() -> None:
     _tracer_initialized = True
 
 
-def get_tracer(name: str = "invoiceflow") -> trace.Tracer:
+class DummySpan:
+    def set_attribute(self, k: str, v: Any) -> None:
+        pass
+
+
+class DummyTracer:
+    @asynccontextmanager
+    async def start_as_current_span(self, name: str) -> AsyncGenerator[DummySpan, None]:
+        yield DummySpan()
+
+
+def get_tracer(name: str = "invoiceflow") -> Any:
+    if not HAS_OTEL or trace is None:
+        return DummyTracer()
     init_tracing()
     return trace.get_tracer(name)
 
@@ -61,7 +90,11 @@ def get_tracer(name: str = "invoiceflow") -> trace.Tracer:
 async def trace_span(
     name: str,
     attributes: dict[str, Any] | None = None,
-) -> AsyncGenerator[trace.Span, None]:
+) -> AsyncGenerator[Any, None]:
+    if not HAS_OTEL or trace is None:
+        yield DummySpan()
+        return
+
     tracer = get_tracer()
     with tracer.start_as_current_span(name) as span:
         if attributes:
@@ -73,21 +106,31 @@ async def trace_span(
 
 def inject_trace_headers(headers: dict[str, str]) -> dict[str, str]:
     """Injects W3C traceparent into Celery or HTTP headers."""
-    from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+    if not HAS_OTEL:
+        return headers
+    try:
+        from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
-    propagator = TraceContextTextMapPropagator()
-    carrier: dict[str, str] = {}
-    propagator.inject(carrier)
-    headers.update(carrier)
+        propagator = TraceContextTextMapPropagator()
+        carrier: dict[str, str] = {}
+        propagator.inject(carrier)
+        headers.update(carrier)
+    except Exception:
+        pass
     return headers
 
 
 def extract_trace_context(headers: dict[str, str]) -> Any:
     """Extracts W3C traceparent from headers for distributed span linking."""
-    from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+    if not HAS_OTEL:
+        return None
+    try:
+        from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
-    propagator = TraceContextTextMapPropagator()
-    return propagator.extract(headers)
+        propagator = TraceContextTextMapPropagator()
+        return propagator.extract(headers)
+    except Exception:
+        return None
 
 
 # ---------------------------------------------------------------------------
