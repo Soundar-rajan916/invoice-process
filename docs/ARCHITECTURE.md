@@ -168,9 +168,13 @@ flowchart LR
 ```
 
 ### 4.1 Inbound Message Tracking & Channels
-- `inbound_messages`: Central audit record keyed by unique `external_id` (`Message-ID` for email, `wamid` for WhatsApp). Idempotent handling ensures re-polling or webhook retries never duplicate work.
+- `inbound_messages`: Central audit record keyed by unique `external_id` (`Message-ID` for email, `{session_id}:{message_id}` or `wamid` for WhatsApp). Idempotent handling ensures re-polling or webhook retries never duplicate work (R3).
 - **Email Poller:** Polls unseen messages, strips logo/signature graphics (<5 KB, image patterns), processes attachments, and moves messages to `Processed` (or `Failed`).
-- **WhatsApp Webhook:** Validates `X-Hub-Signature-256` HMAC via constant-time comparison before processing. Aggregates photos sent within `WHATSAPP_GROUP_WINDOW_SECONDS` (90 s) into a single invoice, with reviewer `split-pages` action available in the UI.
+- **WhatsApp Provider Abstraction:** Decoupled behind `WhatsAppProvider` protocol (`app/ingestors/whatsapp/provider.py`), supporting two interchangeable engines selected by `WHATSAPP_PROVIDER`:
+  1. **OpenWA (`openwa`):** Self-hosted, MIT-licensed WhatsApp gateway container (`ghcr.io/rmyndharis/openwa:v0.27.0`) validating `X-OpenWA-Signature` (`sha256=<hex>`).
+  2. **Meta Cloud API (`meta`):** Official Meta WhatsApp Business Platform validating `X-Hub-Signature-256`.
+- **Photo Grouping Window:** Aggregates images sent from the same sender within `WHATSAPP_GROUP_WINDOW_SECONDS` (default 90 s) into a single multi-page PDF invoice via `stitch_images_to_pdf` (R1).
+- **Universal Human Gate (R2):** All WhatsApp invoices unconditionally enter status `NEEDS_REVIEW`. No auto-approvals or direct pushes are permitted.
 
 ### 4.2 Extraction Safety Nets
 - **Grounding Verification:** For digital PDFs, extracted amounts, line items, and identifiers must appear verbatim in normalized source text. Unmatched amounts trigger blocking `not_in_source` errors.

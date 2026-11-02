@@ -109,3 +109,23 @@ groups:
           description: "CRITICAL: R2, R3, or audit-trail guarantee violated. Immediate investigation required."
 ```
 
+
+      - alert: WhatsAppSessionDisconnected
+        expr: invoiceflow_whatsapp_session_state == 2
+        for: 5m
+        labels:
+          severity: warning
+          team: ops
+        annotations:
+          summary: "WhatsApp gateway session disconnected or unlinked"
+          description: "WhatsApp session is disconnected. Scan QR code or restart gateway session via Admin UI."
+
+      - alert: WhatsAppSignatureFailuresHigh
+        expr: rate(invoiceflow_whatsapp_signature_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "Elevated WhatsApp webhook signature failure rate"
+          description: "Potential webhook secret mismatch or unauthorized requests sent to WhatsApp webhook endpoint."

@@ -143,3 +143,36 @@ This document records all domain, technical, and operational assumptions made du
    - Setting `SHADOW_MODE=true` suppresses external accounting pushes, pausing verified invoices at `APPROVED` with `status_reason="shadow_mode_push_disabled"`.
    - The shadow comparison engine evaluates CSV ground truth against processed invoices within a ₹1.00 tolerance window.
    - The production go-live threshold requires 14 consecutive days with `>= 95.0%` agreement and 0 unreviewed pushes.
+
+
+---
+
+## 4. WhatsApp Intake & OpenWA Gateway Assumptions
+
+1. **Provider Abstraction:**
+   - Provider implementation is decoupled through `WhatsAppProvider` protocol (`app/ingestors/whatsapp/provider.py`), allowing seamless hot-swapping between `openwa` and `meta` via `WHATSAPP_PROVIDER`.
+   - The ingestor layer (`WhatsAppIngestor`) is strictly provider-agnostic, receiving normalized `InboundWhatsAppMessage` models.
+
+2. **OpenWA Verified Protocol Facts:**
+   - Image tag pinned to `ghcr.io/rmyndharis/openwa:v0.27.0`.
+   - API listens on port 2785 with Swagger at `/api/docs`. Admin key generated at `/app/data/.api-key`.
+   - Signature header: `X-OpenWA-Signature` containing `sha256=<hex_digest>` computed using HMAC-SHA256 of raw unparsed request bytes with `OPENWA_WEBHOOK_SECRET`.
+   - Webhook deliveries use envelope `{ "event": "...", "sessionId": "...", "data": {...} }`.
+   - Inbound external ID is scoped as `{session_id}:{message_id}` ensuring strict deduplication (R3).
+
+3. **Risk Management & Production Guard:**
+   - OpenWA uses reverse-engineered protocols (`whatsapp-web.js` / Baileys) with potential account restriction risks.
+   - If `ENVIRONMENT=production` and `WHATSAPP_PROVIDER=openwa`, application refuses to start unless `OPENWA_ACCEPT_UNOFFICIAL_RISK=true` is set.
+   - For enterprise, SOC2, or financial deployments, Meta Cloud API (`WHATSAPP_PROVIDER=meta`) is recommended.
+
+4. **Universal Human Gate (R2):**
+   - Invoices from WhatsApp unconditionally enter status `NEEDS_REVIEW`. No automated approvals or direct pushes are permitted.
+
+5. **Safe Sending & Anti-Ban Protections:**
+   - Outbound notifications are only sent to contacts who messaged within the prior 24 hours.
+   - Rate limiting: max `WHATSAPP_MAX_OUTBOUND_PER_HOUR` (default 20) and `RESEND_MAX_PER_SENDER_PER_DAY` (default 5).
+   - Financial figures are redacted from message bodies; messages never leak invoice contents.
+   - In production, messages include 3–10s random pacing jitter.
+
+6. **Photo Grouping Window:**
+   - Images received from the same sender within `WHATSAPP_GROUP_WINDOW_SECONDS` (default 90) are stitched into a single multi-page PDF (`stitch_images_to_pdf`) to maintain single-invoice integrity (R1).

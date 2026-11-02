@@ -46,6 +46,30 @@ This document details the exact manual steps an operator must perform in externa
 
 ---
 
+## 1B. OpenWA Self-Hosted WhatsApp Gateway Setup
+
+For development, testing, or self-hosted deployments not using Meta Cloud API:
+
+1. **Launch OpenWA Container**
+   \\ash
+   docker compose --profile whatsapp up -d openwa
+   \
+2. **Retrieve Admin API Key**
+   \\ash
+   make openwa-key
+   \   Copy the key to \OPENWA_API_KEY\ in your \.env\ file.
+
+3. **Configure Session & Webhook Automatically**
+   \\ash
+   make whatsapp-setup
+   \
+4. **Link Phone via Dashboard QR Code**
+   Open \http://localhost:2785\ in your browser, enter your admin API key, and scan the QR code using a dedicated WhatsApp account on your mobile phone.
+
+For complete architectural details, safe sending pacing, and troubleshooting, see [docs/WHATSAPP.md](WHATSAPP.md).
+
+---
+
 ## 2. Email IMAP & SMTP Setup
 
 InvoiceFlow supports standard IMAP over TLS (Port 993) and SMTP over TLS (Port 587) with any mail provider (Google Workspace, Microsoft 365, Fastmail, self-hosted).
