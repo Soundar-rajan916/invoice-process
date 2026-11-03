@@ -898,7 +898,17 @@ export function Admin() {
                 </button>
                 {whatsappStatus?.dashboard_url && (
                   <a
-                    href={whatsappStatus.dashboard_url}
+                    href={(() => {
+                      try {
+                        const u = new URL(whatsappStatus.dashboard_url);
+                        if (u.hostname === "localhost" || u.hostname === "127.0.0.1") {
+                          u.hostname = window.location.hostname;
+                        }
+                        return u.toString();
+                      } catch {
+                        return `http://${window.location.hostname}:2785`;
+                      }
+                    })()}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center space-x-1.5 px-3 py-1.5 rounded-btn text-xs font-semibold transition-colors shadow-2xs"
