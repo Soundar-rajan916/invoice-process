@@ -69,9 +69,12 @@ class StorageService:
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code")
             if error_code in ("404", "NoSuchBucket"):
-                self.client.create_bucket(Bucket=self.bucket)
+                create_kwargs: dict[str, Any] = {"Bucket": self.bucket}
+                if self.region and self.region != "us-east-1":
+                    create_kwargs["CreateBucketConfiguration"] = {"LocationConstraint": self.region}
+                self.client.create_bucket(**create_kwargs)
                 self._s3_available = True
-                logger.info("Created S3 bucket", bucket=self.bucket)
+                logger.info("Created S3 bucket", bucket=self.bucket, region=self.region)
             else:
                 self._s3_available = False
                 logger.warning("S3 bucket check failed, using local storage fallback", error=str(e))
