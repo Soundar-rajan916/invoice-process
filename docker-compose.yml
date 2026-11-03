@@ -143,7 +143,7 @@ services:
       - openwa_data:/app/data
     environment:
       - PORT=2785
-      - ENGINE_TYPE=whatsapp-web.js
+      - ENGINE_TYPE=baileys
       - AUTO_START_SESSIONS=true
       - WWEBJS_AUTH_TIMEOUT_MS=120000
       - WWEBJS_WEB_VERSION=off
