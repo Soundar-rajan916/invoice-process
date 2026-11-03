@@ -159,6 +159,7 @@ services:
       - MEDIA_DOWNLOAD_MAX_BYTES=52428800
       - CHAT_MEDIA_ARCHIVE_ENABLED=true
       - NODE_ENV=production
+      - CSP_UPGRADE_INSECURE_REQUESTS=false
     deploy:
       resources:
         limits:
