@@ -34,19 +34,30 @@ class StorageService:
     @property
     def client(self) -> Any:
         if self._client is None:
-            self._client = boto3.client(
-                "s3",
-                endpoint_url=self.endpoint_url,
-                aws_access_key_id=self.access_key,
-                aws_secret_access_key=self.secret_key,
-                region_name=self.region,
-                config=Config(
+            endpoint = self.endpoint_url.strip() if self.endpoint_url and self.endpoint_url.strip() else None
+            is_real_s3 = endpoint is None or "amazonaws.com" in (endpoint or "")
+            connect_timeout = 5.0 if is_real_s3 else 0.5
+            read_timeout = 10.0 if is_real_s3 else 0.5
+            max_retries = 3 if is_real_s3 else 0
+
+            kwargs: dict[str, Any] = {
+                "service_name": "s3",
+                "region_name": self.region,
+                "config": Config(
                     signature_version="s3v4",
-                    connect_timeout=0.2,
-                    read_timeout=0.2,
-                    retries={"max_attempts": 0},
+                    connect_timeout=connect_timeout,
+                    read_timeout=read_timeout,
+                    retries={"max_attempts": max_retries},
                 ),
-            )
+            }
+            if endpoint:
+                kwargs["endpoint_url"] = endpoint
+            if self.access_key and self.access_key.strip():
+                kwargs["aws_access_key_id"] = self.access_key.strip()
+            if self.secret_key and self.secret_key.strip():
+                kwargs["aws_secret_access_key"] = self.secret_key.strip()
+
+            self._client = boto3.client(**kwargs)
         return self._client
 
     def ensure_bucket_exists(self) -> None:
