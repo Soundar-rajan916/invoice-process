@@ -46,8 +46,8 @@ services:
       ACCOUNTING_API_URL: http://mock-accounting:8001
       EXTRACTOR: ${EXTRACTOR:-mock}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
-      GROQ_TEXT_MODEL: ${GROQ_TEXT_MODEL:-llama-3.3-70b-versatile}
-      GROQ_VISION_MODEL: ${GROQ_VISION_MODEL:-llama-3.2-11b-vision-preview}
+      GROQ_TEXT_MODEL: ${GROQ_TEXT_MODEL:-qwen/qwen3.8-27b}
+      GROQ_VISION_MODEL: ${GROQ_VISION_MODEL:-qwen/qwen3.8-27b}
       OPENWA_BASE_URL: http://openwa:2785/api
     ports:
       - "8000:8000"
@@ -88,8 +88,8 @@ services:
       ACCOUNTING_API_URL: http://mock-accounting:8001
       EXTRACTOR: ${EXTRACTOR:-mock}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
-      GROQ_TEXT_MODEL: ${GROQ_TEXT_MODEL:-llama-3.3-70b-versatile}
-      GROQ_VISION_MODEL: ${GROQ_VISION_MODEL:-llama-3.2-11b-vision-preview}
+      GROQ_TEXT_MODEL: ${GROQ_TEXT_MODEL:-qwen/qwen3.8-27b}
+      GROQ_VISION_MODEL: ${GROQ_VISION_MODEL:-qwen/qwen3.8-27b}
       OPENWA_BASE_URL: http://openwa:2785/api
     volumes:
       - ./backend/app:/app/backend/app
