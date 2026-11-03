@@ -164,18 +164,9 @@ class StorageService:
         return deleted
 
     def generate_presigned_url(self, storage_key: str, expires_in: int = 300) -> str:
-        safe_expires = min(max(1, expires_in), 300)
-        if self._s3_available is False:
-            return f"/api/v1/files/raw/{storage_key}"
-        try:
-            url = self.client.generate_presigned_url(
-                ClientMethod="get_object",
-                Params={"Bucket": self.bucket, "Key": storage_key},
-                ExpiresIn=safe_expires,
-            )
-            return url
-        except Exception:
-            return f"/api/v1/files/raw/{storage_key}"
+        # Route through API raw streaming endpoint to ensure seamless rendering
+        # without S3 cross-origin CORS blocks or private bucket access issues.
+        return f"/api/v1/files/raw/{storage_key}"
 
 
 storage_service = StorageService()
