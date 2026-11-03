@@ -836,7 +836,7 @@ export function Admin() {
                         </span>
                       </td>
                       <td className="px-6 py-3.5 text-right">
-                        {u.email === "admin@invoiceflow.io" ? (
+                        {u.email === "admin@invoiceflow.local" || u.email === "admin@invoiceflow.io" ? (
                           <span className="text-xs italic" style={{ color: "var(--text-muted)" }}>Primary Admin</span>
                         ) : (
                           <button

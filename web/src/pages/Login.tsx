@@ -310,7 +310,7 @@ export function Login() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@invoiceflow.io"
+                      placeholder="admin@invoiceflow.local"
                       className="w-full pl-9 pr-3 py-2.5 rounded-btn text-xs outline-none transition-all border"
                       style={{
                         backgroundColor: "var(--bg-card)",
@@ -391,12 +391,12 @@ export function Login() {
                       Demo Account
                     </span>
                     <span className="text-[11px] block font-mono" style={{ color: "var(--text-muted)" }}>
-                      admin@invoiceflow.io
+                      admin@invoiceflow.local
                     </span>
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleQuickFill("admin@invoiceflow.io", "Admin@123456")}
+                    onClick={() => handleQuickFill("admin@invoiceflow.local", "AdminPassword123!")}
                     className="px-2.5 py-1 rounded-btn text-[11px] font-semibold border transition-all cursor-pointer"
                     style={{
                       backgroundColor: "var(--bg-inset)",
