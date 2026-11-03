@@ -1,5 +1,6 @@
 import { Pagination, PaginationItemType } from '@heroui/react';
 import { useState, useRef, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import {
@@ -16,6 +17,9 @@ import {
   RefreshCw,
   Clock,
   Send,
+  FileText,
+  ArrowRight,
+  ImageIcon,
 } from "lucide-react";
 import { SuppliersTableSkeleton } from "@/components/Skeleton";
 
@@ -1027,6 +1031,161 @@ export function Admin() {
                 </div>
               </div>
             )}
+
+            {/* Recent Inbound WhatsApp Messages Table */}
+            <div
+              className="p-6 rounded-card border shadow-xs space-y-4"
+              style={{
+                backgroundColor: "var(--bg-inset)",
+                borderColor: "var(--border)",
+              }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3" style={{ borderColor: "var(--border)" }}>
+                <div>
+                  <h4 className="font-semibold text-sm flex items-center space-x-2" style={{ color: "var(--text)" }}>
+                    <MessageSquare className="h-4 w-4 text-accent" />
+                    <span>Recent Inbound WhatsApp Messages</span>
+                  </h4>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                    Live activity stream of inbound invoices and messages received by the gateway.
+                  </p>
+                </div>
+                <span
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                  style={{
+                    backgroundColor: "var(--bg-card)",
+                    color: "var(--text-secondary)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  {whatsappStatus?.recent_messages?.length ?? 0} messages
+                </span>
+              </div>
+
+              {(!whatsappStatus?.recent_messages || whatsappStatus.recent_messages.length === 0) ? (
+                <div className="py-10 text-center space-y-2">
+                  <MessageSquare className="h-8 w-8 mx-auto opacity-30" style={{ color: "var(--text-muted)" }} />
+                  <p className="text-xs font-medium" style={{ color: "var(--text)" }}>
+                    No WhatsApp messages received yet
+                  </p>
+                  <p className="text-xs max-w-md mx-auto" style={{ color: "var(--text-muted)" }}>
+                    Send an invoice PDF or photo to the connected WhatsApp number (+91 90809 65547) to trigger automated intake.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs" style={{ color: "var(--text)" }}>
+                    <thead
+                      className="text-[11px] font-semibold uppercase tracking-wider border-b"
+                      style={{
+                        backgroundColor: "var(--bg-card)",
+                        color: "var(--text-secondary)",
+                        borderColor: "var(--border)",
+                      }}
+                    >
+                      <tr>
+                        <th className="px-4 py-3">Received</th>
+                        <th className="px-4 py-3">Sender</th>
+                        <th className="px-4 py-3">Type & Content</th>
+                        <th className="px-4 py-3">Gateway Status</th>
+                        <th className="px-4 py-3 text-right">Pipeline / Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {whatsappStatus.recent_messages.map((msg: any) => {
+                        const isDoc = msg.message_type === "document" || (msg.subject && msg.subject.toLowerCase().endsWith(".pdf"));
+                        const isImg = msg.message_type === "image";
+                        return (
+                          <tr
+                            key={msg.id}
+                            className="transition-colors border-b last:border-b-0 hover:bg-black/5 dark:hover:bg-white/5"
+                            style={{ borderColor: "var(--border)" }}
+                          >
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="font-semibold tabular-nums" style={{ color: "var(--text)" }}>
+                                {msg.received_at ? new Date(msg.received_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : "—"}
+                              </div>
+                              <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                                {msg.received_at ? new Date(msg.received_at).toLocaleDateString() : ""}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="flex items-center space-x-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                <span className="font-mono font-medium" style={{ color: "var(--text)" }}>
+                                  {msg.sender}
+                                </span>
+                              </div>
+                              <div className="text-[10px] truncate max-w-[140px]" style={{ color: "var(--text-muted)" }} title={msg.raw_sender}>
+                                {msg.raw_sender}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center space-x-2">
+                                {isDoc ? (
+                                  <FileText className="h-4 w-4 text-accent shrink-0" />
+                                ) : isImg ? (
+                                  <ImageIcon className="h-4 w-4 text-emerald-500 shrink-0" />
+                                ) : (
+                                  <MessageSquare className="h-4 w-4 text-muted shrink-0" />
+                                )}
+                                <span className="font-medium truncate max-w-[260px]" style={{ color: "var(--text)" }} title={msg.subject || ""}>
+                                  {msg.subject || (isDoc ? "PDF Invoice" : isImg ? "Invoice Image" : "Text message")}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              {msg.status === "ingested" ? (
+                                <span
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold"
+                                  style={{ backgroundColor: "var(--success)", color: "var(--ink)" }}
+                                >
+                                  Ingested
+                                </span>
+                              ) : msg.status === "ignored" ? (
+                                <span
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold cursor-help"
+                                  style={{ backgroundColor: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
+                                  title={msg.status_reason || "Skipped (no invoice attachment)"}
+                                >
+                                  Skipped
+                                </span>
+                              ) : (
+                                <span
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold"
+                                  style={{ backgroundColor: "var(--danger)", color: "var(--ink)" }}
+                                >
+                                  {msg.status}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-right whitespace-nowrap">
+                              {msg.invoice_id ? (
+                                <Link
+                                  to={`/invoices/${msg.invoice_id}`}
+                                  className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-btn text-xs font-semibold transition-all shadow-2xs hover:opacity-90"
+                                  style={{
+                                    backgroundColor: "var(--ink)",
+                                    color: "#FFFFFF",
+                                  }}
+                                >
+                                  <span>Review Invoice</span>
+                                  <ArrowRight className="h-3 w-3" />
+                                </Link>
+                              ) : (
+                                <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                                  {msg.status === "ignored" ? "No invoice created" : "Processing..."}
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

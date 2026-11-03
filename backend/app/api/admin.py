@@ -8,7 +8,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -774,6 +774,7 @@ async def get_whatsapp_status(
     last_changed_at = session_row.last_changed_at.isoformat() if session_row else None
     last_webhook_at = session_row.last_webhook_at.isoformat() if session_row and session_row.last_webhook_at else None
 
+    # Check last received from InboundMessage or Invoice
     last_inb_stmt = (
         select(InboundMessage.received_at)
         .where(InboundMessage.channel == "whatsapp")
@@ -781,6 +782,72 @@ async def get_whatsapp_status(
         .limit(1)
     )
     last_received_at = (await db.execute(last_inb_stmt)).scalar_one_or_none()
+    if not last_received_at:
+        last_inv_stmt = (
+            select(Invoice.created_at)
+            .where(
+                or_(
+                    Invoice.sender.like("%@lid"),
+                    Invoice.sender.like("%@c.us"),
+                    Invoice.sender.like("%@g.us"),
+                    Invoice.sender.like("%@newsletter"),
+                )
+            )
+            .order_by(Invoice.created_at.desc())
+            .limit(1)
+        )
+        last_received_at = (await db.execute(last_inv_stmt)).scalar_one_or_none()
+
+    # Query recent WhatsApp inbound messages for administrator visibility
+    recent_inb_stmt = (
+        select(InboundMessage)
+        .where(InboundMessage.channel == "whatsapp")
+        .order_by(InboundMessage.received_at.desc())
+        .limit(20)
+    )
+    recent_inb_rows = (await db.execute(recent_inb_stmt)).scalars().all()
+
+    inb_ids = [m.id for m in recent_inb_rows]
+    invoices_by_inb: dict[uuid.UUID, Invoice] = {}
+    if inb_ids:
+        inv_stmt = select(Invoice).where(Invoice.inbound_message_id.in_(inb_ids))
+        linked_invoices = (await db.execute(inv_stmt)).scalars().all()
+        for inv in linked_invoices:
+            invoices_by_inb[inv.inbound_message_id] = inv
+
+    recent_messages_data = []
+    for m in recent_inb_rows:
+        inv = invoices_by_inb.get(m.id)
+        raw_sender = m.sender or ""
+        sender_digits = "".join(ch for ch in raw_sender.split("@")[0] if ch.isdigit())
+        if len(sender_digits) >= 4:
+            masked_sender = f"•••••• {sender_digits[-4:]}"
+        else:
+            masked_sender = raw_sender
+
+        meta = m.raw_meta or {}
+        data = meta.get("data", {}) if isinstance(meta, dict) else {}
+        msg_type = (
+            data.get("type")
+            or ("document" if m.subject and m.subject.lower().endswith(".pdf") else "image" if m.source_file_ids else "text")
+        )
+
+        recent_messages_data.append({
+            "id": str(m.id),
+            "sender": masked_sender,
+            "raw_sender": raw_sender,
+            "subject": m.subject or ("Media Attachment" if m.source_file_ids else "Text message"),
+            "status": m.status,
+            "status_reason": m.status_reason,
+            "received_at": m.received_at.isoformat() if m.received_at else None,
+            "message_type": msg_type,
+            "invoice_id": str(inv.id) if inv else None,
+            "invoice_status": inv.status if inv else None,
+            "invoice_number": inv.normalized_invoice_number if inv else None,
+        })
+
+    if not last_received_at and recent_messages_data:
+        last_received_at = recent_inb_rows[0].received_at
 
     one_hour_ago = datetime.now(UTC) - timedelta(hours=1)
     outbound_stmt = (
@@ -802,4 +869,5 @@ async def get_whatsapp_status(
         "outbound_last_hour": outbound_last_hour,
         "outbound_cap_per_hour": settings.WHATSAPP_MAX_OUTBOUND_PER_HOUR,
         "dashboard_url": settings.OPENWA_DASHBOARD_URL if provider_name == "openwa" else None,
+        "recent_messages": recent_messages_data,
     }

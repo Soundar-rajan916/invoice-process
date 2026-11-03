@@ -24,7 +24,7 @@ export function ReviewQueue() {
   const [channelFilter, setChannelFilter] = useState("ALL");
   const [flaggedOnly, setFlaggedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState<"oldest" | "newest">("oldest");
+  const [sortOrder, setSortOrder] = useState<"oldest" | "newest">("newest");
   const [page, setPage] = useState(1);
   const pageSize = 20;
 

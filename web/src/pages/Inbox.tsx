@@ -8,6 +8,9 @@ import {
   FileCheck,
   RefreshCw,
   ArrowRight,
+  MessageSquare,
+  Mail,
+  Upload,
 } from "lucide-react";
 import { StatusPill } from "@/components/StatusPill";
 import { IssueChip } from "@/components/IssueChip";
@@ -300,6 +303,7 @@ export function Inbox() {
               >
                 <tr>
                   <th className="px-6 py-3.5">Invoice / GSTIN</th>
+                  <th className="px-6 py-3.5">Channel</th>
                   <th className="px-6 py-3.5">Status</th>
                   <th className="px-6 py-3.5">Received</th>
                   <th className="px-6 py-3.5">Issues</th>
@@ -326,6 +330,24 @@ export function Inbox() {
                       <div className="text-[11px] font-mono" style={{ color: "var(--text-muted)" }}>
                         {inv.supplier_gstin || "Awaiting pipeline"}
                       </div>
+                    </td>
+                    <td className="px-6 py-3.5">
+                      {inv.channel === "whatsapp" ? (
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                          <MessageSquare className="h-3 w-3 mr-0.5" />
+                          <span>WhatsApp</span>
+                        </span>
+                      ) : inv.channel === "email" ? (
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                          <Mail className="h-3 w-3 mr-0.5" />
+                          <span>Email</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-500/10 text-zinc-600 border border-zinc-500/20">
+                          <Upload className="h-3 w-3 mr-0.5" />
+                          <span>Upload</span>
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-3.5">
                       <StatusPill status={inv.status} />
