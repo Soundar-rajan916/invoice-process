@@ -139,7 +139,7 @@ services:
     container_name: invoiceflow_openwa
     profiles:
       - whatsapp
-    shm_size: "256mb"
+    shm_size: "512mb"
     ports:
       - "127.0.0.1:2785:2785"
     volumes:
@@ -147,15 +147,21 @@ services:
     environment:
       - PORT=2785
       - ENGINE_TYPE=whatsapp-web.js
+      - AUTO_START_SESSIONS=true
+      - WWEBJS_AUTH_TIMEOUT_MS=120000
       - SEND_PACING_ENABLED=true
       - SSRF_ALLOWED_HOSTS=api,host.docker.internal
       - WEBHOOK_SSRF_PROTECT=false
-      - MEDIA_DOWNLOAD_MAX_BYTES=20971520
+      - MEDIA_DOWNLOAD_ENABLED=true
+      - MEDIA_DOWNLOAD_TIMEOUT_MS=60000
+      - WEBHOOK_MEDIA_INLINE_MAX_BYTES=52428800
+      - MEDIA_DOWNLOAD_MAX_BYTES=52428800
+      - CHAT_MEDIA_ARCHIVE_ENABLED=true
       - NODE_ENV=production
     deploy:
       resources:
         limits:
-          memory: 1024M
+          memory: 2048M
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:2785/api/health || exit 1"]
       interval: 10s

@@ -228,14 +228,15 @@ class OpenWAProvider(WhatsAppProvider):
                     is_oversized=bool(data.get("omitted", False)),
                 )
             elif msg_type in ("image", "document"):
-                # Media message without media payload (e.g. dropped by gateway or omitted)
-                is_oversized = bool(data.get("isOversized") or data.get("omitted"))
+                # Media message without media payload (e.g. omitted on webhook path or deferred)
+                size_val = int(data.get("sizeBytes") or data.get("size") or 0)
+                is_oversized = bool(data.get("isOversized") or (size_val > self.max_bytes))
                 media_ref = MediaRef(
                     data=None,
                     url=None,
-                    size_bytes=int(data.get("sizeBytes") or 0),
+                    size_bytes=size_val,
                     mimetype=mimetype,
-                    is_oversized=is_oversized or True,  # If type is media but data is missing
+                    is_oversized=is_oversized,
                 )
 
             norm_msg = InboundWhatsAppMessage(
@@ -289,7 +290,7 @@ class OpenWAProvider(WhatsAppProvider):
         # 2. Authenticated URL
         if msg.media.url:
             headers = {"X-API-Key": self.api_key} if self.api_key else {}
-            async with httpx.AsyncClient(timeout=15.0, follow_redirects=False) as client:
+            async with httpx.AsyncClient(timeout=25.0, follow_redirects=False) as client:
                 resp = await client.get(msg.media.url, headers=headers)
                 resp.raise_for_status()
                 content_bytes = resp.content
@@ -310,7 +311,48 @@ class OpenWAProvider(WhatsAppProvider):
                 raise ValueError(f"Unsupported media content type: {real_type}")
             return content_bytes
 
-        raise MediaTooLargeError("Media data unavailable", size_bytes=0)
+        # 3. Fallback: Fetch from OpenWA REST media endpoint
+        msg_id = msg.external_id.split(":", 1)[1] if ":" in msg.external_id else msg.external_id
+        url = f"{self.base_url}/sessions/{self.session_id}/messages/{msg.chat_id}/{msg_id}/media"
+        headers = {"X-API-Key": self.api_key} if self.api_key else {}
+        try:
+            async with httpx.AsyncClient(timeout=30.0, follow_redirects=False) as client:
+                resp = await client.get(url, headers=headers)
+                if resp.status_code == 200:
+                    ct = resp.headers.get("content-type", "")
+                    if "application/json" in ct:
+                        body_json = resp.json()
+                        raw_b64 = body_json.get("data") or body_json.get("base64")
+                        if raw_b64:
+                            clean_b64 = raw_b64.split(",")[-1] if "," in raw_b64 else raw_b64
+                            content_bytes = base64.b64decode(clean_b64)
+                        else:
+                            raise MediaTooLargeError("Media missing from OpenWA media response", size_bytes=0)
+                    else:
+                        content_bytes = resp.content
+
+                    if len(content_bytes) > self.max_bytes:
+                        raise MediaTooLargeError(
+                            f"Downloaded media exceeds maximum allowed size ({len(content_bytes)} > {self.max_bytes})",
+                            size_bytes=len(content_bytes),
+                        )
+                    real_type = detect_content_type(content_bytes, msg.mimetype or "application/octet-stream")
+                    if real_type not in (
+                        "application/pdf",
+                        "image/jpeg",
+                        "image/png",
+                        "image/webp",
+                        "image/heic",
+                    ):
+                        raise ValueError(f"Unsupported media content type: {real_type}")
+                    return content_bytes
+                else:
+                    raise MediaTooLargeError(f"OpenWA media endpoint returned {resp.status_code}", size_bytes=0)
+        except MediaTooLargeError:
+            raise
+        except Exception as e:
+            logger.error("Failed to fetch media from OpenWA REST endpoint", error=str(e), url=url)
+            raise MediaTooLargeError(f"Media data unavailable: {e}", size_bytes=0) from e
 
     async def send_text(self, chat_id: str, text: str) -> ProviderSendResult:
         """Sends an outbound text message to a specific chat ID via OpenWA REST API."""
