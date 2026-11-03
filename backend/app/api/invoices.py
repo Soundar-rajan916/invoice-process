@@ -922,11 +922,15 @@ async def request_resend_invoice(
     if invoice.sender:
         from app.services.outbox import queue_resend_notification
 
-        channel = (
-            "whatsapp"
-            if (invoice.sender.startswith("+") or invoice.sender.replace("+", "").isdigit())
-            else "email"
+        is_whatsapp = (
+            getattr(invoice, "source", None) == "whatsapp"
+            or invoice.sender.endswith("@c.us")
+            or invoice.sender.endswith("@lid")
+            or invoice.sender.endswith("@g.us")
+            or invoice.sender.startswith("+")
+            or invoice.sender.replace("+", "").isdigit()
         )
+        channel = "whatsapp" if is_whatsapp else "email"
         await queue_resend_notification(
             db,
             invoice=invoice,

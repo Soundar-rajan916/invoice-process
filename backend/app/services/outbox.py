@@ -369,6 +369,16 @@ async def dispatch_pending_outbox_messages(session: AsyncSession, limit: int = 5
             )
             recent_inbound_count = (await session.execute(inbound_check)).scalar() or 0
 
+            # Also check if linked invoice was received within the last 24h
+            if recent_inbound_count == 0 and msg.invoice_id:
+                inv_check = select(func.count(Invoice.id)).where(
+                    Invoice.id == msg.invoice_id,
+                    Invoice.created_at >= twenty_four_hours_ago,
+                )
+                linked_inv_count = (await session.execute(inv_check)).scalar() or 0
+                if linked_inv_count > 0:
+                    recent_inbound_count = linked_inv_count
+
             # In test environment, if test explicitly creates outbox message without inbound, allow unless testing this policy
             if recent_inbound_count == 0 and not getattr(settings, "_TEST_BYPASS_24H_RULE", False) and settings.WHATSAPP_PROVIDER == "openwa":
                 # Check if there is ANY inbound message from this recipient in tests
