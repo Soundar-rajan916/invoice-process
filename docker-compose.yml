@@ -150,6 +150,7 @@ services:
       - ENGINE_TYPE=whatsapp-web.js
       - AUTO_START_SESSIONS=true
       - WWEBJS_AUTH_TIMEOUT_MS=120000
+      - WWEBJS_WEB_VERSION=off
       - SEND_PACING_ENABLED=true
       - SSRF_ALLOWED_HOSTS=api,host.docker.internal
       - WEBHOOK_SSRF_PROTECT=false
