@@ -142,7 +142,7 @@ services:
       - whatsapp
     shm_size: "512mb"
     ports:
-      - "127.0.0.1:2785:2785"
+      - "2785:2785"
     volumes:
       - openwa_data:/app/data
     environment:
