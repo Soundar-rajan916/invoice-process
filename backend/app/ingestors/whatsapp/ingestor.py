@@ -151,6 +151,8 @@ class WhatsAppIngestor:
         if inv:
             inv.inbound_message_id = inbound_rec.id
             inv.sender = sender_chat
+            if msg.timestamp:
+                inv.created_at = msg.timestamp
 
         inbound_rec.source_file_ids = [str(res.source_file_id)]
         await self.session.commit()
@@ -227,6 +229,8 @@ class WhatsAppIngestor:
         if inv:
             inv.inbound_message_id = inbound_records[0].id
             inv.sender = sender_chat
+            if inbound_records[0].received_at:
+                inv.created_at = inbound_records[0].received_at
 
         for inb in inbound_records:
             inb.source_file_ids = [str(res.source_file_id)]

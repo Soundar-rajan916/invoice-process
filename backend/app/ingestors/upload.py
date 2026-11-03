@@ -96,6 +96,7 @@ class UploadIngestor:
             if existing_invoice and existing_invoice.status == "RESEND_REQUESTED":
                 existing_invoice.status = "RECEIVED"
                 existing_invoice.status_reason = None
+                existing_invoice.created_at = datetime.now(UTC)
                 existing_invoice.row_version += 1
 
                 event = ReviewEvent(

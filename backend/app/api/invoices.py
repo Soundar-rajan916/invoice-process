@@ -89,9 +89,16 @@ async def list_invoices(
     count_rows = (await db.execute(count_stmt)).all()
     counts = {r[0]: r[1] for r in count_rows}
 
+    effective_received = func.coalesce(InboundMessage.received_at, Invoice.created_at)
+
     # 2. Base query
     query = (
-        select(Invoice, SourceFile.original_filename, InboundMessage.channel)
+        select(
+            Invoice,
+            SourceFile.original_filename,
+            InboundMessage.channel,
+            InboundMessage.received_at,
+        )
         .join(SourceFile, Invoice.source_file_id == SourceFile.id)
         .outerjoin(InboundMessage, Invoice.inbound_message_id == InboundMessage.id)
     )
@@ -130,13 +137,13 @@ async def list_invoices(
 
     # Sorting: oldest received_at first by default (R4 queue pressure)
     if sort == "newest":
-        query = query.order_by(Invoice.created_at.desc())
+        query = query.order_by(effective_received.desc())
     elif sort == "total_asc":
         query = query.order_by(Invoice.created_at.asc())
     elif sort == "total_desc":
         query = query.order_by(Invoice.created_at.desc())
     else:  # oldest default
-        query = query.order_by(Invoice.created_at.asc())
+        query = query.order_by(effective_received.asc())
 
     # Pagination
     offset = (page - 1) * page_size
@@ -145,13 +152,15 @@ async def list_invoices(
 
     results = []
 
-    for inv, orig_filename, inb_channel in rows:
+    for inv, orig_filename, inb_channel, inb_received_at in rows:
         # Check issues count
         issue_stmt = select(
             func.count(ValidationIssue.id).filter(ValidationIssue.severity == "error"),
             func.count(ValidationIssue.id).filter(ValidationIssue.severity == "warning"),
         ).where(ValidationIssue.invoice_id == inv.id)
         err_count, warn_count = (await db.execute(issue_stmt)).one()
+
+        display_received = inb_received_at or inv.created_at
 
         results.append(
             {
@@ -161,7 +170,7 @@ async def list_invoices(
                 "supplier_gstin": inv.supplier_gstin,
                 "normalized_invoice_number": inv.normalized_invoice_number,
                 "financial_year": inv.financial_year,
-                "received_at": inv.created_at.isoformat(),
+                "received_at": display_received.isoformat(),
                 "page_count": inv.page_count,
                 "extraction_path": inv.extraction_path,
                 "dup_of_id": str(inv.dup_of_id) if inv.dup_of_id else None,
@@ -292,10 +301,13 @@ async def get_invoice_detail(
         is_lease_active = True
 
     channel = "upload"
+    received_at_dt = invoice.created_at
     if invoice.inbound_message_id:
         inbound_msg = await db.get(InboundMessage, invoice.inbound_message_id)
         if inbound_msg:
             channel = inbound_msg.channel
+            if inbound_msg.received_at:
+                received_at_dt = inbound_msg.received_at
 
     return {
         "id": str(invoice.id),
@@ -311,7 +323,7 @@ async def get_invoice_detail(
         "dup_override_reason": invoice.dup_override_reason,
         "accounting_id": invoice.accounting_id,
         "row_version": invoice.row_version,
-        "received_at": invoice.created_at.isoformat(),
+        "received_at": received_at_dt.isoformat(),
         "original_filename": source_file.original_filename if source_file else None,
         "channel": channel,
         "sender": invoice.sender,
@@ -1034,6 +1046,8 @@ async def upload_replacement_invoice_file(
     invoice.status = "RECEIVED"
 
     invoice.status_reason = None
+
+    invoice.created_at = datetime.now(UTC)
 
     invoice.row_version += 1
 
