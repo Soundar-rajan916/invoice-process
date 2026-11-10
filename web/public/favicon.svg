@@ -1,12 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#0F172A" />
-  <!-- Document Sheet -->
-  <path d="M9 7C9 5.89543 9.89543 5 11 5H17.5858C18.1163 5 18.6251 5.21071 19 5.58579L22.4142 9C22.7893 9.37486 23 9.88371 23 10.4142V25C23 26.1046 22.1046 27 21 27H11C9.89543 27 9 26.1046 9 25V7Z" fill="#1E293B" stroke="#4F46E5" stroke-width="1.2"/>
-  <!-- Folded corner tab -->
-  <path d="M17 5V9C17 9.55228 17.4477 10 18 10H22" stroke="#818CF8" stroke-width="1.2" stroke-linejoin="round"/>
-  <!-- Flow / Line grid items -->
-  <path d="M13 14H19" stroke="#E2E8F0" stroke-width="1.4" stroke-linecap="round"/>
-  <path d="M13 18H19" stroke="#94A3B8" stroke-width="1.4" stroke-linecap="round"/>
-  <circle cx="13" cy="22" r="1" fill="#4F46E5" />
-  <path d="M16 22H19" stroke="#818CF8" stroke-width="1.4" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Dark Rounded Square / Squircle -->
+  <rect width="48" height="48" rx="13" fill="#18181B" />
+  
+  <!-- Centered Lucide FileSpreadsheet Icon in Crisp White -->
+  <g transform="translate(10, 10) scale(1.1667)" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+    <path d="M8 13h2" />
+    <path d="M14 13h2" />
+    <path d="M8 17h2" />
+    <path d="M14 17h2" />
+  </g>
 </svg>
