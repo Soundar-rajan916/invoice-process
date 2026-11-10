@@ -4,6 +4,8 @@ InvoiceFlow is an autonomous, high-accuracy, human-in-the-loop invoice processin
 
 It extracts key tax and line-item details using Groq's high-speed LPU inference, applies deterministic Indian GST validation and three-layer deduplication, enforces zero-error human review, and idempotently pushes verified records to downstream accounting systems.
 
+> **Comprehensive Technical Guide:** For the full end-to-end engineering, architecture, and developer onboarding manual, read the [InvoiceFlow System and Architecture Guide](docs/PROJECT_GUIDE.md).
+
 ---
 
 ## 1. System Requirements & Prerequisites

@@ -1,0 +1,72 @@
+erDiagram
+    users ||--o{ invoices : "approves / claims / erases"
+    users ||--o{ extractions : "edits"
+    users ||--o{ source_files : "uploads"
+    users ||--o{ review_events : "acts as"
+    users ||--o{ revoked_tokens : "owns"
+
+    source_files ||--o{ invoices : "backs"
+    inbound_messages ||--o{ invoices : "originates"
+    
+    invoices ||--o{ extractions : "has versions"
+    invoices ||--o{ validation_issues : "has flags"
+    invoices ||--o{ review_events : "audit log"
+    invoices ||--o{ push_attempts : "attempts"
+    invoices ||--o{ outbound_messages : "triggers"
+    invoices ||--o{ reconciliation_findings : "subject to"
+    invoices ||--o{ invoices : "dup_of"
+
+    reconciliation_runs ||--o{ reconciliation_findings : "generates"
+
+    invoices {
+        uuid id PK
+        uuid source_file_id FK
+        string status
+        string supplier_gstin
+        string normalized_invoice_number
+        string financial_year
+        uuid current_extraction_id FK
+        uuid approved_extraction_id FK
+        uuid approved_by FK
+        datetime approved_at
+        string accounting_id
+        integer row_version
+    }
+
+    extractions {
+        uuid id PK
+        uuid invoice_id FK
+        integer version
+        string kind
+        jsonb data
+        jsonb confidences
+        string model_id
+    }
+
+    validation_issues {
+        uuid id PK
+        uuid invoice_id FK
+        uuid extraction_id FK
+        string code
+        string severity
+        text message
+        boolean resolved_by_override
+    }
+
+    review_events {
+        uuid id PK
+        uuid invoice_id FK
+        uuid actor_id FK
+        string action
+        jsonb payload
+        datetime created_at
+    }
+
+    suppliers {
+        uuid id PK
+        string gstin UK
+        string name
+        string state_code
+        boolean is_active
+    }
+

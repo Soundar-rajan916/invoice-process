@@ -1,0 +1,36 @@
+stateDiagram-v2
+    [*] --> RECEIVED: Webhook / Upload Ingest
+    
+    RECEIVED --> PROCESSING: Celery worker begins pipeline
+    RECEIVED --> WAITING_PROVIDER: Waiting for batch window / webhook parts
+    
+    WAITING_PROVIDER --> PROCESSING: Batch completes or timeout
+    
+    PROCESSING --> NEEDS_REVIEW: Extraction and validation complete
+    PROCESSING --> RESEND_REQUESTED: Document unreadable / all pages blurry
+    PROCESSING --> FAILED: Unrecoverable pipeline exception
+    PROCESSING --> WAITING_PROVIDER: Additional pages detected
+    PROCESSING --> RECEIVED: Worker crash retry
+    
+    NEEDS_REVIEW --> APPROVED: Human reviewer approves (actor_id required)
+    NEEDS_REVIEW --> REJECTED: Human reviewer rejects
+    NEEDS_REVIEW --> REJECTED_DUPLICATE: Confirmed as duplicate
+    NEEDS_REVIEW --> RESEND_REQUESTED: Reviewer requests vendor resend
+    NEEDS_REVIEW --> NEEDS_REVIEW: Reviewer edits fields (self-transition)
+    
+    REJECTED_DUPLICATE --> NEEDS_REVIEW: Reviewer overrides duplicate
+    
+    APPROVED --> PUSHING: Celery push task claimed
+    APPROVED --> NEEDS_REVIEW: Field edited after approval (invalidation)
+    
+    PUSHING --> PUSHED: Accounting API returns HTTP 201 Created
+    PUSHING --> APPROVED: Transient network failure (retryable)
+    PUSHING --> PUSH_FAILED: Max attempts exhausted or circuit breaker OPEN
+    
+    FAILED --> PROCESSING: Admin triggers retry
+    PUSH_FAILED --> APPROVED: Admin triggers retry
+    
+    PUSHED --> [*]
+    REJECTED --> [*]
+    RESEND_REQUESTED --> [*]
+

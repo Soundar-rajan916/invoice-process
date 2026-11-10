@@ -1,0 +1,38 @@
+sequenceDiagram
+    autonumber
+    actor Supplier as Supplier
+    participant Channel as WhatsApp
+    participant API as FastAPI Ingestion
+    participant S3 as S3 Storage
+    participant Queue as Redis (Celery)
+    participant Worker as Celery Worker
+    participant DB as PostgreSQL 16
+    actor Reviewer as Accounts Reviewer
+    participant Outbox as Celery Outbox Task
+
+    Supplier->>Channel: Send blurry mobile photo
+    Channel->>API: Deliver Webhook with media
+    API->>S3: Upload raw image
+    API->>DB: Insert Invoice (status='RECEIVED')
+    API->>Queue: Enqueue process_invoice
+
+    Queue->>Worker: Consume process_invoice
+    Worker->>DB: UPDATE status='PROCESSING'
+    Worker->>Worker: Preprocess: Laplacian blur score < 50.0 (unusable)
+    Worker->>DB: Set status='RESEND_REQUESTED', status_reason='Blurry image'
+    Worker->>DB: Insert outbound_messages record (template='invoice_resend_request')
+    Worker->>DB: Log review_event audit trail
+
+    Reviewer->>API: Views invoice (status='RESEND_REQUESTED')
+    Note over Reviewer,API: Reviewer sees rejection reason and preview
+
+    loop Celery Beat every 30s
+        Outbox->>DB: Query pending outbound messages
+        DB-->>Outbox: Return resend notification
+        Outbox->>Channel: Call Send Message API to Supplier (rate limited)
+        Channel-->>Outbox: Delivery confirmed
+        Outbox->>DB: UPDATE outbound_messages status='sent'
+    end
+
+    Channel-->>Supplier: WhatsApp message: "Document illegible. Please resend a clear copy."
+

@@ -1,0 +1,35 @@
+graph TD
+    classDef actor fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0f172a;
+    classDef system fill:#f8fafc,stroke:#475569,stroke-width:2px,color:#0f172a;
+    classDef boundary fill:#f1f5f9,stroke:#94a3b8,stroke-width:2px,stroke-dasharray: 5 5,color:#334155;
+
+    Supplier["Suppliers / Vendors"]:::actor
+    Reviewer["Accounts Reviewer"]:::actor
+    Admin["System Administrator"]:::actor
+
+    subgraph ChannelBoundary["Intake Channels"]
+        EmailServer["Supplier Mail Server<br/>(IMAP/TLS)"]:::system
+        WhatsAppNet["WhatsApp Network<br/>(Cloud API / OpenWA)"]:::system
+    end
+
+    subgraph CoreSystem["InvoiceFlow System Boundary"]
+        App["InvoiceFlow Platform<br/>(FastAPI, Celery, React, S3, RDS)"]:::system
+    end
+
+    subgraph ExternalServices["External APIs"]
+        Groq["Groq Cloud LPU<br/>(llama-3.3-70b / llama-3.2-11b)"]:::system
+        AccountingERP["Target Accounting / ERP<br/>(REST API / Mock Service)"]:::system
+    end
+
+    Supplier -->|Invoices via Email PDF| EmailServer
+    Supplier -->|Invoices via WhatsApp Photo/PDF| WhatsAppNet
+    EmailServer -->|IMAP Polling| App
+    WhatsAppNet -->|Signed Webhook Deliveries| App
+
+    Reviewer -->|Review, Edit, Approve/Reject| App
+    Admin -->|User Mgmt, Reconciliation, DLQ| App
+
+    App -->|OCR & Extraction Prompts| Groq
+    Groq -->|Structured JSON Extraction| App
+    App -->|Idempotent Push with HMAC| AccountingERP
+

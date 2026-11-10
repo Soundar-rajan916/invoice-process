@@ -1,0 +1,37 @@
+graph TD
+    classDef client fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0f172a;
+    classDef app fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#0f172a;
+    classDef worker fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#0f172a;
+    classDef storage fill:#f1f5f9,stroke:#475569,stroke-width:2px,color:#0f172a;
+    classDef ext fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#0f172a;
+
+    Browser["Browser Single Page App<br/>(React 18, Vite, HeroUI)"]:::client
+    Nginx["Reverse Proxy<br/>(Nginx :80)"]:::app
+
+    API["Backend REST API<br/>(FastAPI :8000)"]:::app
+    Worker["Async Worker & Beat<br/>(Celery 4 Prefork)"]:::worker
+    
+    Redis["Message Broker & Cache<br/>(Redis 7 Alpine)"]:::storage
+    Postgres["Relational Database<br/>(PostgreSQL 16)"]:::storage
+    S3["Object Storage<br/>(AWS S3 / MinIO)"]:::storage
+
+    OpenWA["WhatsApp Gateway Container<br/>(OpenWA :2785)"]:::ext
+    Groq["Vision & Text LLM<br/>(Groq API)"]:::ext
+    ERP["Accounting Service<br/>(Mock Accounting :8001)"]:::ext
+
+    Browser -->|HTTP / SPA Navigation| Nginx
+    Nginx -->|Proxy /api/| API
+    
+    API -->|Read / Write Entities| Postgres
+    API -->|Presigned URL & Uploads| S3
+    API -->|Enqueue Ingest/Extract Tasks| Redis
+
+    Worker -->|Consume Queued Tasks| Redis
+    Worker -->|State Updates & Audit Logs| Postgres
+    Worker -->|Download / Upload Pages| S3
+    Worker -->|LLM Inference Calls| Groq
+    Worker -->|Accounting Sync Push| ERP
+
+    OpenWA -->|Webhook Deliveries| API
+    API -->|Session Commands & QR| OpenWA
+

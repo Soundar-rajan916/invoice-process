@@ -117,25 +117,34 @@ class StorageService:
             Path("/app/data/storage_fallback"),
             Path("../data/storage_fallback"),
         )
-        if self._s3_available is False:
-            for base in candidate_dirs:
-                local_path = base / storage_key
-                if local_path.exists():
-                    return local_path.read_bytes()
-            raise FileNotFoundError(f"Storage key '{storage_key}' not found in local fallback")
 
-        try:
-            response = self.client.get_object(Bucket=self.bucket, Key=storage_key)
-            return response["Body"].read()
-        except Exception as e:
-            self._s3_available = False
-            for base in candidate_dirs:
-                local_path = base / storage_key
-                if local_path.exists():
-                    return local_path.read_bytes()
-            raise FileNotFoundError(
-                f"Storage key '{storage_key}' not found in S3 or local fallback"
-            ) from e
+        # Attempt download from S3 first
+        if self.bucket and self._s3_available is not False:
+            try:
+                response = self.client.get_object(Bucket=self.bucket, Key=storage_key)
+                self._s3_available = True
+                return response["Body"].read()
+            except ClientError as e:
+                code = e.response.get("Error", {}).get("Code", "")
+                if code in ("NoSuchKey", "404"):
+                    # Object does not exist in S3; do NOT kill S3 availability
+                    pass
+                else:
+                    logger.warning("S3 download ClientError", key=storage_key, error=str(e))
+                    self._s3_available = False
+            except Exception as e:
+                logger.warning("S3 download exception", key=storage_key, error=str(e))
+                self._s3_available = False
+
+        # Fallback to local files if S3 unavailable or key missing in S3
+        for base in candidate_dirs:
+            local_path = base / storage_key
+            if local_path.exists():
+                return local_path.read_bytes()
+
+        raise FileNotFoundError(
+            f"Storage key '{storage_key}' not found in S3 or local fallback"
+        )
 
     def delete_object(self, storage_key: str) -> bool:
         """Deletes an object from S3 or local fallback."""

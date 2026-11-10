@@ -1,0 +1,44 @@
+sequenceDiagram
+    autonumber
+    actor Supplier as Supplier
+    participant Channel as WhatsApp/Email
+    participant API as FastAPI Ingestion
+    participant S3 as S3 Storage
+    participant Queue as Redis (Celery)
+    participant Worker as Celery Worker
+    participant Groq as Groq Vision API
+    participant DB as PostgreSQL 16
+    actor Reviewer as Accounts Reviewer
+    participant ERP as Accounting API
+
+    Supplier->>Channel: Send invoice PDF
+    Channel->>API: Deliver Webhook / IMAP Message
+    API->>API: Verify Signature & SHA-256 Hash
+    API->>S3: Upload raw document
+    API->>DB: Insert Invoice (status='RECEIVED')
+    API->>Queue: Enqueue process_invoice task
+    API-->>Channel: Return HTTP 200 OK
+
+    Queue->>Worker: Consume process_invoice
+    Worker->>DB: UPDATE status='PROCESSING'
+    Worker->>S3: Download original document bytes
+    Worker->>Worker: Preprocess (PyMuPDF render, deskew, blur eval)
+    Worker->>S3: Upload high-res page preview images
+    Worker->>Groq: Post Vision extraction prompt with images
+    Groq-->>Worker: Return structured invoice JSON
+    Worker->>Worker: Run deterministic validation & dedup checks
+    Worker->>DB: Save extraction v1, validation issues, status='NEEDS_REVIEW'
+
+    Reviewer->>API: Open invoice in Review Workspace
+    API->>DB: Acquire 5-minute reviewer lease
+    API-->>Reviewer: Return invoice, issues, and page previews
+    Reviewer->>API: Click Approve & Push (POST /approve)
+    API->>DB: Check R2 rule; UPDATE status='APPROVED', approved_by=user_id
+    API->>Queue: Enqueue push_invoice_task
+
+    Queue->>Worker: Consume push_invoice_task
+    Worker->>DB: UPDATE status='PUSHING'
+    Worker->>ERP: POST /api/v1/invoices (Idempotency Key)
+    ERP-->>Worker: HTTP 201 Created (accounting_id)
+    Worker->>DB: UPDATE status='PUSHED', accounting_id=id
+
